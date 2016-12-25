@@ -1,27 +1,55 @@
-/**
- * Sends a packet with the specified type
- * 
- */
-function sendPacket (packetType, data) {
-      if (data === undefined) {
-            data = {};
+var Socket = (function () {
+      var ns = {};
+      ns.packetHandlers = {};
+      ns.socket = null;
+
+      /**
+       * Creates a socket connection to the server
+       * 
+       */
+      ns.connect = function (callback) {
+            ns.socket = new WebSocket("ws:localhost.dev/");
+            ns.socket.onmessage = ns.onMessage;
+            ns.socket.onopen = callback;
       }
 
-      var type = String(packetType + "          ").substr(0, 10);
-      socket.send(type + JSON.stringify(data));
-}
+      /**
+       * Sends a packet with the specified type
+       * 
+       */
+      ns.sendPacket = function (packetType, data) {
+            if (data === undefined) {
+                  data = {};
+            }
 
-/**
- * Handles messages from the server
- * 
- */
-function onMessage(e) {
-      console.log(e);
-
-      var packetType = e.data.split(" ");
-      var packetData = e.data.substr(10);
-
-      if (packetType[0] === "map") {
-            secondInit(packetData);
+            var type = String(packetType + "          ").substr(0, 10);
+            ns.socket.send(type + JSON.stringify(data));
       }
-}
+
+      /**
+       * Handles messages from the server
+       * 
+       */
+      ns.onMessage = function(e) {
+            console.log(e);
+
+            var packetType = e.data.substr(0, 10).trim();
+            var packetData = e.data.substr(10);
+
+            if (ns.packetHandlers[packetType] !== undefined) {
+                  ns.packetHandlers[packetType][1].call(ns.packetHandlers[packetType][0], packetData);
+            } else {
+                  // No handler exists for this packet type
+            }
+      }
+
+      ns.registerHandler = function (packetType, handlerObject, handler) {
+            ns.packetHandlers[packetType] = [handlerObject, handler];
+      }
+
+      ns.unregisterHandler = function (packetType) {
+            delete ns.packetHandlers[packetType];
+      }
+
+      return ns;
+})();

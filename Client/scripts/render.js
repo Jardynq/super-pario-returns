@@ -1,24 +1,28 @@
 var Render = (function () {
       var ns = {}; // Namespace
 
-      ns.renderQueue = [];
-      ns.offsetX = 0;
-      ns.offsetY = 0;
-      ns.zoom = 2;
-
-
-
+      /**
+       * Render Class
+       * 
+       */
+      ns.Render = function (tilesize) {
+            this.renderQueue = [];
+            this.offsetX = 0;
+            this.offsetY = 0;
+            this.zoom = 2;
+            this.tilesize = tilesize;
+      }
 
       /**
        * Renders all objects on screen
        * 
        */
-      ns.renderAll = function renderAll (ctx) {
+      ns.Render.prototype.renderAll = function renderAll (ctx) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (var i = 0; i < ns.renderQueue.length; i++) {
-                  var renderObject = ns.renderQueue[i];
+            for (var i = 0; i < this.renderQueue.length; i++) {
+                  var renderObject = this.renderQueue[i];
 
-                  renderObject.render(ctx);
+                  renderObject.render(ctx, this);
             }
       };
 
@@ -34,15 +38,11 @@ var Render = (function () {
             this.renderIndex = 0;
       };
       ns.RenderObject.prototype.render = function (ctx) {};
-      ns.RenderObject.prototype.addToRenderQueue = function () {
-            var queue = ns.renderQueue;
-
+      ns.RenderObject.prototype.addToRenderQueue = function (queue) {
             this.renderIndex = queue.length;
             queue.push(this);
       };
-      ns.RenderObject.prototype.removeFromRenderQueue = function (gameRoom) {
-            var queue = ns.renderQueue;
-
+      ns.RenderObject.prototype.removeFromRenderQueue = function (queue) {
             queue.splice(this.renderIndex, 1);
             for (var i = this.renderIndex; i < queue.length; i++ ) {
                   var renderObject = queue[i];
@@ -51,18 +51,21 @@ var Render = (function () {
             }
       };
 
+      
 
-
-
+      /**
+       * Special renderer for tiles
+       * 
+       */
       ns.TileRenderer = function TileRenderer(tileMap) {
             this.tileMap = tileMap;
       };
       ns.TileRenderer.prototype = Object.create(ns.RenderObject.prototype); // TileRenderer inherits RenderObject
-      ns.TileRenderer.prototype.render = function (ctx) {
+      ns.TileRenderer.prototype.render = function (ctx, render) {
             for (i = 0; i < this.tileMap.tiles.length; i++) {
                   var tile = this.tileMap.tiles[i];
-
-                  tile.render(this.tileMap.tileSize, ctx);
+                  
+                  tile.render(ctx, render);
             }
       };
 

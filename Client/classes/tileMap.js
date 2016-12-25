@@ -1,9 +1,9 @@
 TileMap = (function () {
       var ns = {};
 
-      ns.Map = function Map (tiles) {
+      ns.Map = function Map (tiles, tilesize) {
             this.tiles = tiles;
-            this.tileSize = 64;
+            this.tileSize = tilesize;
             this.width = null;
       };
       ns.Map.prototype.generateMap = function () {

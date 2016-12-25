@@ -8,9 +8,9 @@ Tile = (function () {
 
             this.collision = collision;
       };
-      ns.ColorTile.prototype.render = function (tilesize, ctx) {
+      ns.ColorTile.prototype.render = function (ctx, render) {
             ctx.beginPath();
-            ctx.rect((this.x * tilesize + Render.offsetX) * Render.zoom, (this.y * tilesize + Render.offsetY) * Render.zoom, tilesize * Render.zoom, tilesize * Render.zoom);
+            ctx.rect((this.x * render.tilesize + render.offsetX) * render.zoom, (this.y * render.tilesize + render.offsetY) * render.zoom, render.tilesize * render.zoom, render.tilesize * render.zoom);
             ctx.fillStyle = this.color;
 
             // DEBUG

@@ -19,7 +19,7 @@ namespace Server
         {
             // Load the map
             var map = new TileMap();
-            map.LoadMap(@"C:\Users\svorr\Nextcloud\VS Projects\C#\Map.txt");
+            map.LoadMap(@"C:\Users\svorr\Documents\GitHub\super-pario-returns\Map.txt");
             Room = new GameRoom(map);
 
             var server = new WebSocketServer();
