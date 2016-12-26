@@ -3,15 +3,20 @@ var GameRoom = function () {
       Socket.registerHandler("map", this, this.loadMap);
       Socket.sendPacket("map");
 
+      Socket.registerHandler("entity", this, this.updateEntities);
+
       this.render = new Render.Render();
       this.tileRenderer = null;
       this.entityRenderer = null;
 
-      this.entities = [];
+      this.entities = {};
+
+      this.mouseX = null;
+      this.mouseY = null;
 };
 
 GameRoom.prototype.loadMap = function (tileData) {
-      this.map = new TileMap.Map(tileData, 64);
+      this.map = new TileMap.Map(tileData, 50);
 
       // Generates our tilemap
       this.map.generateMap();
@@ -31,8 +36,27 @@ GameRoom.prototype.loadMap = function (tileData) {
       this.entityRenderer.addToRenderQueue(this.render.renderQueue);
 };
 
-GameRoom.prototype.step = function () {
-      
+GameRoom.prototype.updateEntities = function (entityString) {
+      entityData = JSON.parse(entityString);
+
+      for (var id in entityData) {
+            var ent = entityData[id];
+            if (this.entities[id] === undefined) {
+                  var entity = new Entity(ent.X, ent.Y, ent.Width, ent.Height, ent.Hex);
+                  entity.xSpeed = ent.XSpeed;
+                  entity.ySpeed = ent.YSpeed;
+                  entity.id = id;
+                  this.addToEntities(entity);
+            } else {
+                  this.entities[id].update(ent);
+            }
+      }
+};
+
+GameRoom.prototype.step = function (timeScale) {
+      for (var id in this.entities) {
+            this.entities[id].step(timeScale);
+      }
 };
 
 GameRoom.prototype.renderAll = function (ctx) {
@@ -40,12 +64,35 @@ GameRoom.prototype.renderAll = function (ctx) {
 };
 
 GameRoom.prototype.addToEntities = function (entity) {
-      entity.index = this.entities.length;
-      this.entities.push(entity);
+      this.entities[entity.id] = entity;
 };
 GameRoom.prototype.removeFromEntities = function (entity) {
-      this.entities.splice(entity.index, 1);
-      for (var i = entity.index; i < this.entities.length; i++ ) {
-            this.entities[i].index--;
-      }
+      delete this.entities[entity.id];
+};
+
+GameRoom.prototype.onKeyDown = function (e) {
+
+};
+GameRoom.prototype.onKeyUp = function (e) {      
+      
+};
+
+GameRoom.prototype.onMouseWheel = function (e) {
+        // Max zoom
+        if (this.render.zoom >= 2.25) {
+            this.render.zoom = 2.25;
+        } else if (this.render.zoom <= 0.75) {
+            this.render.zoom = 0.75;
+        }
+
+        if (e.wheelDelta > 0) {
+            this.render.zoom += 0.05;
+        } else if (e.wheelDelta < 0) {
+            this.render.zoom -= 0.05;
+        }    
+      
+};
+GameRoom.prototype.onMouseMove = function (e) {
+      this.mouseX = e.x;
+      this.mouseY = e.y;
 };

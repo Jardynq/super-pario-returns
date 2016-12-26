@@ -5,6 +5,8 @@ var ctx = null;
 var map = null;
 var room = null;
 
+var lastTickCount = new Date().getTime();
+
 Socket.connect(init);
 
 /**
@@ -12,7 +14,12 @@ Socket.connect(init);
  * 
  */
 function step () {
-      room.step();
+      var newTickCount = new Date().getTime();
+      var elapsedMilliseconds = newTickCount - lastTickCount;
+      var timeScale = elapsedMilliseconds / 1000;
+      lastTickCount = newTickCount;
+
+      room.step(timeScale);
       room.renderAll(ctx);      
       window.requestAnimationFrame(step); // Request next frame
 }
@@ -45,6 +52,31 @@ function fixCanvas () {
 }
 
 
-window.addEventListener('mousewheel', Input.onMouseWheel);
 
-// Event handlers
+
+/**
+ * Checking for input
+ * 
+ */
+function onKeyDown (e) {
+      room.onKeyDown(e);
+}
+function onKeyUp (e) {
+      room.onKeyUp(e);
+}
+function onMouseWheel (e) {
+      room.onMouseWheel(e);
+}
+function onMouseMove (e) {
+      room.onMouseMove(e);      
+}
+
+// Event handlers for Input.js that is used to check which key is down or up
+window.addEventListener('keydown', Input.onKeyDown);
+window.addEventListener("keyup", Input.onKeyUp);
+
+// Event handlers for the game
+window.addEventListener('keydown', onKeyDown);
+window.addEventListener("keyup", onKeyUp);
+window.addEventListener('mousewheel', onMouseWheel);
+window.addEventListener('mousemove', onMouseMove);

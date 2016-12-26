@@ -80,10 +80,8 @@ var Render = (function () {
       };
       ns.EntityRenderer.prototype = Object.create(ns.RenderObject.prototype); // EntityRenderer inherits RenderObject
       ns.EntityRenderer.prototype.render = function (ctx, render) {
-            for (i = 0; i < this.room.entities.length; i++) {
-                  var entity = this.room.entities[i];
-                  
-                  entity.render(ctx, render);
+            for (var id in this.room.entities) {
+                  this.room.entities[id].render(ctx, render);
             }
       };
 

@@ -9,7 +9,7 @@ var Entity = function (x, y, width, height, color) {
       this.xSpeed = null;
       this.ySpeed = null;
 
-      this.index = null;
+      this.id = null;
 };
 Entity.prototype = Object.create(Render.RenderObject.prototype); // Entity inherits RenderObject
 Entity.prototype.render = function (ctx, render) {
@@ -19,4 +19,21 @@ Entity.prototype.render = function (ctx, render) {
 
       ctx.stroke();      
       ctx.fill();
+};
+
+Entity.prototype.update = function (entityData) {
+      this.x = entityData.X;
+      this.y = entityData.Y;
+
+      this.width = entityData.Width;
+      this.height = entityData.Height;
+      this.color = entityData.Hex;
+
+      this.ySpeed = entityData.YSpeed;
+      this.xSpeed = entityData.XSpeed;
+};
+
+Entity.prototype.step = function (timeScale) {
+      this.x += this.xSpeed * timeScale;
+      this.y += this.ySpeed * timeScale;
 };

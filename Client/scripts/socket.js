@@ -31,6 +31,7 @@ var Socket = (function () {
        * 
        */
       ns.onMessage = function(e) {
+            console.log(e);
             var packetType = e.data.substr(0, 10).trim();
             var packetData = e.data.substr(10);
 

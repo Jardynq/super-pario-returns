@@ -15,5 +15,15 @@ namespace Server.Packets
         {
 
         }
+
+        public virtual void Send ()
+        {
+
+        }
+
+        public virtual void Send (Player receiver)
+        {
+            
+        }
     }
 }

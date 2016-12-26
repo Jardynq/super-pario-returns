@@ -14,6 +14,9 @@ namespace Server
     {
         public static GameRoom Room;
         public static Random rnd = new Random();
+        private static WebSocketServer server;
+
+        public const int TARGET_FRAMERATE = 60;
 
         static void Main(string[] args)
         {
@@ -22,11 +25,20 @@ namespace Server
             map.LoadMap(@"C:\Users\svorr\Documents\GitHub\super-pario-returns\Map.txt");
             Room = new GameRoom(map);
 
-            var server = new WebSocketServer();
+            server = new WebSocketServer();
             server.AddWebSocketService<GameService>("/");
             server.Start();
             Console.ReadKey(true);
             server.Stop();
+        }
+
+        public static void Send(string id, string type, string data)
+        {
+            server.WebSocketServices["/"].Sessions[id].Context.WebSocket.Send(type + new String(' ', 10 - type.Length) + data);
+        }
+        public static void Broadcast(string type, string data)
+        {
+            server.WebSocketServices["/"].Sessions.Broadcast(type + new String(' ', 10 - type.Length) + data);
         }
     }
 
