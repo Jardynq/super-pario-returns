@@ -8,14 +8,14 @@ Tile = (function () {
 
             this.collision = collision;
       };
-      ns.ColorTile.prototype.render = function (ctx, render) {
+      ns.ColorTile.prototype.render = function (ctx, render, tilesize) {
             ctx.beginPath();
-            ctx.rect((this.x * render.tilesize + render.offsetX) * render.zoom, (this.y * render.tilesize + render.offsetY) * render.zoom, render.tilesize * render.zoom, render.tilesize * render.zoom);
+            ctx.rect((this.x * tilesize + render.offsetX) * render.zoom, (this.y * tilesize + render.offsetY) * render.zoom, tilesize * render.zoom, tilesize * render.zoom);
             ctx.fillStyle = this.color;
 
             // DEBUG
             ctx.stroke();
-            // Debug Purposes            
+            // DEBUG          
 
             ctx.fill();
       };

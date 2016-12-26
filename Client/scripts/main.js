@@ -41,6 +41,10 @@ function init () {
 // Adapts canvas to screen size
 function fixCanvas () {
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight; // HD
+      canvas.height = window.innerHeight;
 }
 
+
+window.addEventListener('mousewheel', Input.onMouseWheel);
+
+// Event handlers

@@ -5,13 +5,12 @@ var Render = (function () {
        * Render Class
        * 
        */
-      ns.Render = function (tilesize) {
+      ns.Render = function () {
             this.renderQueue = [];
             this.offsetX = 0;
             this.offsetY = 0;
-            this.zoom = 2;
-            this.tilesize = tilesize;
-      }
+            this.zoom = 1;
+      };
 
       /**
        * Renders all objects on screen
@@ -65,12 +64,28 @@ var Render = (function () {
             for (i = 0; i < this.tileMap.tiles.length; i++) {
                   var tile = this.tileMap.tiles[i];
                   
-                  tile.render(ctx, render);
+                  tile.render(ctx, render, this.tileMap.tilesize);
             }
       };
 
 
 
+
+      /**
+       * Special renderer for tiles
+       * 
+       */
+      ns.EntityRenderer = function EntityRenderer(room) {
+            this.room = room;
+      };
+      ns.EntityRenderer.prototype = Object.create(ns.RenderObject.prototype); // EntityRenderer inherits RenderObject
+      ns.EntityRenderer.prototype.render = function (ctx, render) {
+            for (i = 0; i < this.room.entities.length; i++) {
+                  var entity = this.room.entities[i];
+                  
+                  entity.render(ctx, render);
+            }
+      };
 
       return ns;
 })();

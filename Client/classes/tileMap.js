@@ -3,7 +3,7 @@ TileMap = (function () {
 
       ns.Map = function Map (tiles, tilesize) {
             this.tiles = tiles;
-            this.tileSize = tilesize;
+            this.tilesize = tilesize;
             this.width = null;
       };
       ns.Map.prototype.generateMap = function () {
@@ -20,7 +20,6 @@ TileMap = (function () {
                  } 
             }
 
-
             // Generates the map
             for (var g = 0; g < this.tiles.length; g++) {
                   var tile = this.tiles[g];
@@ -29,7 +28,7 @@ TileMap = (function () {
                   // Fills the appropriate tile
 
                   if (tile === "0") { // Sky
-                        this.tiles[g] = new Tile.ColorTile("blue", x, (g - x) / this.width, true);                 
+                        this.tiles[g] = new Tile.ColorTile("blue", x, (g - x) / this.width, false);
                         continue;
                   }
                   if (tile === "1") { // Ground
