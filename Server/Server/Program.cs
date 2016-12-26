@@ -44,6 +44,12 @@ namespace Server
 
     public class GameService : WebSocketBehavior
     {
+        public GameRoom Room;
+        public GameService ()
+        {
+            Room = Program.Room;
+        }
+
         protected override Task OnMessage(MessageEventArgs e)
         {
             string request = e.Text.ReadToEnd();
@@ -53,6 +59,9 @@ namespace Server
             switch (packetType) {
                 case "map":
                     packet = (Packet)JsonConvert.DeserializeObject<MapPacket>(request.Substring(10));
+                    break;
+                case "playerAct":
+                    packet = (Packet)JsonConvert.DeserializeObject<PlayerActionPacket>(request.Substring(10));
                     break;
                 default:
                     return base.OnMessage(e); // Packet not recognized. Ignore it.

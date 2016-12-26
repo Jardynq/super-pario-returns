@@ -20,19 +20,10 @@ namespace Server.Entities
         public float YSpeed = 0;
 
         public int ID = 0;
+        public string Type;
 
         [JsonIgnore]
         public GameRoom Room;
-
-        [JsonIgnore]
-        public Color Color = Color.AliceBlue;
-        public string Hex
-        {
-            get
-            {
-                return "#" + Color.R.ToString("X2") + Color.G.ToString("X2") + Color.B.ToString("X2");
-            }
-        }
 
         public Entity (GameRoom room)
         {

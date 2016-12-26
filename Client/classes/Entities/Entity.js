@@ -1,15 +1,5 @@
-var Entity = function (x, y, width, height, color) {
-      this.x = x;
-      this.y = y;
+var Entity = function () {
 
-      this.width = width;
-      this.height = height;
-      this.color = color;
-
-      this.xSpeed = null;
-      this.ySpeed = null;
-
-      this.id = null;
 };
 Entity.prototype = Object.create(Render.RenderObject.prototype); // Entity inherits RenderObject
 Entity.prototype.render = function (ctx, render) {
@@ -22,15 +12,14 @@ Entity.prototype.render = function (ctx, render) {
 };
 
 Entity.prototype.update = function (entityData) {
-      this.x = entityData.X;
-      this.y = entityData.Y;
+      this.x = Number(entityData.X);
+      this.y = Number(entityData.Y);
 
-      this.width = entityData.Width;
-      this.height = entityData.Height;
-      this.color = entityData.Hex;
+      this.width = Number(entityData.Width);
+      this.height = Number(entityData.Height);
 
-      this.ySpeed = entityData.YSpeed;
-      this.xSpeed = entityData.XSpeed;
+      this.ySpeed = Number(entityData.YSpeed);
+      this.xSpeed = Number(entityData.XSpeed);
 };
 
 Entity.prototype.step = function (timeScale) {

@@ -4,6 +4,7 @@ var GameRoom = function () {
       Socket.sendPacket("map");
 
       Socket.registerHandler("entity", this, this.updateEntities);
+      Socket.registerHandler("join", this, this.onJoin);
 
       this.render = new Render.Render();
       this.tileRenderer = null;
@@ -13,6 +14,8 @@ var GameRoom = function () {
 
       this.mouseX = null;
       this.mouseY = null;
+
+      this.player = null;
 };
 
 GameRoom.prototype.loadMap = function (tileData) {
@@ -37,20 +40,31 @@ GameRoom.prototype.loadMap = function (tileData) {
 };
 
 GameRoom.prototype.updateEntities = function (entityString) {
-      entityData = JSON.parse(entityString);
+      var entityData = JSON.parse(entityString).Entities;
 
       for (var id in entityData) {
             var ent = entityData[id];
             if (this.entities[id] === undefined) {
-                  var entity = new Entity(ent.X, ent.Y, ent.Width, ent.Height, ent.Hex);
-                  entity.xSpeed = ent.XSpeed;
-                  entity.ySpeed = ent.YSpeed;
+                  var entity;
+                  if (ent.Type === "player") {
+                        entity = new PlayerEntity();
+                  } else {
+                        alert("UNKNOWN ENTITY TYPE YOU FGT");
+                  }
+
                   entity.id = id;
+                  entity.update(ent);
                   this.addToEntities(entity);
             } else {
                   this.entities[id].update(ent);
             }
       }
+};
+GameRoom.prototype.onJoin = function (dataString) {
+      var joinData = JSON.parse(dataString);
+
+      this.player = this.entities[joinData.PlayerEntityID];
+      this.player.setMain();
 };
 
 GameRoom.prototype.step = function (timeScale) {

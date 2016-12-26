@@ -73,8 +73,10 @@
     <Compile Include="Entities\PlayerEntity.cs" />
     <Compile Include="GameRoom.cs" />
     <Compile Include="Packets\EntityPacket.cs" />
+    <Compile Include="Packets\JoinPacket.cs" />
     <Compile Include="Packets\MapPacket.cs" />
     <Compile Include="Packets\Packet.cs" />
+    <Compile Include="Packets\PlayerActionPacket.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

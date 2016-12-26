@@ -11,26 +11,12 @@ namespace Server.Packets
     public class EntityPacket : Packet
     {
 
-        private Dictionary<int, Entity> _entities;
+        public Dictionary<int, Entity> Entities;
 
         public EntityPacket (GameRoom room)
         {
-            _entities = room.Entities;
+            Entities = room.Entities.ToDictionary(entry => entry.Key, entry => entry.Value);
             PacketType = "entity";
-        }
-
-        public override void Send()
-        {
-            var entitiesCloned = _entities.ToDictionary(entry => entry.Key, entry => entry.Value);
-            Program.Broadcast(PacketType, JsonConvert.SerializeObject(entitiesCloned));
-            base.Send();
-        }
-
-        public override void Send(Player receiver)
-        {
-            var entitiesCloned = _entities.ToDictionary(entry => entry.Key, entry => entry.Value);
-            Program.Send(receiver.ID, PacketType, JsonConvert.SerializeObject(entitiesCloned));
-            base.Send();
         }
     }
 }

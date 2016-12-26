@@ -30,6 +30,9 @@ namespace Server
         {
             Player player = new Player(id, this);
             Players[id] = player;
+
+            new EntityPacket(this).Send(player);
+            new JoinPacket(player).Send(player);
         }
 
         public void RemovePlayer(string id)
