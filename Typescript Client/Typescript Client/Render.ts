@@ -1,4 +1,6 @@
-﻿class Camera {
+﻿/// <reference path="./declarations.ts"/>
+
+class Camera {
     public offset: {
         x: number,
         y: number
@@ -8,6 +10,11 @@
     };
 
     public zoom: number = 1;
+    public room: GameRoom;
+
+    constructor(room: GameRoom) {
+        this.room = room;
+    }
 }
 
 interface iRenderable {

@@ -28,8 +28,11 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
+    <TypeScriptCompile Include="declarations.ts" />
     <TypeScriptCompile Include="Entities\Entity.ts" />
+    <TypeScriptCompile Include="Entities\PlayerEntity.ts" />
     <TypeScriptCompile Include="GameRoom.ts" />
+    <TypeScriptCompile Include="Keyboard.ts" />
     <TypeScriptCompile Include="Render.ts" />
     <TypeScriptCompile Include="Socket.ts" />
     <TypeScriptCompile Include="Tile\Tile.ts" />

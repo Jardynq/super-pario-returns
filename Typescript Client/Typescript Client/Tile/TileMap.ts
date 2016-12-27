@@ -1,4 +1,4 @@
-﻿/// <reference path="./../app.ts"/>
+﻿/// <reference path="./../declarations.ts"/>
 
 class TileMap implements iRenderable {
     public width: number;

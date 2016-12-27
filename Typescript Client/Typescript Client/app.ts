@@ -1,10 +1,6 @@
-﻿/// <reference path="./Socket.ts"/>
-/// <reference path="./Tile/TileMap.ts"/>
-/// <reference path="./GameRoom.ts"/>
+﻿/// <reference path="./declarations.ts"/>
 
 // Global variables
-const TILE_SIZE = 50;
-
 var canvas: HTMLCanvasElement;
 var ctx: CanvasRenderingContext2D;
 var map: TileMap;

@@ -1,4 +1,6 @@
-﻿class Tile implements iRenderable {
+﻿/// <reference path="./../declarations.ts"/>
+
+class Tile implements iRenderable {
     public x: number;
     public y: number;
     public collision: boolean;
@@ -24,8 +26,10 @@ class ColorTile extends Tile {
     }
 
     public render(ctx: CanvasRenderingContext2D, camera: Camera): void {
+        var tilesize = camera.room.tilesize;
+
         ctx.beginPath();
-        ctx.rect((this.x * TILE_SIZE + camera.offset.x) * camera.zoom, (this.y * TILE_SIZE + camera.offset.y) * camera.zoom, TILE_SIZE * camera.zoom, TILE_SIZE * camera.zoom);
+        ctx.rect((this.x * tilesize + camera.offset.x) * camera.zoom, (this.y * tilesize + camera.offset.y) * camera.zoom, tilesize * camera.zoom, tilesize * camera.zoom);
         ctx.fillStyle = this.color;
 
         ctx.stroke();

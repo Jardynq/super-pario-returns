@@ -1,4 +1,4 @@
-﻿/// <reference path="./app.ts"/>
+﻿/// <reference path="./declarations.ts"/>
 
 class Socket {
     private socket: WebSocket;
@@ -24,9 +24,27 @@ class Socket {
 
     public registerHandler(packetType: string, handler: (packetData: string) => void): void {
         this.packetHandlers[packetType] = handler;
-    };
+    }
 
     public unregisterHandler = function (packetType: string): void {
         delete this.packetHandlers[packetType];
+    }
+
+    /**
+     * Sends a packet with the specified type 
+     */
+    public sendPacket(packetType: string, data?: string | {}): void {
+        if (data === undefined) {
+            data = {};
+        }
+        var dataString: string;
+        if (typeof data === "string") {
+            dataString = data;
+        } else {
+            dataString = JSON.stringify(data);
+        }
+
+        var type: string = String(packetType + "          ").substr(0, 10);
+        this.socket.send(type + dataString);
     };
 }
