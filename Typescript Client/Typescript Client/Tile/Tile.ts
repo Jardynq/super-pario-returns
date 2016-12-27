@@ -31,6 +31,7 @@ class ColorTile extends Tile {
         ctx.beginPath();
         ctx.rect((this.x * tilesize + camera.offset.x) * camera.zoom, (this.y * tilesize + camera.offset.y) * camera.zoom, tilesize * camera.zoom, tilesize * camera.zoom);
         ctx.fillStyle = this.color;
+        ctx.closePath();
 
         ctx.stroke();
         ctx.fill();

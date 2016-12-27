@@ -14,36 +14,25 @@ namespace Server.Packets
         public TileMap Map;
 
         public MapPacket (TileMap map) {
-            PacketType = "map";
+            PacketType = PACKET_TYPE.MAP;
             Map = map;
         }
 
-        private string GenerateMapString () {
-            string response = "";
+        public override byte[] Serialize()
+        {
+            var output = new byte[Map.Tiles.GetLength(0) * Map.Tiles.GetLength(1) + 1];
+            output[0] = (byte)Map.Tiles.GetLength(0);
 
             for (int y = 0; y < Map.Tiles.GetLength(1); y++)
             {
                 for (int x = 0; x < Map.Tiles.GetLength(0); x++)
                 {
-                    int tile = Map.Tiles[x, y];
-
-                    response += tile + ",";
+                    byte tile = Map.Tiles[x, y];
+                    output[y * Map.Tiles.GetLength(0) + x + 1] = tile;
                 }
-                response = response.Substring(0, response.Length - 1) + "|";
             }
-            response = response.Substring(0, response.Length - 1);
 
-            return response;
-        }
-
-        public override void Send()
-        {
-            Program.Broadcast(PacketType, GenerateMapString());
-        }
-
-        public override void Send(Player receiver)
-        {
-            Program.Send(receiver.ID, PacketType, GenerateMapString());
+            return output;
         }
     }
 }

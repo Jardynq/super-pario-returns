@@ -10,22 +10,44 @@ namespace Server.Packets
 {
     public class Packet
     {
-        [JsonIgnore]
-        public string PacketType;
+        public PACKET_TYPE PacketType;
 
         public virtual void Handle (GameService session)
         {
 
         }
 
+        public virtual byte[] Serialize() {
+            return new byte[0];
+        }
+
         public virtual void Send()
         {
-            Program.Broadcast(PacketType, JsonConvert.SerializeObject(this));
+            byte[] data = this.Serialize();
+            byte[] output = new byte[data.Length + 1];
+
+            data.CopyTo(output, 1);
+            output[0] = (byte)PacketType;
+
+            Program.Broadcast(output);
         }
 
         public virtual void Send(Player receiver)
         {
-            Program.Send(receiver.ID, PacketType, JsonConvert.SerializeObject(this));
+            byte[] data = this.Serialize();
+            byte[] output = new byte[data.Length + 1];
+
+            data.CopyTo(output, 1);
+            output[0] = (byte)PacketType;
+
+            Program.Send(receiver.ID, output);
         }
+    }
+
+    public enum PACKET_TYPE : byte {
+        MAP,
+        JOIN,
+        PLAYER_ACTION,
+        ENTITY
     }
 }

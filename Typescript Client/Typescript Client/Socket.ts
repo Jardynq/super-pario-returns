@@ -2,49 +2,46 @@
 
 class Socket {
     private socket: WebSocket;
-    private packetHandlers: { [packetType: string]: (packetData: string) => void } = {};
+    private packetHandlers: { [packetType: number]: (reader: DataView) => void } = {};
 
     constructor(url: string, callback: () => void) {
         this.socket = new WebSocket(url);
         this.socket.onmessage = this.onmessage.bind(this);
         this.socket.onopen = callback;
+        this.socket.binaryType = "arraybuffer";
     }
 
     private onmessage(e: MessageEvent): void {
-        var packetType = e.data.substr(0, 10).trim();
-        var packetData = e.data.substr(10);
+        var reader = new DataView(e.data);
+        var packetType = reader.getUint8(0);
 
         if (this.packetHandlers[packetType] !== undefined) {
-            this.packetHandlers[packetType](packetData);
+            this.packetHandlers[packetType](reader);
         } else {
             // No handler exists for this packet type
-           throw "Unknown packet recieved. Type is: " + packetType;
+            throw "Unknown packet recieved. Type is: " + packetType;
         }
     }
 
-    public registerHandler(packetType: string, handler: (packetData: string) => void): void {
+    public registerHandler(packetType: PACKET_TYPE, handler: (reader: DataView) => void): void {
         this.packetHandlers[packetType] = handler;
     }
 
-    public unregisterHandler = function (packetType: string): void {
+    public unregisterHandler = function (packetType: PACKET_TYPE): void {
         delete this.packetHandlers[packetType];
     }
 
     /**
-     * Sends a packet with the specified type 
+     * Sends a packet. The type must be encoded into the data
      */
-    public sendPacket(packetType: string, data?: string | {}): void {
-        if (data === undefined) {
-            data = {};
-        }
-        var dataString: string;
-        if (typeof data === "string") {
-            dataString = data;
-        } else {
-            dataString = JSON.stringify(data);
-        }
-
-        var type: string = String(packetType + "          ").substr(0, 10);
-        this.socket.send(type + dataString);
+    public sendPacket(data: DataView): void {
+        this.socket.send(data.buffer);
     };
+}
+
+enum PACKET_TYPE {
+    MAP,
+    JOIN,
+    PLAYER_ACTION,
+    ENTITY
 }

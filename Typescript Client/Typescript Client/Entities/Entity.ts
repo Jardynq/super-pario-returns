@@ -3,18 +3,18 @@
 class Entity implements iRenderable {
     public id: number;
 
-    public x: number;
-    public y: number;
-    public xSpeed: number;
-    public ySpeed: number;
-    public width: number;
-    public height: number;
+    public x: number = 0;
+    public y: number = 0;
+    public xSpeed: number = 0;
+    public ySpeed: number = 0;
+    public width: number = 0;
+    public height: number = 0;
 
     public color: string;
 
-    constructor(id: number, entityData: { Type: string }) {
+    constructor(id: number, data: DataView) {
         this.id = id;
-        this.update(entityData);
+        this.update(data);
     }
 
     public step(timeScale: number): void {
@@ -22,28 +22,17 @@ class Entity implements iRenderable {
         this.y += this.ySpeed * timeScale;
     }
 
-    public update(entityData: any) {
-        this.x = Number(entityData.X);
-        this.y = Number(entityData.Y);
+    public update(data: DataView) {
+        var offset = 4; // To compensate for LENGTH, ID and TYPE
+        this.x = data.getInt16(offset, true);
+        offset += 2;
+        this.y = data.getInt16(offset, true);
+        offset += 2;
 
-        this.xSpeed = Number(entityData.XSpeed);
-        this.ySpeed = Number(entityData.YSpeed);
-
-        this.width = Number(entityData.Width);
-        this.height = Number(entityData.Height);
-    }
-
-    public toEntityData(): any {
-        var output: any = {};
-
-        output.X = this.x;
-        output.Y = this.y;
-        output.xSpeed = this.xSpeed;
-        output.ySpeed = this.ySpeed;
-        output.width = this.width;
-        output.height = this.height;
-
-        return output;
+        this.xSpeed = data.getInt16(offset, true);
+        offset += 2;
+        this.ySpeed = data.getInt16(offset, true);
+        offset += 2;
     }
 
     public render(ctx: CanvasRenderingContext2D, camera: Camera): void {
@@ -54,4 +43,8 @@ class Entity implements iRenderable {
         ctx.stroke();
         ctx.fill();
     }
+}
+
+enum ENTITY_TYPE {
+    PLAYER
 }

@@ -17,7 +17,7 @@ namespace Server.Entities
             X = Program.rnd.Next(500);
             Y = Program.rnd.Next(500);
 
-            Type = "player";
+            Type = ENTITY_TYPE.PLAYER;
         }
     }
 }

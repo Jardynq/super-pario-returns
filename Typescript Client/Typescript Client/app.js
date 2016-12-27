@@ -1,58 +1,54 @@
 /// <reference path="./declarations.ts"/>
-// Global variables
-var canvas;
-var ctx;
-var map;
-var room;
-var lastTickCount = new Date().getTime();
-/**
- * Connect to the server
- */
-var socket = new Socket("ws:localhost/", function () {
-    // Runs on succesful connection
-    init();
-    room = new GameRoom();
-    step();
-});
-/**
- * Initialises the game
- */
-function init() {
-    canvas = document.getElementById("game-canvas");
-    ctx = canvas.getContext("2d");
-    fixCanvas();
-    window.addEventListener("resize", fixCanvas);
-}
-/**
- * Adapts canvas to screen size
- */
-function fixCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-/**
- * Main game loop
- */
-function step() {
-    // Calculate time scale to stay in sync with server
-    var newTickCount = new Date().getTime();
-    var elapsedMilliseconds = newTickCount - lastTickCount;
-    var timeScale = elapsedMilliseconds / 1000;
-    lastTickCount = newTickCount;
-    room.step(timeScale);
-    room.renderAll(ctx);
-    // Request next frame
-    window.requestAnimationFrame(step);
-}
+var Socket = (function () {
+    function Socket(url, callback) {
+        this.packetHandlers = {};
+        this.unregisterHandler = function (packetType) {
+            delete this.packetHandlers[packetType];
+        };
+        this.socket = new WebSocket(url);
+        this.socket.onmessage = this.onmessage.bind(this);
+        this.socket.onopen = callback;
+        this.socket.binaryType = "arraybuffer";
+    }
+    Socket.prototype.onmessage = function (e) {
+        var reader = new DataView(e.data);
+        var packetType = reader.getUint8(0);
+        if (this.packetHandlers[packetType] !== undefined) {
+            this.packetHandlers[packetType](reader);
+        }
+        else {
+            // No handler exists for this packet type
+            throw "Unknown packet recieved. Type is: " + packetType;
+        }
+    };
+    Socket.prototype.registerHandler = function (packetType, handler) {
+        this.packetHandlers[packetType] = handler;
+    };
+    /**
+     * Sends a packet. The type must be encoded into the data
+     */
+    Socket.prototype.sendPacket = function (data) {
+        this.socket.send(data.buffer);
+    };
+    ;
+    return Socket;
+}());
+var PACKET_TYPE;
+(function (PACKET_TYPE) {
+    PACKET_TYPE[PACKET_TYPE["MAP"] = 0] = "MAP";
+    PACKET_TYPE[PACKET_TYPE["JOIN"] = 1] = "JOIN";
+    PACKET_TYPE[PACKET_TYPE["PLAYER_ACTION"] = 2] = "PLAYER_ACTION";
+    PACKET_TYPE[PACKET_TYPE["ENTITY"] = 3] = "ENTITY";
+})(PACKET_TYPE || (PACKET_TYPE = {}));
 /// <reference path="./declarations.ts"/>
 var GameRoom = (function () {
     function GameRoom() {
         this.entities = {};
         this.camera = new Camera(this);
         this.tilesize = 50;
-        socket.registerHandler("map", this.loadMap.bind(this));
-        socket.registerHandler("entity", this.updateEntities.bind(this));
-        socket.registerHandler("join", this.onJoin.bind(this));
+        socket.registerHandler(PACKET_TYPE.MAP, this.loadMap.bind(this));
+        socket.registerHandler(PACKET_TYPE.ENTITY, this.updateEntities.bind(this));
+        socket.registerHandler(PACKET_TYPE.JOIN, this.onJoin.bind(this));
     }
     /**
      * Frame step
@@ -73,35 +69,41 @@ var GameRoom = (function () {
             this.entities[id].render(ctx, this.camera);
         }
     };
-    GameRoom.prototype.loadMap = function (packetData) {
+    GameRoom.prototype.loadMap = function (reader) {
         this.map = new TileMap();
-        this.map.parseMapPacketData(packetData);
+        this.map.parseMapPacket(reader);
     };
-    GameRoom.prototype.updateEntities = function (entityString) {
-        var entityData = JSON.parse(entityString).Entities;
-        for (var id in entityData) {
-            var ent = entityData[id];
+    GameRoom.prototype.updateEntities = function (reader) {
+        // The total number of entities in the game
+        var entityCount = reader.getUint16(1, true);
+        var offset = 3;
+        for (var i = 0; i < entityCount; i++) {
+            // The length in bytes of this entity
+            var entityLength = reader.getUint8(offset);
+            var entityData = reader.buffer.slice(offset, offset + entityLength + 1);
+            var entityView = new DataView(entityData);
+            var id = entityView.getUint16(1, true);
+            offset += entityData.byteLength;
             if (this.entities[id] === undefined) {
-                var entityType = ent.Type;
+                var type = entityView.getUint8(2);
                 var entity;
-                if (entityType === "player") {
-                    entity = new PlayerEntity(Number(id), entityData);
+                if (type === ENTITY_TYPE.PLAYER) {
+                    entity = new PlayerEntity(Number(id), entityView);
                 }
                 else {
-                    throw "Unknown entity recieved. Type is: " + ent.Type;
+                    throw "Unknown entity recieved. Type is: " + type;
                 }
                 this.entities[id] = entity;
             }
             else {
-                this.entities[id].update(ent);
+                this.entities[id].update(entityView);
             }
         }
     };
-    GameRoom.prototype.onJoin = function (dataString) {
-        var joinData = JSON.parse(dataString);
-        var playerID = joinData.PlayerEntityID;
-        this.player = new MainPlayerEntity(playerID, this.entities[joinData.PlayerEntityID].toEntityData());
-        this.entities[joinData.PlayerEntityID] = this.player;
+    GameRoom.prototype.onJoin = function (reader) {
+        var playerID = reader.getUint16(1, true);
+        this.player = new MainPlayerEntity(playerID, reader);
+        this.entities[playerID] = this.player;
     };
     return GameRoom;
 }());
@@ -158,29 +160,37 @@ var TileMap = (function () {
     function TileMap() {
         this.tiles = [];
     }
-    TileMap.prototype.parseMapPacketData = function (packetData) {
-        var rows = packetData.split('|');
+    TileMap.prototype.parseMapPacket = function (reader) {
         // Get the width of the map
-        this.width = rows[0].split(',').length;
-        // Generate the map from the supplied string
-        for (var y = 0; y < rows.length; y++) {
-            var columns = rows[y].split(',');
-            for (var x = 0; x < columns.length; x++) {
-                var tileData = columns[x];
-                if (tileData == "0") {
-                    this.tiles[y * this.width + x] = new ColorTile(x, y, false, "blue");
-                }
-                else if (tileData == "1") {
-                    this.tiles[y * this.width + x] = new ColorTile(x, y, true, "black");
-                }
+        this.width = reader.getUint8(1);
+        // Start at two since byte 1 is the TYPE and byte 2 is the width
+        for (var i = 2; i < reader.byteLength; i++) {
+            var tileIndex = i - 2;
+            var tileValue = reader.getUint8(i);
+            var x = tileIndex % this.width;
+            var y = (tileIndex - x) / this.width;
+            this.height = y + 1; // This way the height will be set to the last y value
+            if (tileValue == 0) {
+                this.tiles[tileIndex] = new ColorTile(x, y, false, "blue");
+            }
+            else {
+                this.tiles[tileIndex] = new ColorTile(x, y, true, "black");
             }
         }
     };
     TileMap.prototype.render = function (ctx, camera) {
-        // TODO: Only render tiles on screen
-        for (var i = 0; i < this.tiles.length; i++) {
-            this.tiles[i].render(ctx, camera);
+        var xStart = camera.offset.x / camera.room.tilesize;
+        var yStart = camera.offset.y / camera.room.tilesize;
+        var screenWidth = ctx.canvas.width / camera.room.tilesize;
+        var screenHeight = ctx.canvas.height / camera.room.tilesize;
+        for (var x = Math.max(0, xStart); x < Math.min(xStart + screenWidth, this.width); x++) {
+            for (var y = Math.max(0, yStart); y < Math.min(yStart + screenHeight, this.height); y++) {
+                this.getTile(x, y).render(ctx, camera);
+            }
         }
+    };
+    TileMap.prototype.getTile = function (x, y) {
+        return this.tiles[y * this.width + x];
     };
     return TileMap;
 }());
@@ -211,6 +221,7 @@ var ColorTile = (function (_super) {
         ctx.beginPath();
         ctx.rect((this.x * tilesize + camera.offset.x) * camera.zoom, (this.y * tilesize + camera.offset.y) * camera.zoom, tilesize * camera.zoom, tilesize * camera.zoom);
         ctx.fillStyle = this.color;
+        ctx.closePath();
         ctx.stroke();
         ctx.fill();
     };
@@ -218,31 +229,30 @@ var ColorTile = (function (_super) {
 }(Tile));
 /// <reference path="./../declarations.ts"/>
 var Entity = (function () {
-    function Entity(id, entityData) {
+    function Entity(id, data) {
+        this.x = 0;
+        this.y = 0;
+        this.xSpeed = 0;
+        this.ySpeed = 0;
+        this.width = 0;
+        this.height = 0;
         this.id = id;
-        this.update(entityData);
+        this.update(data);
     }
     Entity.prototype.step = function (timeScale) {
         this.x += this.xSpeed * timeScale;
         this.y += this.ySpeed * timeScale;
     };
-    Entity.prototype.update = function (entityData) {
-        this.x = Number(entityData.X);
-        this.y = Number(entityData.Y);
-        this.xSpeed = Number(entityData.XSpeed);
-        this.ySpeed = Number(entityData.YSpeed);
-        this.width = Number(entityData.Width);
-        this.height = Number(entityData.Height);
-    };
-    Entity.prototype.toEntityData = function () {
-        var output = {};
-        output.X = this.x;
-        output.Y = this.y;
-        output.xSpeed = this.xSpeed;
-        output.ySpeed = this.ySpeed;
-        output.width = this.width;
-        output.height = this.height;
-        return output;
+    Entity.prototype.update = function (data) {
+        var offset = 4; // To compensate for LENGTH, ID and TYPE
+        this.x = data.getInt16(offset, true);
+        offset += 2;
+        this.y = data.getInt16(offset, true);
+        offset += 2;
+        this.xSpeed = data.getInt16(offset, true);
+        offset += 2;
+        this.ySpeed = data.getInt16(offset, true);
+        offset += 2;
     };
     Entity.prototype.render = function (ctx, camera) {
         ctx.beginPath();
@@ -253,6 +263,10 @@ var Entity = (function () {
     };
     return Entity;
 }());
+var ENTITY_TYPE;
+(function (ENTITY_TYPE) {
+    ENTITY_TYPE[ENTITY_TYPE["PLAYER"] = 0] = "PLAYER";
+})(ENTITY_TYPE || (ENTITY_TYPE = {}));
 /// <reference path="./app.ts"/>
 /// <reference path="./Socket.ts"/>
 /// <reference path="./GameRoom.ts"/>
@@ -262,54 +276,57 @@ var Entity = (function () {
 /// <reference path="./Tile/Tile.ts"/>
 /// <reference path="./Entities/Entity.ts"/> 
 /// <reference path="./declarations.ts"/>
-var Socket = (function () {
-    function Socket(url, callback) {
-        this.packetHandlers = {};
-        this.unregisterHandler = function (packetType) {
-            delete this.packetHandlers[packetType];
-        };
-        this.socket = new WebSocket(url);
-        this.socket.onmessage = this.onmessage.bind(this);
-        this.socket.onopen = callback;
-    }
-    Socket.prototype.onmessage = function (e) {
-        var packetType = e.data.substr(0, 10).trim();
-        var packetData = e.data.substr(10);
-        if (this.packetHandlers[packetType] !== undefined) {
-            this.packetHandlers[packetType](packetData);
-        }
-        else {
-            // No handler exists for this packet type
-            throw "Unknown packet recieved. Type is: " + packetType;
-        }
-    };
-    Socket.prototype.registerHandler = function (packetType, handler) {
-        this.packetHandlers[packetType] = handler;
-    };
-    /**
-     * Sends a packet with the specified type
-     */
-    Socket.prototype.sendPacket = function (packetType, data) {
-        if (data === undefined) {
-            data = {};
-        }
-        var dataString;
-        if (typeof data === "string") {
-            dataString = data;
-        }
-        else {
-            dataString = JSON.stringify(data);
-        }
-        var type = String(packetType + "          ").substr(0, 10);
-        this.socket.send(type + dataString);
-    };
-    ;
-    return Socket;
-}());
+// Global variables
+var canvas;
+var ctx;
+var map;
+var room;
+var lastTickCount = new Date().getTime();
+/**
+ * Connect to the server
+ */
+var socket = new Socket("ws:localhost/", function () {
+    // Runs on succesful connection
+    init();
+    room = new GameRoom();
+    step();
+});
+/**
+ * Initialises the game
+ */
+function init() {
+    canvas = document.getElementById("game-canvas");
+    ctx = canvas.getContext("2d");
+    fixCanvas();
+    window.addEventListener("resize", fixCanvas);
+}
+/**
+ * Adapts canvas to screen size
+ */
+function fixCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+/**
+ * Main game loop
+ */
+function step() {
+    // Calculate time scale to stay in sync with server
+    var newTickCount = new Date().getTime();
+    var elapsedMilliseconds = newTickCount - lastTickCount;
+    var timeScale = elapsedMilliseconds / 1000;
+    lastTickCount = newTickCount;
+    room.step(timeScale);
+    room.renderAll(ctx);
+    // Request next frame
+    window.requestAnimationFrame(step);
+}
 var PlayerEntity = (function (_super) {
     __extends(PlayerEntity, _super);
     function PlayerEntity(id, entityData) {
         _super.call(this, id, entityData);
+        this.height = 60;
+        this.width = 30;
         this.color = "aquaMarine";
     }
     return PlayerEntity;
@@ -324,29 +341,34 @@ var MainPlayerEntity = (function (_super) {
         this.color = "red";
     }
     MainPlayerEntity.prototype.step = function (timeScale) {
+        _super.prototype.step.call(this, timeScale);
+        var oldXSpeed = this.xSpeed;
+        var oldYSpeed = this.ySpeed;
         if (Keyboard.isKeyDown("ArrowRight")) {
-            this.xSpeed = 100;
+            this.xSpeed = 300;
         }
         else if (Keyboard.isKeyDown("ArrowLeft")) {
-            this.xSpeed = -100;
+            this.xSpeed = -300;
         }
         else {
             this.xSpeed = 0;
         }
         if (Keyboard.isKeyDown("ArrowUp")) {
-            this.ySpeed = -100;
+            this.ySpeed = -300;
         }
         else if (Keyboard.isKeyDown("ArrowDown")) {
-            this.ySpeed = 100;
+            this.ySpeed = 300;
         }
         else {
             this.ySpeed = 0;
         }
-        // Player Actions
-        socket.sendPacket("playerAct", {
-            xSpeed: this.xSpeed,
-            ySpeed: this.ySpeed
-        });
+        if (oldXSpeed != this.xSpeed || oldYSpeed != this.ySpeed) {
+            var actionPacket = new DataView(new ArrayBuffer(5));
+            actionPacket.setUint8(0, PACKET_TYPE.PLAYER_ACTION);
+            actionPacket.setInt16(1, this.xSpeed, true);
+            actionPacket.setInt16(3, this.ySpeed, true);
+            socket.sendPacket(actionPacket);
+        }
     };
     return MainPlayerEntity;
 }(PlayerEntity));

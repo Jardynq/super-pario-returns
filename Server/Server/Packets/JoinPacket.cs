@@ -1,15 +1,14 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Server.Packets
 {
     public class JoinPacket : Packet
     {
-        [JsonIgnore]
         public Player Player;
 
         public int PlayerEntityID
@@ -22,8 +21,13 @@ namespace Server.Packets
 
         public JoinPacket (Player player)
         {
-            PacketType = "join";
+            PacketType = PACKET_TYPE.JOIN;
             Player = player;
+        }
+
+        public override byte[] Serialize()
+        {
+            return Player.entity.Serialize();
         }
     }
 }

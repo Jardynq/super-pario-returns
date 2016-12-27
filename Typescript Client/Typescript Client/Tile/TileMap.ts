@@ -2,32 +2,43 @@
 
 class TileMap implements iRenderable {
     public width: number;
+    public height: number;
     public tiles: Tile[] = [];
 
-    public parseMapPacketData(packetData: string): void {
-        var rows = packetData.split('|');
-
+    public parseMapPacket(reader: DataView): void {
         // Get the width of the map
-        this.width = rows[0].split(',').length;
+        this.width = reader.getUint8(1);
 
-        // Generate the map from the supplied string
-        for (var y = 0; y < rows.length; y++) {
-            var columns = rows[y].split(',');
-            for (var x = 0; x < columns.length; x++) {
-                var tileData = columns[x];
-                if (tileData == "0") { // Sky
-                    this.tiles[y * this.width + x] = new ColorTile(x, y, false, "blue");
-                } else if (tileData == "1") { // Ground
-                    this.tiles[y * this.width + x] = new ColorTile(x, y, true, "black");
-                }
+        // Start at two since byte 1 is the TYPE and byte 2 is the width
+        for (var i: number = 2; i < reader.byteLength; i++) {
+            var tileIndex: number = i - 2;
+            var tileValue: number = reader.getUint8(i);
+            var x = tileIndex % this.width;
+            var y = (tileIndex - x) / this.width;
+            this.height = y + 1; // This way the height will be set to the last y value
+
+            if (tileValue == 0) {
+                this.tiles[tileIndex] = new ColorTile(x, y, false, "blue");
+            } else {
+                this.tiles[tileIndex] = new ColorTile(x, y, true, "black");
             }
         }
     }
 
-    public render (ctx: CanvasRenderingContext2D, camera: Camera) {
-        // TODO: Only render tiles on screen
-        for (var i: number = 0; i < this.tiles.length; i++) {
-            this.tiles[i].render(ctx, camera);
+    public render(ctx: CanvasRenderingContext2D, camera: Camera) {
+        var xStart: number = camera.offset.x / camera.room.tilesize;
+        var yStart: number = camera.offset.y / camera.room.tilesize;
+        var screenWidth: number = ctx.canvas.width / camera.room.tilesize;
+        var screenHeight: number = ctx.canvas.height / camera.room.tilesize;
+
+        for (var x: number = Math.max(0, xStart); x < Math.min(xStart + screenWidth, this.width); x++) {
+            for (var y: number = Math.max(0, yStart); y < Math.min(yStart + screenHeight, this.height); y++) {
+                this.getTile(x, y).render(ctx, camera);
+            }
         }
+    }
+
+    public getTile(x: number, y: number): Tile {
+        return this.tiles[y * this.width + x];
     }
 }

@@ -17,7 +17,10 @@ namespace Server
         public static Random rnd = new Random();
         private static WebSocketServer server;
 
-        public const int TARGET_FRAMERATE = 60;
+        // Number of frames per second in the simulation
+        public const int TARGET_FRAMERATE = 30;
+        // Number of entity update packets per second
+        public const int TARGET_UPDATE_RATE = 5;
 
         static void Main(string[] args)
         {
@@ -33,13 +36,13 @@ namespace Server
             server.Stop();
         }
 
-        public static void Send(string id, string type, string data)
+        public static void Send(string id, byte[] data)
         {
-            server.WebSocketServices["/"].Sessions[id].Context.WebSocket.Send(type + new String(' ', 10 - type.Length) + data);
+            server.WebSocketServices["/"].Sessions[id].Context.WebSocket.Send(data);
         }
-        public static void Broadcast(string type, string data)
+        public static void Broadcast(byte[] data)
         {
-            server.WebSocketServices["/"].Sessions.Broadcast(type + new String(' ', 10 - type.Length) + data);
+            server.WebSocketServices["/"].Sessions.Broadcast(data);
         }
     }
 
@@ -53,25 +56,29 @@ namespace Server
 
         protected override Task OnMessage(MessageEventArgs e)
         {
-            string request = e.Text.ReadToEnd();
-            string packetType = request.Substring(0, 10).Trim();
-            Packet packet;
+            using (System.IO.MemoryStream memStream = new System.IO.MemoryStream())
+            using (System.IO.BinaryReader reader = new System.IO.BinaryReader(memStream))
+            {
+                e.Data.CopyTo(memStream);
+                memStream.Position = 0;
 
-            switch (packetType) {
-                case "map":
-                    packet = (Packet)JsonConvert.DeserializeObject<MapPacket>(request.Substring(10));
-                    break;
-                case "playerAct":
-                    packet = (Packet)JsonConvert.DeserializeObject<PlayerActionPacket>(request.Substring(10));
-                    break;
-                default:
-                    return base.OnMessage(e); // Packet not recognized. Ignore it.
+                PACKET_TYPE packetType = (PACKET_TYPE)reader.ReadByte();
+                Packet packet;
+
+                switch (packetType)
+                {
+                    case PACKET_TYPE.PLAYER_ACTION:
+                        packet = PlayerActionPacket.Parse(reader);
+                        break;
+                    default:
+                        return base.OnMessage(e); // Packet not recognized. Ignore it.
+                }
+
+                packet.PacketType = packetType;
+                packet.Handle(this);
+
+                return base.OnMessage(e);
             }
-
-            packet.PacketType = packetType;
-            packet.Handle(this);
-
-            return base.OnMessage(e);
         }
 
         protected override Task OnOpen()
@@ -92,11 +99,6 @@ namespace Server
             Program.Room.RemovePlayer(Id);
 
             return base.OnClose(e);
-        }
-
-        public void SendPacket (string type, string data)
-        {
-            Send(type + new String(' ', 10 - type.Length) + data);
         }
     }
 }

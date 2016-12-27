@@ -9,7 +9,7 @@ namespace Server
 {
     public class TileMap
     {
-        public int[,] Tiles;
+        public byte[,] Tiles;
 
         public void LoadMap (string path)
         {
@@ -30,14 +30,14 @@ namespace Server
                 }
             }
 
-            this.Tiles = new int[tileIndices[0].Count, tileIndices.Count];
+            this.Tiles = new byte[tileIndices[0].Count, tileIndices.Count];
 
             for (int y = 0; y < tileIndices.Count; y++)
             {
                 for (int x = 0; x < tileIndices[y].Count; x++)
                 {
                     var tile = tileIndices[y][x];
-                    this.Tiles[x, y] = tile;
+                    this.Tiles[x, y] = (byte)tile;
                 }
             }
         }

@@ -14,16 +14,17 @@ namespace Server
         public Dictionary<string, Player> Players = new Dictionary<string, Player>();
         public TileMap TileMap;
 
-        public Dictionary<int, Entity> Entities = new Dictionary<int, Entity>();
-        private int _lastEntityID = 0;
+        public Dictionary<ushort, Entity> Entities = new Dictionary<ushort, Entity>();
+        private ushort _lastEntityID = 0;
 
-        // Related to main loop
+        // Related to frame loop
+        private int _framesPassed = 0;
         private int _lastTickCount = 0;
 
         public GameRoom (TileMap map)
         {
             TileMap = map;
-            new Thread(new ThreadStart(Step)).Start();
+            new Thread(new ThreadStart(FrameLoop)).Start();
         }
 
         public void AddPlayer (string id)
@@ -32,7 +33,7 @@ namespace Server
             Players[id] = player;
 
             new MapPacket(TileMap).Send(player);
-            new EntityPacket(this).Send(player);
+            new EntityPacket(Entities).Send(player);
             new JoinPacket(player).Send(player);
         }
 
@@ -48,9 +49,8 @@ namespace Server
             Entities[entity.ID] = entity;
         }
 
-        public void Step ()
+        private void FrameLoop()
         {
-            _lastTickCount = Environment.TickCount;
             while (true)
             {
                 int tickCount = Environment.TickCount;
@@ -59,18 +59,28 @@ namespace Server
 
                 if (elapsedMilliseconds < targetFrameLength)
                 {
-                    Thread.Sleep(targetFrameLength - elapsedMilliseconds);
-                    elapsedMilliseconds = Environment.TickCount - _lastTickCount;
+                    Thread.Sleep(targetFrameLength - elapsedMilliseconds);   
                 }
-                _lastTickCount = Environment.TickCount;
-                float timeScale = elapsedMilliseconds / 1000f;
+                Step();
+            }
+        }
 
-                // Frame loop
-                foreach (int id in Entities.Keys.ToList<int>())
-                {
-                    Entities[id].Step(timeScale);
-                }
-                new EntityPacket(this).Send();
+        public void Step ()
+        {
+            int elapsedMilliseconds = Environment.TickCount - _lastTickCount;
+            _lastTickCount = Environment.TickCount;
+
+            float timeScale = elapsedMilliseconds / 1000f;
+
+            // Frame loop
+            foreach (ushort id in Entities.Keys.ToList<ushort>())
+            {
+                Entities[id].Step(timeScale);
+            }
+
+            if (++_framesPassed > Program.TARGET_FRAMERATE / Program.TARGET_UPDATE_RATE) {
+                new EntityPacket(Entities).Send();
+                _framesPassed = 0;
             }
         }
     }

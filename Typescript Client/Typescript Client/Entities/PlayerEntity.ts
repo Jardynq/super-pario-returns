@@ -2,6 +2,8 @@
     constructor(id: number, entityData: any) {
         super(id, entityData);
 
+        this.height = 60;
+        this.width = 30;
         this.color = "aquaMarine";
     }
 }
@@ -17,25 +19,33 @@ class MainPlayerEntity extends PlayerEntity {
     }
 
     public step(timeScale: number): void {
+        super.step(timeScale);
+
+        var oldXSpeed: number = this.xSpeed;
+        var oldYSpeed: number = this.ySpeed;
+
         if (Keyboard.isKeyDown("ArrowRight")) {
-            this.xSpeed = 100;
+            this.xSpeed = 300;
         } else if (Keyboard.isKeyDown("ArrowLeft")) {
-            this.xSpeed = -100;
+            this.xSpeed = -300;
         } else {
             this.xSpeed = 0;
         }
+
         if (Keyboard.isKeyDown("ArrowUp")) {
-            this.ySpeed = -100;
+            this.ySpeed = -300;
         } else if (Keyboard.isKeyDown("ArrowDown")) {
-            this.ySpeed = 100;
+            this.ySpeed = 300;
         } else {
             this.ySpeed = 0;
         }
 
-        // Player Actions
-        socket.sendPacket("playerAct", {
-            xSpeed: this.xSpeed,
-            ySpeed: this.ySpeed
-        });
+        if (oldXSpeed != this.xSpeed || oldYSpeed != this.ySpeed) {
+            var actionPacket = new DataView(new ArrayBuffer(5));
+            actionPacket.setUint8(0, PACKET_TYPE.PLAYER_ACTION);
+            actionPacket.setInt16(1, this.xSpeed, true);
+            actionPacket.setInt16(3, this.ySpeed, true);
+            socket.sendPacket(actionPacket);
+        }
     }
 }

@@ -10,9 +10,9 @@ class GameRoom {
     public player: MainPlayerEntity;
 
     constructor() {
-        socket.registerHandler("map", this.loadMap.bind(this));
-        socket.registerHandler("entity", this.updateEntities.bind(this));
-        socket.registerHandler("join", this.onJoin.bind(this));
+        socket.registerHandler(PACKET_TYPE.MAP, this.loadMap.bind(this));
+        socket.registerHandler(PACKET_TYPE.ENTITY, this.updateEntities.bind(this));
+        socket.registerHandler(PACKET_TYPE.JOIN, this.onJoin.bind(this));
     }
 
     /**
@@ -38,39 +38,45 @@ class GameRoom {
         }
     }
 
-    public loadMap(packetData: string): void {
+    public loadMap(reader: DataView): void {
         this.map = new TileMap();
-        this.map.parseMapPacketData(packetData);
+        this.map.parseMapPacket(reader);
     }
 
-    public updateEntities(entityString: string): void {
-        var entityData: any[] = JSON.parse(entityString).Entities;
+    public updateEntities(reader: DataView): void {
+        // The total number of entities in the game
+        var entityCount = reader.getUint16(1, true);
+        var offset = 3;
 
-        for (var id in entityData) {
-            var ent: any = entityData[id] as { Type: string };
+        for (var i = 0; i < entityCount; i++) {
+            // The length in bytes of this entity
+            var entityLength: number = reader.getUint8(offset);
+            var entityData: ArrayBuffer = reader.buffer.slice(offset, offset + entityLength + 1);
+            var entityView = new DataView(entityData);
+            var id = entityView.getUint16(1, true);
+            offset += entityData.byteLength;
 
             if (this.entities[id] === undefined) {
-                var entityType: string = ent.Type;
+                var type = entityView.getUint8(2);
                 var entity: Entity;
 
-                if (entityType === "player") {
-                    entity = new PlayerEntity(Number(id), entityData);
+                if (type === ENTITY_TYPE.PLAYER) {
+                    entity = new PlayerEntity(Number(id), entityView);
                 } else {
-                    throw "Unknown entity recieved. Type is: " + ent.Type;
+                    throw "Unknown entity recieved. Type is: " + type;
                 }
 
                 this.entities[id] = entity;
             } else {
-                this.entities[id].update(ent);
+                this.entities[id].update(entityView);
             }
         }
     }
 
-    public onJoin(dataString: string): void {
-        var joinData = JSON.parse(dataString);
-        var playerID: number = joinData.PlayerEntityID;
+    public onJoin(reader: DataView): void {
+        var playerID: number = reader.getUint16(1, true);
 
-        this.player = new MainPlayerEntity(playerID, this.entities[joinData.PlayerEntityID].toEntityData());
-        this.entities[joinData.PlayerEntityID] = this.player;
+        this.player = new MainPlayerEntity(playerID, reader);
+        this.entities[playerID] = this.player;
     }
 }
