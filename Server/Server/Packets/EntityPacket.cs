@@ -24,6 +24,12 @@ namespace Server.Packets
         {
             using (MemoryStream stream = new MemoryStream())
             using (BinaryWriter writer = new BinaryWriter(stream)) {
+                // Write a timestamp
+                double timestamp = DateTime.UtcNow.ToUniversalTime().Subtract(
+                    new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                ).TotalMilliseconds;
+                writer.Write(timestamp);
+
                 writer.Write((ushort)Entities.Count);
                 foreach (ushort id in Entities.Keys) {
                     byte[] entityData = Entities[id].Serialize();
