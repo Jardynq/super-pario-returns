@@ -1,8 +1,6 @@
 var GameRoom = function () {
-      // Request map from server
+      // Register socket handlers
       Socket.registerHandler("map", this, this.loadMap);
-      Socket.sendPacket("map");
-
       Socket.registerHandler("entity", this, this.updateEntities);
       Socket.registerHandler("join", this, this.onJoin);
 

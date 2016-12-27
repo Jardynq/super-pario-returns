@@ -7,6 +7,7 @@ using WebSocketSharp;
 using WebSocketSharp.Server;
 using Newtonsoft.Json;
 using Server.Packets;
+using System.Reflection;
 
 namespace Server
 {
@@ -22,7 +23,7 @@ namespace Server
         {
             // Load the map
             var map = new TileMap();
-            map.LoadMap(@"C:\Users\svorr\Documents\GitHub\super-pario-returns\Map.txt");
+            map.LoadMap(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/../../../../Map.txt");
             Room = new GameRoom(map);
 
             server = new WebSocketServer();

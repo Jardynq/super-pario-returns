@@ -8,7 +8,7 @@ var Socket = (function () {
        * 
        */
       ns.connect = function (callback) {
-            ns.socket = new WebSocket("ws:localhost.dev/");
+            ns.socket = new WebSocket("ws:localhost/");
             ns.socket.onmessage = ns.onMessage;
             ns.socket.onopen = callback;
       };

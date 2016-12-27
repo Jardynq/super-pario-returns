@@ -31,6 +31,7 @@ namespace Server
             Player player = new Player(id, this);
             Players[id] = player;
 
+            new MapPacket(TileMap).Send(player);
             new EntityPacket(this).Send(player);
             new JoinPacket(player).Send(player);
         }
