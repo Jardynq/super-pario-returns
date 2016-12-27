@@ -43,5 +43,6 @@ enum PACKET_TYPE {
     MAP,
     JOIN,
     PLAYER_ACTION,
-    ENTITY
+    ENTITY,
+    PING
 }

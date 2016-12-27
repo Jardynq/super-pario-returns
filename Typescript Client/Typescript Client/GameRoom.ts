@@ -7,12 +7,17 @@ class GameRoom {
     public camera: Camera = new Camera(this);
     public tilesize: number = 50;
 
+    // Related to syncronisation
+    public lastEntityUpdateLocalTimestamp = 0;
+    public lastEntityUpdateServertimestamp = 0;
+
     public player: MainPlayerEntity;
 
     constructor() {
         socket.registerHandler(PACKET_TYPE.MAP, this.loadMap.bind(this));
         socket.registerHandler(PACKET_TYPE.ENTITY, this.updateEntities.bind(this));
         socket.registerHandler(PACKET_TYPE.JOIN, this.onJoin.bind(this));
+        socket.registerHandler(PACKET_TYPE.PING, (reader) => socket.sendPacket(reader));
     }
 
     /**
@@ -72,14 +77,6 @@ class GameRoom {
             } else {
                 this.entities[id].update(entityView);
             }
-        }
-
-        // Step forward from old packets
-        lastTickCount = new Date().getTime();
-        var elapsedMilliseconds: number = lastTickCount - timestamp;
-        console.log(elapsedMilliseconds);
-        if (elapsedMilliseconds > 0) {
-            this.step(elapsedMilliseconds / 1000);
         }
     }
 

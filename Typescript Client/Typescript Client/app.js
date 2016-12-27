@@ -39,6 +39,7 @@ var PACKET_TYPE;
     PACKET_TYPE[PACKET_TYPE["JOIN"] = 1] = "JOIN";
     PACKET_TYPE[PACKET_TYPE["PLAYER_ACTION"] = 2] = "PLAYER_ACTION";
     PACKET_TYPE[PACKET_TYPE["ENTITY"] = 3] = "ENTITY";
+    PACKET_TYPE[PACKET_TYPE["PING"] = 4] = "PING";
 })(PACKET_TYPE || (PACKET_TYPE = {}));
 /// <reference path="./declarations.ts"/>
 var GameRoom = (function () {
@@ -46,9 +47,13 @@ var GameRoom = (function () {
         this.entities = {};
         this.camera = new Camera(this);
         this.tilesize = 50;
+        // Related to syncronisation
+        this.lastEntityUpdateLocalTimestamp = 0;
+        this.lastEntityUpdateServertimestamp = 0;
         socket.registerHandler(PACKET_TYPE.MAP, this.loadMap.bind(this));
         socket.registerHandler(PACKET_TYPE.ENTITY, this.updateEntities.bind(this));
         socket.registerHandler(PACKET_TYPE.JOIN, this.onJoin.bind(this));
+        socket.registerHandler(PACKET_TYPE.PING, function (reader) { return socket.sendPacket(reader); });
     }
     /**
      * Frame step
@@ -99,13 +104,6 @@ var GameRoom = (function () {
             else {
                 this.entities[id].update(entityView);
             }
-        }
-        // Step forward from old packets
-        lastTickCount = new Date().getTime();
-        var elapsedMilliseconds = lastTickCount - timestamp;
-        console.log(elapsedMilliseconds);
-        if (elapsedMilliseconds > 0) {
-            this.step(elapsedMilliseconds / 1000);
         }
     };
     GameRoom.prototype.onJoin = function (reader) {

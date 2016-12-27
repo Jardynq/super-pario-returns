@@ -80,6 +80,7 @@ namespace Server
 
             if (++_framesPassed > Program.TARGET_FRAMERATE / Program.TARGET_UPDATE_RATE) {
                 new EntityPacket(Entities).Send();
+                new PingPacket().Send();
                 _framesPassed = 0;
             }
         }

@@ -11,6 +11,7 @@ namespace Server
     {
         public readonly string ID;
         public PlayerEntity entity;
+        public int Ping = 0;
 
         public Player (string id, GameRoom room)
         {
