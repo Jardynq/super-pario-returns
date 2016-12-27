@@ -1,5 +1,6 @@
 var Entity = function () {
-
+      this.width = null;
+      this.height = null;
 };
 Entity.prototype = Object.create(Render.RenderObject.prototype); // Entity inherits RenderObject
 Entity.prototype.render = function (ctx, render) {
@@ -14,9 +15,6 @@ Entity.prototype.render = function (ctx, render) {
 Entity.prototype.update = function (entityData) {
       this.x = Number(entityData.X);
       this.y = Number(entityData.Y);
-
-      this.width = Number(entityData.Width);
-      this.height = Number(entityData.Height);
 
       this.ySpeed = Number(entityData.YSpeed);
       this.xSpeed = Number(entityData.XSpeed);
