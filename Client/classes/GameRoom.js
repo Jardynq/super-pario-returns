@@ -3,6 +3,7 @@ var GameRoom = function () {
       Socket.registerHandler(Socket.PACKET_TYPES.map, this, this.loadMap);
       Socket.registerHandler(Socket.PACKET_TYPES.entity, this, this.updateEntities);
       Socket.registerHandler(Socket.PACKET_TYPES.join, this, this.onJoin);
+      Socket.registerHandler(Socket.PACKET_TYPES.ping, this, this.ping);
 
       this.render = new Render.Render();
       this.tileRenderer = null;
@@ -43,9 +44,9 @@ GameRoom.prototype.loadMap = function (reader) {
       this.entityRenderer.addToRenderQueue(this.render.renderQueue);
 };
 GameRoom.prototype.updateEntities = function (reader) {
-      var amount = reader.getUint16(1, true);
+      var amount = reader.getUint16(9, true);
 
-      var offset = 3;
+      var offset = 11;
       for (i = 0; i < amount; i++) {
             // The length in bytes of this entity
             var entityLength = reader.getUint8(offset, true);
@@ -82,6 +83,9 @@ GameRoom.prototype.updateEntities = function (reader) {
 GameRoom.prototype.onJoin = function (reader) {
       this.player = this.entities[reader.getUint16(1, true)];
       this.player.setMain();
+};
+GameRoom.prototype.ping = function (reader) {
+      Socket.sendPacket(reader.buffer);
 };
 
 
