@@ -10,7 +10,12 @@ class Entity implements iRenderable {
     public width: number = 0;
     public height: number = 0;
 
+    public hasGravity: boolean = false;
     public color: string;
+
+    // Constants
+    public static GRAVITY: number = 60;
+    public static MAX_SPEED: number = 1000;
 
     constructor(id: number, data: DataView) {
         this.id = id;
@@ -18,6 +23,10 @@ class Entity implements iRenderable {
     }
 
     public step(timeScale: number): void {
+        if (this.hasGravity) {
+            this.ySpeed = Math.min(this.ySpeed + Entity.GRAVITY * timeScale, Entity.MAX_SPEED);
+        }
+
         this.x += this.xSpeed * timeScale;
         this.y += this.ySpeed * timeScale;
     }
@@ -29,10 +38,10 @@ class Entity implements iRenderable {
         this.y = data.getInt16(offset, true);
         offset += 2;
 
-        this.xSpeed = data.getInt16(offset, true);
-        offset += 2;
-        this.ySpeed = data.getInt16(offset, true);
-        offset += 2;
+        this.xSpeed = data.getFloat32(offset, true);
+        offset += 4;
+        this.ySpeed = data.getFloat32(offset, true);
+        offset += 4;
     }
 
     public render(ctx: CanvasRenderingContext2D, camera: Camera): void {

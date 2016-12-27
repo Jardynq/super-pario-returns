@@ -2,6 +2,7 @@
     constructor(id: number, entityData: any) {
         super(id, entityData);
 
+        this.hasGravity = true;
         this.height = 60;
         this.width = 30;
         this.color = "aquaMarine";
@@ -30,14 +31,6 @@ class MainPlayerEntity extends PlayerEntity {
             this.xSpeed = -300;
         } else {
             this.xSpeed = 0;
-        }
-
-        if (Keyboard.isKeyDown("ArrowUp")) {
-            this.ySpeed = -300;
-        } else if (Keyboard.isKeyDown("ArrowDown")) {
-            this.ySpeed = 300;
-        } else {
-            this.ySpeed = 0;
         }
 
         if (oldXSpeed != this.xSpeed || oldYSpeed != this.ySpeed) {

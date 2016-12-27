@@ -13,6 +13,7 @@ namespace Server.Entities
         {
             Height = 60;
             Width = 30;
+            HasGravity = true;
 
             X = Program.rnd.Next(500);
             Y = Program.rnd.Next(500);

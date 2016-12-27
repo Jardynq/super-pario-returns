@@ -12,6 +12,9 @@ class Camera {
     public zoom: number = 1;
     public room: GameRoom;
 
+    public maxZoom: number = 3;
+    public minZoom: number = 0.5;
+
     constructor(room: GameRoom) {
         this.room = room;
     }
