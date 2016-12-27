@@ -18,9 +18,9 @@ namespace Server
         private static WebSocketServer server;
 
         // Number of frames per second in the simulation
-        public const int TARGET_FRAMERATE = 30;
+        public const int TARGET_FRAMERATE = 60;
         // Number of entity update packets per second
-        public const int TARGET_UPDATE_RATE = 5;
+        public const int TARGET_UPDATE_RATE = 1;
 
         static void Main(string[] args)
         {
@@ -69,6 +69,9 @@ namespace Server
                 {
                     case PACKET_TYPE.PLAYER_ACTION:
                         packet = PlayerActionPacket.Parse(reader);
+                        break;
+                    case PACKET_TYPE.PING:
+                        packet = PingPacket.Parse(reader);
                         break;
                     default:
                         return base.OnMessage(e); // Packet not recognized. Ignore it.

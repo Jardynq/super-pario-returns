@@ -48,6 +48,7 @@ namespace Server.Packets
         MAP,
         JOIN,
         PLAYER_ACTION,
-        ENTITY
+        ENTITY,
+        PING
     }
 }
