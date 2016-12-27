@@ -1,8 +1,8 @@
 var GameRoom = function () {
       // Register socket handlers
-      Socket.registerHandler("map", this, this.loadMap);
-      Socket.registerHandler("entity", this, this.updateEntities);
-      Socket.registerHandler("join", this, this.onJoin);
+      Socket.registerHandler(Socket.PACKET_TYPES.map, this, this.loadMap);
+      Socket.registerHandler(Socket.PACKET_TYPES.entity, this, this.updateEntities);
+      Socket.registerHandler(Socket.PACKET_TYPES.join, this, this.onJoin);
 
       this.render = new Render.Render();
       this.tileRenderer = null;
@@ -25,11 +25,8 @@ GameRoom.prototype.step = function (timeScale) {
 };
 
 // Packet handler functions
-GameRoom.prototype.loadMap = function (tileData) {
-      this.map = new TileMap.Map(tileData, 50);
-
-      // Generates our tilemap
-      this.map.generateMap();
+GameRoom.prototype.loadMap = function (reader) {
+      this.map = new TileMap.Map(reader, 50);
 
       // Initializes the render engine for tiles
       if (this.tileRenderer !== null) {
@@ -45,39 +42,45 @@ GameRoom.prototype.loadMap = function (tileData) {
       this.entityRenderer = new Render.EntityRenderer(this);
       this.entityRenderer.addToRenderQueue(this.render.renderQueue);
 };
-GameRoom.prototype.updateEntities = function (entityString) {
-      var entityData = JSON.parse(entityString).Entities;
+GameRoom.prototype.updateEntities = function (reader) {
+      var amount = reader.getUint16(1, true);
 
-      for (var id in entityData) {
-            var ent = entityData[id];
+      var offset = 3;
+      for (i = 0; i < amount; i++) {
+            // The length in bytes of this entity
+            var entityLength = reader.getUint8(offset, true);
+            var entityData = reader.buffer.slice(offset, offset + entityLength + 1);
+            var entityView = new DataView(entityData);
+            var id = entityView.getUint16(1, true);
+            offset += entityData.byteLength;
+
             if (this.entities[id] === undefined) {
+                  var type = entityView.getUint8(2, true);
                   var entity;
-                  if (ent.Type === "player") {
-                        entity = new PlayerEntity();
+
+                  if (type === Entity.ENTITY_TYPES.player) {
+                        entity = new PlayerEntity(entityView);
                   } else {
-                        alert("UNKNOWN ENTITY TYPE YOU FGT");
+                        throw "Unknown entity recieved. Type is: " + type;
                   }
 
                   entity.id = id;
-                  entity.update(ent);
                   this.addToEntities(entity);
             } else {
-                  this.entities[id].update(ent);
+                  this.entities[id].update(entityView);
             }
       }
 
-      // Player Actions
+      /*// Player Actions
       if (this.player !== null) {
             Socket.sendPacket("playerAct", {
                   xSpeed: this.player.xSpeed,
                   ySpeed: this.player.ySpeed
             });
-      }
+      }*/
 };
-GameRoom.prototype.onJoin = function (dataString) {
-      var joinData = JSON.parse(dataString);
-
-      this.player = this.entities[joinData.PlayerEntityID];
+GameRoom.prototype.onJoin = function (reader) {
+      this.player = this.entities[reader.getUint16(1, true)];
       this.player.setMain();
 };
 

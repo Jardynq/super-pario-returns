@@ -83,13 +83,6 @@ var Render = (function () {
                         tile.render(ctx, render, this.tileMap.tilesize);   
                   }
             }
-
-            /*
-            for (i = 0; i < this.tileMap.tiles.length; i++) {
-                  var tile = this.tileMap.tiles[i];
-                  
-                  tile.render(ctx, render, this.tileMap.tilesize);
-            }*/
       };
 
 

@@ -1,38 +1,32 @@
 TileMap = (function () {
       var ns = {};
 
-      ns.Map = function Map (tileData, tilesize) {
-            this.tileData = tileData;
+      ns.Map = function Map (reader, tilesize) {
             this.tilesize = tilesize;
             this.width = null;
             this.height = null;
             this.tiles = [];
+            
+            this.generateMap(reader);
       };
-      ns.Map.prototype.generateMap = function () {
-            // Formats the map we got from the server
+      ns.Map.prototype.generateMap = function (reader) {
+            this.width = reader.getUint8(1, true);
 
-            var rows = this.tileData.split('|');
+            // Parses the byte array
+            for (var i = 2; i < reader.byteLength; i++) {
+                  var tile = reader.getUint8(i, true);
+                  var x = (i - 2) % this.width;
+                  var y = (i - 2 - x) / this.width;
 
-            // Get the width of the map
-            this.width = rows[0].split(',').length;
-
-            // Generate the map from the supplied string
-            for (var y = 0; y < rows.length; y++) {
-            var columns = rows[y].split(',');
-                  for (var x = 0; x < columns.length; x++) {
-                        var tileData = columns[x];
-                        if (tileData == "0") { // Sky
-                              this.tiles[y * this.width + x] = new Tile.ColorTile("blue", x, y, false);
-                        }
-                        if (tileData == "1") { // Ground
-                              this.tiles[y * this.width + x] = new Tile.ColorTile("black", x, y, true);
-                        }
-                        if (tileData == "2") { // Debug
-                              this.tiles[y * this.width + x] = new Tile.ColorTile("yellow", x, y, true);
-                              console.log(this.tiles[y * this.width + x]);
-                        }
+                  if (tile === 0) { // Sky
+                        this.tiles[i - 2] = new Tile.ColorTile("blue", x, y, false);
+                  }
+                  if (tile == 1) { // Ground
+                        this.tiles[i - 2] = new Tile.ColorTile("black", x, y, true);
                   }
             }
+
+            console.log(this.tiles);
 
             // Sets the height var
             this.height = this.tiles.length / this.width;
