@@ -8,7 +8,7 @@ var Socket = (function () {
        * 
        */
       ns.connect = function (callback) {
-            ns.socket = new WebSocket("ws:localhost/");
+            ns.socket = new WebSocket("ws:192.168.0.20");
             ns.socket.onmessage = ns.onMessage;
             ns.socket.onopen = callback;
       };
@@ -31,7 +31,6 @@ var Socket = (function () {
        * 
        */
       ns.onMessage = function(e) {
-            console.log(e);
             var packetType = e.data.substr(0, 10).trim();
             var packetData = e.data.substr(10);
 

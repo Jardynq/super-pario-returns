@@ -8,7 +8,7 @@ var Render = (function () {
       ns.Render = function () {
             this.renderQueue = [];
             this.offsetX = 0;
-            this.offsetY = 0;
+            this.offsetY = 0;//-1850;
             this.zoom = 1;
       };
 
@@ -61,11 +61,35 @@ var Render = (function () {
       };
       ns.TileRenderer.prototype = Object.create(ns.RenderObject.prototype); // TileRenderer inherits RenderObject
       ns.TileRenderer.prototype.render = function (ctx, render) {
+            
+            var startTile = this.tileMap.getTile(0 - (render.offsetX / this.tileMap.tilesize), 0 - (render.offsetY / this.tileMap.tilesize));
+
+            var endTile = this.tileMap.getTile(canvas.width / (this.tileMap.tilesize * render.zoom) - (render.offsetX / this.tileMap.tilesize), canvas.height / (this.tileMap.tilesize * render.zoom) - (render.offsetY / this.tileMap.tilesize));
+
+            // Makes sure that if the endtile.y is bigger than the bottom of the map set it to the bottom of the map
+            if (endTile === null) {
+                  endTile = this.tileMap.getTile(this.tileMap.width - 1, this.tileMap.height - 1);
+            }
+
+
+            // Renders all of the tile that are in between endtile and startTile, aka on render on screen
+            for (var i = startTile.y; i <= endTile.y; i++) {
+                  for (var g = startTile.x; g <= endTile.x; g++) {
+                        var tile = this.tileMap.getTile(g, i);
+                        if (tile === null) {
+                              continue;
+                        }
+
+                        tile.render(ctx, render, this.tileMap.tilesize);   
+                  }
+            }
+
+            /*
             for (i = 0; i < this.tileMap.tiles.length; i++) {
                   var tile = this.tileMap.tiles[i];
                   
                   tile.render(ctx, render, this.tileMap.tilesize);
-            }
+            }*/
       };
 
 
