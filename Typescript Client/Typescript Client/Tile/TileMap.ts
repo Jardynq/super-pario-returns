@@ -26,10 +26,10 @@ class TileMap implements iRenderable {
     }
 
     public render(ctx: CanvasRenderingContext2D, camera: Camera) {
-        var xStart: number = camera.offset.x / camera.room.tilesize;
-        var yStart: number = camera.offset.y / camera.room.tilesize;
-        var screenWidth: number = ctx.canvas.width / camera.room.tilesize;
-        var screenHeight: number = ctx.canvas.height / camera.room.tilesize;
+        var xStart: number = Math.floor(-camera.offset.x / camera.room.tilesize);
+        var yStart: number = Math.floor(-camera.offset.y / camera.room.tilesize);
+        var screenWidth: number = ctx.canvas.width / camera.room.tilesize / camera.zoom + 1;
+        var screenHeight: number = ctx.canvas.height / camera.room.tilesize / camera.zoom + 1;
 
         for (var x: number = Math.max(0, xStart); x < Math.min(xStart + screenWidth, this.width); x++) {
             for (var y: number = Math.max(0, yStart); y < Math.min(yStart + screenHeight, this.height); y++) {

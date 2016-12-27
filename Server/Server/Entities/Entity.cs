@@ -10,6 +10,9 @@ namespace Server.Entities
 {
     public class Entity
     {
+        const float GRAVITY = 60;
+        const float MAX_SPEED = 3000;
+
         public float X = 0;
         public float Y = 0;
 
@@ -22,6 +25,8 @@ namespace Server.Entities
         public ushort ID = 0;
         public ENTITY_TYPE Type;
 
+        public bool HasGravity = false;
+
         public GameRoom Room;
 
         public Entity (GameRoom room)
@@ -32,6 +37,10 @@ namespace Server.Entities
 
         public void Step (float timeScale)
         {
+            if (HasGravity) {
+                YSpeed = Math.Min(YSpeed + GRAVITY * timeScale, MAX_SPEED);
+            }
+
             X += XSpeed * timeScale;
             Y += YSpeed * timeScale;
         }
@@ -47,8 +56,8 @@ namespace Server.Entities
                 writer.Write((byte)Type);
                 writer.Write((short)X);
                 writer.Write((short)Y);
-                writer.Write((short)XSpeed);
-                writer.Write((short)YSpeed);
+                writer.Write((float)XSpeed);
+                writer.Write((float)YSpeed);
             }
 
             byte[] output = stream.ToArray();

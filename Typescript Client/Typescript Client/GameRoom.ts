@@ -18,6 +18,8 @@ class GameRoom {
         socket.registerHandler(PACKET_TYPE.ENTITY, this.updateEntities.bind(this));
         socket.registerHandler(PACKET_TYPE.JOIN, this.onJoin.bind(this));
         socket.registerHandler(PACKET_TYPE.PING, (reader) => socket.sendPacket(reader));
+
+        window.addEventListener("wheel", this.onScroll.bind(this));
     }
 
     /**
@@ -27,12 +29,17 @@ class GameRoom {
     public step(timeScale: number): void {
         for (var id in this.entities) {
             this.entities[id].step(timeScale);
-        }
-    }
+        }    }
 
     public renderAll(ctx: CanvasRenderingContext2D): void {
         // Clear the canvas from previous rendering passes
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Update the camera
+        if (this.player !== undefined) {
+            this.camera.offset.x = -this.player.x + (ctx.canvas.width * 0.5 / this.camera.zoom);
+            this.camera.offset.y = -this.player.y + (ctx.canvas.height * 0.5 / this.camera.zoom);
+        }
 
         if (this.map !== undefined) {
             this.map.render(ctx, this.camera);
@@ -40,6 +47,18 @@ class GameRoom {
 
         for (var id in this.entities) {
             this.entities[id].render(ctx, this.camera);
+        }
+    }
+
+
+    /**
+     * Handles scrolling
+     */
+    public onScroll(e: WheelEvent) {
+        if (e.deltaY < 0) {
+            this.camera.zoom = Math.min(this.camera.zoom * 1.1, this.camera.maxZoom);
+        } else {
+            this.camera.zoom = Math.max(this.camera.zoom / 1.1, this.camera.minZoom);
         }
     }
 
