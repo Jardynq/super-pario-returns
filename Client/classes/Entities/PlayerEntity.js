@@ -6,41 +6,63 @@ var PlayerEntity = function (reader) {
       this.isMain = false;
 
       this.walkSpeed = 500;
-      this.jumpHeight = 500;
+      this.jumpHeight = 1200;
 
       this.width = 30;
       this.height = 60;
+
+      this.hasGravity = true;
+      this.gravity = 60;
 };
 PlayerEntity.prototype = Object.create(Entity.prototype); // PlayerEntity inherits Entity
 PlayerEntity.prototype.step = function (timescale) {
       Entity.prototype.step.call(this, timescale);
       
       if (this.isMain) {
-            var oldXSpeed = this.xSpeed;
-            var oldYSpeed = this.ySpeed;
+            this.oldXSpeed = this.xSpeed;
+            this.oldYSpeed = this.ySpeed;
 
-            if (Input.isKeyDown("ArrowRight")) {
-                  this.xSpeed = this.walkSpeed;
-            } else if (Input.isKeyDown("ArrowLeft")) {
-                  this.xSpeed = -this.walkSpeed;
-            } else {
-                  this.xSpeed = 0;
-            }
-            if (Input.isKeyDown("ArrowUp")) {
-                  this.ySpeed = -this.jumpHeight;
-            } else if (Input.isKeyDown("ArrowDown")) {
-                  this.ySpeed = this.jumpHeight;
-            } else {
-                  this.ySpeed = 0;
-            }
+            this.updateMovement();
 
-            if (oldXSpeed != this.xSpeed || oldYSpeed != this.ySpeed) {
-                  var actionPacket = new DataView(new ArrayBuffer(5));
-                  actionPacket.setUint8(0, Socket.PACKET_TYPES.playerAction);
-                  actionPacket.setInt16(1, this.xSpeed, true);
-                  actionPacket.setInt16(3, this.ySpeed, true);
-                  Socket.sendPacket(actionPacket);
-            }
+            this.updateCollisionX();
+            this.updateCollisionY();
+
+            this.sendActionPacket();
+      }
+};
+
+// Movement
+PlayerEntity.prototype.updateMovement = function () {
+      // Left - right movement
+      if (Input.isKeyDown("KeyD")) {
+            this.xSpeed = this.walkSpeed;
+      } else if (Input.isKeyDown("KeyA")) {
+            this.xSpeed = -this.walkSpeed;
+      } else {
+            this.xSpeed = 0;
+      }
+};
+PlayerEntity.prototype.onKeyDown = function () {
+      if (Input.isKeyDown("KeyW")) {
+            this.ySpeed = -this.jumpHeight;
+      }
+};
+PlayerEntity.prototype.updateCollisionX = function() {
+
+};
+PlayerEntity.prototype.updateCollisionY = function() {
+      if (this.y >= 1500) {
+            this.y = 1500;
+            this.ySpeed = 0;
+      }
+};
+PlayerEntity.prototype.sendActionPacket = function (oldXSpeed, oldYSpeed) {
+      if (this.oldXSpeed != this.xSpeed || this.oldYSpeed != this.ySpeed) {
+            var actionPacket = new DataView(new ArrayBuffer(5));
+            actionPacket.setUint8(0, Socket.PACKET_TYPES.playerAction);
+            actionPacket.setInt16(1, this.xSpeed, true);
+            actionPacket.setInt16(3, this.ySpeed, true);
+            Socket.sendPacket(actionPacket);
       }
 };
 

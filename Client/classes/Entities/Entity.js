@@ -24,6 +24,10 @@ Entity.prototype.update = function (reader) {
 };
 
 Entity.prototype.step = function (timeScale) {
+      if (this.hasGravity) {
+            this.ySpeed = Math.min(this.gravity, room.maxFallSpeed) * timeScale;
+      }
+
       this.x += this.xSpeed * timeScale;
       this.y += this.ySpeed * timeScale;
 };

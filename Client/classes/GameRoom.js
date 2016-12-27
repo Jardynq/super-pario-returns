@@ -15,6 +15,8 @@ var GameRoom = function () {
       this.mouseY = null;
 
       this.player = null;
+
+      this.maxFallSpeed = 3000;
 };
 // Main step function
 GameRoom.prototype.step = function (timeScale) {
@@ -71,14 +73,6 @@ GameRoom.prototype.updateEntities = function (reader) {
                   this.entities[id].update(entityView);
             }
       }
-
-      /*// Player Actions
-      if (this.player !== null) {
-            Socket.sendPacket("playerAct", {
-                  xSpeed: this.player.xSpeed,
-                  ySpeed: this.player.ySpeed
-            });
-      }*/
 };
 GameRoom.prototype.onJoin = function (reader) {
       this.player = this.entities[reader.getUint16(1, true)];
@@ -125,7 +119,7 @@ GameRoom.prototype.removeFromEntities = function (entity) {
 
 // Inputs
 GameRoom.prototype.onKeyDown = function (e) {
-
+      this.player.onKeyDown();
 };
 GameRoom.prototype.onKeyUp = function (e) {      
       
