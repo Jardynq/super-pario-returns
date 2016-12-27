@@ -45,6 +45,7 @@ PlayerEntity.prototype.updateMovement = function () {
 PlayerEntity.prototype.onKeyDown = function () {
       if (Input.isKeyDown("KeyW")) {
             this.ySpeed = -this.jumpHeight;
+            this.sendActionPacket();
       }
 };
 PlayerEntity.prototype.updateCollisionX = function() {
@@ -56,7 +57,7 @@ PlayerEntity.prototype.updateCollisionY = function() {
             this.ySpeed = 0;
       }
 };
-PlayerEntity.prototype.sendActionPacket = function (oldXSpeed, oldYSpeed) {
+PlayerEntity.prototype.sendActionPacket = function () {
       if (this.oldXSpeed != this.xSpeed || this.oldYSpeed != this.ySpeed) {
             var actionPacket = new DataView(new ArrayBuffer(5));
             actionPacket.setUint8(0, Socket.PACKET_TYPES.playerAction);
