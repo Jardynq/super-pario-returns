@@ -14,7 +14,7 @@ namespace Server.Packets
         public TileMap Map;
 
         public MapPacket (TileMap map) {
-            PacketType = PACKET_TYPE.MAP;
+            PacketType = PacketType.Map;
             Map = map;
         }
 

@@ -5,6 +5,11 @@ class Entity implements iRenderable {
 
     public x: number = 0;
     public y: number = 0;
+
+    // Used to smooth out entity movement by easing between states
+    public renderX: number = 0;
+    public renderY: number = 0;
+
     public xSpeed: number = 0;
     public ySpeed: number = 0;
     public width: number = 0;
@@ -16,8 +21,8 @@ class Entity implements iRenderable {
     public color: string;
 
     // Constants
-    public static GRAVITY: number = 100;
-    public static MAX_SPEED: number = 100;
+    public static Gravity: number = 100;
+    public static MaxSpeed: number = 100;
 
     constructor(id: number, room: GameRoom, data: DataView) {
         this.id = id;
@@ -27,7 +32,7 @@ class Entity implements iRenderable {
 
     public step(timeScale: number): void {
         if (this.hasGravity) {
-            this.ySpeed = Math.min(this.ySpeed + Entity.GRAVITY * timeScale, Entity.MAX_SPEED);
+            this.ySpeed = Math.min(this.ySpeed + Entity.Gravity * timeScale, Entity.MaxSpeed);
         }
 
         this.onGround = false;
@@ -35,6 +40,9 @@ class Entity implements iRenderable {
         this.HandleCollision(true);
         this.y += this.ySpeed * timeScale;
         this.HandleCollision(false);
+
+        this.renderX += (this.x - this.renderX) * 0.5;
+        this.renderY += (this.y - this.renderY) * 0.5;
     }
 
     public update(data: DataView) {
@@ -59,6 +67,8 @@ class Entity implements iRenderable {
         collisionTiles.push(this.room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y - this.height * 0.5 + 0.3));
         collisionTiles.push(this.room.map.getTileAt(this.x - this.width * 0.5 + 0.3, this.y + this.height * 0.5 - 0.3));
         collisionTiles.push(this.room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y + this.height * 0.5 - 0.3));
+        collisionTiles.push(this.room.map.getTileAt(this.x - this.width * 0.5 + 0.3, this.y));
+        collisionTiles.push(this.room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y));
 
         for (var i = 0; i < collisionTiles.length; i++) {
             var tile = collisionTiles[i];
@@ -86,7 +96,7 @@ class Entity implements iRenderable {
 
     public render(ctx: CanvasRenderingContext2D, camera: Camera): void {
         ctx.beginPath();
-        ctx.rect((this.x + camera.offset.x - this.width * 0.5) * camera.zoom, (this.y + camera.offset.y - this.height * 0.5) * camera.zoom, this.width * camera.zoom, this.height * camera.zoom);
+        ctx.rect((this.renderX + camera.offset.x - this.width * 0.5) * camera.zoom, (this.renderY + camera.offset.y - this.height * 0.5) * camera.zoom, this.width * camera.zoom, this.height * camera.zoom);
         ctx.fillStyle = this.color;
 
         ctx.stroke();
@@ -94,6 +104,6 @@ class Entity implements iRenderable {
     }
 }
 
-enum ENTITY_TYPE {
-    PLAYER
+enum EntityType {
+    Player
 }

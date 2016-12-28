@@ -23,7 +23,7 @@ namespace Server.Entities
         public double YSpeed = 0;
 
         public ushort ID = 0;
-        public ENTITY_TYPE Type;
+        public EntityType Type;
 
         public bool HasGravity = false;
 
@@ -56,6 +56,8 @@ namespace Server.Entities
             collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5 - 0.3), (float)(Y - Height * 0.5 + 0.3)));
             collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5 + 0.3), (float)(Y + Height * 0.5 - 0.3)));
             collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5 - 0.3), (float)(Y + Height * 0.5 - 0.3)));
+            collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5 + 0.3), (float)(Y)));
+            collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5 - 0.3), (float)(Y)));
 
             foreach (Tile.Tile tile in collisionTiles) {
                 if (tile != null && tile.HasCollision) {
@@ -103,8 +105,8 @@ namespace Server.Entities
         }
     }
 
-    public enum ENTITY_TYPE : byte
+    public enum EntityType : byte
     {
-        PLAYER
+        Player
     }
 }

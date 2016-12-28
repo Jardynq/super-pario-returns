@@ -17,7 +17,7 @@ namespace Server.Packets
         public EntityPacket (Dictionary<ushort, Entity> entities)
         {
             Entities = entities.ToDictionary(entry => entry.Key, entry => entry.Value);
-            PacketType = PACKET_TYPE.ENTITY;
+            PacketType = PacketType.Entity;
         }
 
         public override byte[] Serialize()

@@ -10,7 +10,7 @@ namespace Server.Packets
 {
     public class Packet
     {
-        public PACKET_TYPE PacketType;
+        public PacketType PacketType;
 
         public virtual void Handle (GameService session)
         {
@@ -44,11 +44,11 @@ namespace Server.Packets
         }
     }
 
-    public enum PACKET_TYPE : byte {
-        MAP,
-        JOIN,
-        PLAYER_ACTION,
-        ENTITY,
-        PING
+    public enum PacketType : byte {
+        Map,
+        Join,
+        PlayerAction,
+        Entity,
+        Ping
     }
 }

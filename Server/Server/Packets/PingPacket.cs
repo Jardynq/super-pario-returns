@@ -10,7 +10,7 @@ namespace Server.Packets
     {
         public double Timestamp;
         public PingPacket () {
-            PacketType = PACKET_TYPE.PING;
+            PacketType = PacketType.Ping;
             Timestamp = DateTime.UtcNow.ToUniversalTime().Subtract(
                 new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             ).TotalMilliseconds;

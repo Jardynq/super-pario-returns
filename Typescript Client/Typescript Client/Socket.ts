@@ -23,11 +23,11 @@ class Socket {
         }
     }
 
-    public registerHandler(packetType: PACKET_TYPE, handler: (reader: DataView) => void): void {
+    public registerHandler(packetType: PacketType, handler: (reader: DataView) => void): void {
         this.packetHandlers[packetType] = handler;
     }
 
-    public unregisterHandler = function (packetType: PACKET_TYPE): void {
+    public unregisterHandler = function (packetType: PacketType): void {
         delete this.packetHandlers[packetType];
     }
 
@@ -39,10 +39,10 @@ class Socket {
     };
 }
 
-enum PACKET_TYPE {
-    MAP,
-    JOIN,
-    PLAYER_ACTION,
-    ENTITY,
-    PING
+enum PacketType {
+    Map,
+    Join,
+    PlayerAction,
+    Entity,
+    Ping
 }

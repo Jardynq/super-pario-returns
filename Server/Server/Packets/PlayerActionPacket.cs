@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Server.Entities;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,11 +10,10 @@ namespace Server.Packets
 {
     public class PlayerActionPacket : Packet
     {
-        public int XSpeed;
-        public int YSpeed;
+        public PlayerActionType Type;
 
         public PlayerActionPacket () {
-            PacketType = PACKET_TYPE.PLAYER_ACTION;
+            PacketType = PacketType.PlayerAction;
         }
 
         public override void Handle(GameService session)
@@ -23,8 +23,18 @@ namespace Server.Packets
             // Move the player forward before resetting their speed
             player.entity.Room.Step();
 
-            player.entity.XSpeed = XSpeed;
-            player.entity.YSpeed = YSpeed;
+            if (Type == PlayerActionType.MoveLeft) {
+                player.entity.XSpeed = -PlayerEntity.MOVE_SPEED;
+            } else if (Type == PlayerActionType.MoveRight) {
+                player.entity.XSpeed = PlayerEntity.MOVE_SPEED;
+            } else if (Type == PlayerActionType.StopMove) {
+                player.entity.XSpeed = 0;
+            }
+            Console.WriteLine(player.entity.XSpeed);
+
+            if (Type == PlayerActionType.Jump) {
+                player.entity.YSpeed = -PlayerEntity.JUMP_FORCE;
+            }
 
             // Send an entity update packet containing only this entity
             var entities = new Dictionary<ushort, Entities.Entity>();
@@ -36,10 +46,16 @@ namespace Server.Packets
 
         public static PlayerActionPacket Parse (BinaryReader reader) {
             PlayerActionPacket packet = new PlayerActionPacket();
-            packet.XSpeed = reader.ReadInt16();
-            packet.YSpeed = reader.ReadInt16();
+            packet.Type = (PlayerActionType)reader.ReadByte();
 
             return packet;
         }
+    }
+
+    public enum PlayerActionType : byte {
+        MoveLeft,
+        MoveRight,
+        StopMove,
+        Jump
     }
 }

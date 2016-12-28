@@ -9,6 +9,9 @@ namespace Server.Entities
 {
     public class PlayerEntity : Entity
     {
+        public const short MOVE_SPEED = 500;
+        public const short JUMP_FORCE = 1000;
+
         public PlayerEntity (GameRoom room) : base(room)
         {
             Height = 60;
@@ -18,7 +21,7 @@ namespace Server.Entities
             X = Program.rnd.Next(500);
             Y = Program.rnd.Next(500);
 
-            Type = ENTITY_TYPE.PLAYER;
+            Type = EntityType.Player;
         }
     }
 }

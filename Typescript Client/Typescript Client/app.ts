@@ -10,7 +10,7 @@ var lastTickCount: number = new Date().getTime();
 /**
  * Connect to the server
  */
-var socket: Socket = new Socket("ws:localhost/", () => {
+var socket: Socket = new Socket("ws:192.168.0.16/", () => {
     // Runs on succesful connection
 
     init();
@@ -26,7 +26,7 @@ function init(): void {
     ctx = canvas.getContext("2d");
     fixCanvas();
 
-    window.addEventListener("resize", fixCanvas); 
+    window.addEventListener("resize", fixCanvas);
 }
 
 /**

@@ -22,7 +22,7 @@ namespace Server.Packets
 
         public JoinPacket (Player player)
         {
-            PacketType = PACKET_TYPE.JOIN;
+            PacketType = PacketType.Join;
             Player = player;
         }
 
@@ -32,6 +32,8 @@ namespace Server.Packets
             using (BinaryWriter writer = new BinaryWriter(stream)) {
                 writer.Write((float)Entity.GRAVITY);
                 writer.Write((float)Entity.MAX_SPEED);
+                writer.Write((short)PlayerEntity.MOVE_SPEED);
+                writer.Write((short)PlayerEntity.JUMP_FORCE);
                 writer.Write(Player.entity.Serialize());
 
                 return stream.ToArray();

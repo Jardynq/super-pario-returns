@@ -13,10 +13,10 @@ class GameRoom {
     public player: MainPlayerEntity;
 
     constructor() {
-        socket.registerHandler(PACKET_TYPE.MAP, this.loadMap.bind(this));
-        socket.registerHandler(PACKET_TYPE.ENTITY, this.updateEntities.bind(this));
-        socket.registerHandler(PACKET_TYPE.JOIN, this.onJoin.bind(this));
-        socket.registerHandler(PACKET_TYPE.PING, (reader) => socket.sendPacket(reader));
+        socket.registerHandler(PacketType.Map, this.loadMap.bind(this));
+        socket.registerHandler(PacketType.Entity, this.updateEntities.bind(this));
+        socket.registerHandler(PacketType.Join, this.onJoin.bind(this));
+        socket.registerHandler(PacketType.Ping, (reader) => socket.sendPacket(reader));
 
         window.addEventListener("wheel", this.onScroll.bind(this));
     }
@@ -28,7 +28,9 @@ class GameRoom {
     public step(timeScale: number): void {
         for (var id in this.entities) {
             this.entities[id].step(timeScale);
-        }    }
+        }
+        this.camera.step();
+    }
 
     public renderAll(ctx: CanvasRenderingContext2D): void {
         // Clear the canvas from previous rendering passes
@@ -36,8 +38,8 @@ class GameRoom {
 
         // Update the camera
         if (this.player !== undefined) {
-            this.camera.offset.x = -this.player.x + (ctx.canvas.width * 0.5 / this.camera.zoom);
-            this.camera.offset.y = -this.player.y + (ctx.canvas.height * 0.5 / this.camera.zoom);
+            this.camera.targetOffset.x = -this.player.x + (ctx.canvas.width * 0.5 / this.camera.zoom);
+            this.camera.targetOffset.y = -this.player.y + (ctx.canvas.height * 0.5 / this.camera.zoom);
         }
 
         if (this.map !== undefined) {
@@ -85,7 +87,7 @@ class GameRoom {
                 var type = entityView.getUint8(2);
                 var entity: Entity;
 
-                if (type === ENTITY_TYPE.PLAYER) {
+                if (type === EntityType.Player) {
                     entity = new PlayerEntity(Number(id), this, entityView);
                 } else {
                     throw "Unknown entity recieved. Type is: " + type;
@@ -99,9 +101,11 @@ class GameRoom {
     }
 
     public onJoin(reader: DataView): void {
-        Entity.GRAVITY = reader.getFloat32(1, true);
-        Entity.MAX_SPEED = reader.getFloat32(5, true);
-        var playerID: number = reader.getUint16(9, true);
+        Entity.Gravity = reader.getFloat32(1, true);
+        Entity.MaxSpeed = reader.getFloat32(5, true);
+        PlayerEntity.moveSpeed = reader.getInt16(9, true);
+        PlayerEntity.jumpForce = reader.getInt16(11, true);
+        var playerID: number = reader.getUint16(13, true);
 
         this.player = new MainPlayerEntity(playerID, this, reader);
         this.entities[playerID] = this.player;

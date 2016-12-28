@@ -33,27 +33,27 @@ var Socket = (function () {
     ;
     return Socket;
 }());
-var PACKET_TYPE;
-(function (PACKET_TYPE) {
-    PACKET_TYPE[PACKET_TYPE["MAP"] = 0] = "MAP";
-    PACKET_TYPE[PACKET_TYPE["JOIN"] = 1] = "JOIN";
-    PACKET_TYPE[PACKET_TYPE["PLAYER_ACTION"] = 2] = "PLAYER_ACTION";
-    PACKET_TYPE[PACKET_TYPE["ENTITY"] = 3] = "ENTITY";
-    PACKET_TYPE[PACKET_TYPE["PING"] = 4] = "PING";
-})(PACKET_TYPE || (PACKET_TYPE = {}));
+var PacketType;
+(function (PacketType) {
+    PacketType[PacketType["Map"] = 0] = "Map";
+    PacketType[PacketType["Join"] = 1] = "Join";
+    PacketType[PacketType["PlayerAction"] = 2] = "PlayerAction";
+    PacketType[PacketType["Entity"] = 3] = "Entity";
+    PacketType[PacketType["Ping"] = 4] = "Ping";
+})(PacketType || (PacketType = {}));
 /// <reference path="./declarations.ts"/>
 var GameRoom = (function () {
     function GameRoom() {
         this.entities = {};
         this.camera = new Camera(this);
-        this.tilesize = 50;
         // Related to syncronisation
         this.lastEntityUpdateLocalTimestamp = 0;
         this.lastEntityUpdateServertimestamp = 0;
-        socket.registerHandler(PACKET_TYPE.MAP, this.loadMap.bind(this));
-        socket.registerHandler(PACKET_TYPE.ENTITY, this.updateEntities.bind(this));
-        socket.registerHandler(PACKET_TYPE.JOIN, this.onJoin.bind(this));
-        socket.registerHandler(PACKET_TYPE.PING, function (reader) { return socket.sendPacket(reader); });
+        socket.registerHandler(PacketType.Map, this.loadMap.bind(this));
+        socket.registerHandler(PacketType.Entity, this.updateEntities.bind(this));
+        socket.registerHandler(PacketType.Join, this.onJoin.bind(this));
+        socket.registerHandler(PacketType.Ping, function (reader) { return socket.sendPacket(reader); });
+        window.addEventListener("wheel", this.onScroll.bind(this));
     }
     /**
      * Frame step
@@ -63,10 +63,16 @@ var GameRoom = (function () {
         for (var id in this.entities) {
             this.entities[id].step(timeScale);
         }
+        this.camera.step();
     };
     GameRoom.prototype.renderAll = function (ctx) {
         // Clear the canvas from previous rendering passes
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Update the camera
+        if (this.player !== undefined) {
+            this.camera.targetOffset.x = -this.player.x + (ctx.canvas.width * 0.5 / this.camera.zoom);
+            this.camera.targetOffset.y = -this.player.y + (ctx.canvas.height * 0.5 / this.camera.zoom);
+        }
         if (this.map !== undefined) {
             this.map.render(ctx, this.camera);
         }
@@ -74,8 +80,19 @@ var GameRoom = (function () {
             this.entities[id].render(ctx, this.camera);
         }
     };
+    /**
+     * Handles scrolling
+     */
+    GameRoom.prototype.onScroll = function (e) {
+        if (e.deltaY < 0) {
+            this.camera.zoom = Math.min(this.camera.zoom * 1.1, this.camera.maxZoom);
+        }
+        else {
+            this.camera.zoom = Math.max(this.camera.zoom / 1.1, this.camera.minZoom);
+        }
+    };
     GameRoom.prototype.loadMap = function (reader) {
-        this.map = new TileMap();
+        this.map = new TileMap(50);
         this.map.parseMapPacket(reader);
     };
     GameRoom.prototype.updateEntities = function (reader) {
@@ -93,8 +110,8 @@ var GameRoom = (function () {
             if (this.entities[id] === undefined) {
                 var type = entityView.getUint8(2);
                 var entity;
-                if (type === ENTITY_TYPE.PLAYER) {
-                    entity = new PlayerEntity(Number(id), entityView);
+                if (type === EntityType.Player) {
+                    entity = new PlayerEntity(Number(id), this, entityView);
                 }
                 else {
                     throw "Unknown entity recieved. Type is: " + type;
@@ -107,8 +124,12 @@ var GameRoom = (function () {
         }
     };
     GameRoom.prototype.onJoin = function (reader) {
-        var playerID = reader.getUint16(1, true);
-        this.player = new MainPlayerEntity(playerID, reader);
+        Entity.Gravity = reader.getFloat32(1, true);
+        Entity.MaxSpeed = reader.getFloat32(5, true);
+        PlayerEntity.moveSpeed = reader.getInt16(9, true);
+        PlayerEntity.jumpForce = reader.getInt16(11, true);
+        var playerID = reader.getUint16(13, true);
+        this.player = new MainPlayerEntity(playerID, this, reader);
         this.entities[playerID] = this.player;
     };
     return GameRoom;
@@ -120,9 +141,19 @@ var Camera = (function () {
             x: 0,
             y: 0
         };
+        this.targetOffset = {
+            x: 0,
+            y: 0
+        };
         this.zoom = 1;
+        this.maxZoom = 3;
+        this.minZoom = 0.5;
         this.room = room;
     }
+    Camera.prototype.step = function () {
+        this.offset.x += (this.targetOffset.x - this.offset.x) * 0.5;
+        this.offset.y += (this.targetOffset.y - this.offset.y) * 0.5;
+    };
     return Camera;
 }());
 var Keyboard = (function () {
@@ -163,8 +194,9 @@ var Keyboard = (function () {
 window.addEventListener("load", Keyboard.init);
 /// <reference path="./../declarations.ts"/>
 var TileMap = (function () {
-    function TileMap() {
+    function TileMap(tilesize) {
         this.tiles = [];
+        this.tilesize = tilesize;
     }
     TileMap.prototype.parseMapPacket = function (reader) {
         // Get the width of the map
@@ -185,18 +217,31 @@ var TileMap = (function () {
         }
     };
     TileMap.prototype.render = function (ctx, camera) {
-        var xStart = camera.offset.x / camera.room.tilesize;
-        var yStart = camera.offset.y / camera.room.tilesize;
-        var screenWidth = ctx.canvas.width / camera.room.tilesize;
-        var screenHeight = ctx.canvas.height / camera.room.tilesize;
+        var xStart = Math.floor(-camera.offset.x / camera.room.map.tilesize);
+        var yStart = Math.floor(-camera.offset.y / camera.room.map.tilesize);
+        var screenWidth = ctx.canvas.width / camera.room.map.tilesize / camera.zoom + 1;
+        var screenHeight = ctx.canvas.height / camera.room.map.tilesize / camera.zoom + 1;
         for (var x = Math.max(0, xStart); x < Math.min(xStart + screenWidth, this.width); x++) {
             for (var y = Math.max(0, yStart); y < Math.min(yStart + screenHeight, this.height); y++) {
                 this.getTile(x, y).render(ctx, camera);
             }
         }
     };
+    /**
+     * Returns the tile at the specified tile coordinates (1.1, 1.2, 1.3 etc.)
+     */
     TileMap.prototype.getTile = function (x, y) {
+        if (x < 0 || x >= this.width)
+            return null;
+        if (y < 0 || y * this.width + x >= this.tiles.length)
+            return null;
         return this.tiles[y * this.width + x];
+    };
+    /**
+     * Returns the tile at the specified world coordinates
+     */
+    TileMap.prototype.getTileAt = function (x, y) {
+        return this.getTile(Math.floor(x / this.tilesize), Math.floor(y / this.tilesize));
     };
     return TileMap;
 }());
@@ -207,10 +252,10 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Tile = (function () {
-    function Tile(x, y, collision) {
+    function Tile(x, y, hasCollision) {
         this.x = x;
         this.y = y;
-        this.collision = collision;
+        this.hasCollision = hasCollision;
     }
     Tile.prototype.render = function (ctx, camera) {
     };
@@ -218,12 +263,12 @@ var Tile = (function () {
 }());
 var ColorTile = (function (_super) {
     __extends(ColorTile, _super);
-    function ColorTile(x, y, collision, color) {
-        _super.call(this, x, y, collision);
+    function ColorTile(x, y, hasCollision, color) {
+        _super.call(this, x, y, hasCollision);
         this.color = color;
     }
     ColorTile.prototype.render = function (ctx, camera) {
-        var tilesize = camera.room.tilesize;
+        var tilesize = camera.room.map.tilesize;
         ctx.beginPath();
         ctx.rect((this.x * tilesize + camera.offset.x) * camera.zoom, (this.y * tilesize + camera.offset.y) * camera.zoom, tilesize * camera.zoom, tilesize * camera.zoom);
         ctx.fillStyle = this.color;
@@ -235,19 +280,33 @@ var ColorTile = (function (_super) {
 }(Tile));
 /// <reference path="./../declarations.ts"/>
 var Entity = (function () {
-    function Entity(id, data) {
+    function Entity(id, room, data) {
         this.x = 0;
         this.y = 0;
+        // Used to smooth out entity movement by easing between states
+        this.renderX = 0;
+        this.renderY = 0;
         this.xSpeed = 0;
         this.ySpeed = 0;
         this.width = 0;
         this.height = 0;
+        this.onGround = false;
+        this.hasGravity = false;
         this.id = id;
+        this.room = room;
         this.update(data);
     }
     Entity.prototype.step = function (timeScale) {
+        if (this.hasGravity) {
+            this.ySpeed = Math.min(this.ySpeed + Entity.Gravity * timeScale, Entity.MaxSpeed);
+        }
+        this.onGround = false;
         this.x += this.xSpeed * timeScale;
+        this.HandleCollision(true);
         this.y += this.ySpeed * timeScale;
+        this.HandleCollision(false);
+        this.renderX += (this.x - this.renderX) * 0.5;
+        this.renderY += (this.y - this.renderY) * 0.5;
     };
     Entity.prototype.update = function (data) {
         var offset = 4; // To compensate for LENGTH, ID and TYPE
@@ -255,24 +314,61 @@ var Entity = (function () {
         offset += 2;
         this.y = data.getInt16(offset, true);
         offset += 2;
-        this.xSpeed = data.getInt16(offset, true);
-        offset += 2;
-        this.ySpeed = data.getInt16(offset, true);
-        offset += 2;
+        this.xSpeed = data.getFloat32(offset, true);
+        offset += 4;
+        this.ySpeed = data.getFloat32(offset, true);
+        offset += 4;
+    };
+    Entity.prototype.HandleCollision = function (x) {
+        var speed = x ? this.xSpeed : this.ySpeed;
+        var collisionTiles = [];
+        collisionTiles.push(this.room.map.getTileAt(this.x - this.width * 0.5 + 0.3, this.y - this.height * 0.5 + 0.3));
+        collisionTiles.push(this.room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y - this.height * 0.5 + 0.3));
+        collisionTiles.push(this.room.map.getTileAt(this.x - this.width * 0.5 + 0.3, this.y + this.height * 0.5 - 0.3));
+        collisionTiles.push(this.room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y + this.height * 0.5 - 0.3));
+        collisionTiles.push(this.room.map.getTileAt(this.x - this.width * 0.5 + 0.3, this.y));
+        collisionTiles.push(this.room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y));
+        for (var i = 0; i < collisionTiles.length; i++) {
+            var tile = collisionTiles[i];
+            if (tile != null && tile.hasCollision) {
+                if (x) {
+                    if (speed > 0) {
+                        this.x = tile.x * this.room.map.tilesize - this.width * 0.5;
+                    }
+                    else if (speed < 0) {
+                        this.x = tile.x * this.room.map.tilesize + this.room.map.tilesize + this.width * 0.5;
+                    }
+                    this.xSpeed = 0;
+                }
+                else {
+                    if (speed > 0) {
+                        this.y = tile.y * this.room.map.tilesize - this.height * 0.5;
+                        this.onGround = true;
+                    }
+                    else if (speed < 0) {
+                        this.y = tile.y * this.room.map.tilesize + this.room.map.tilesize + this.height * 0.5;
+                    }
+                    this.ySpeed = 0;
+                }
+            }
+        }
     };
     Entity.prototype.render = function (ctx, camera) {
         ctx.beginPath();
-        ctx.rect((this.x + camera.offset.x) * camera.zoom, (this.y + camera.offset.y) * camera.zoom, this.width * camera.zoom, this.height * camera.zoom);
+        ctx.rect((this.renderX + camera.offset.x - this.width * 0.5) * camera.zoom, (this.renderY + camera.offset.y - this.height * 0.5) * camera.zoom, this.width * camera.zoom, this.height * camera.zoom);
         ctx.fillStyle = this.color;
         ctx.stroke();
         ctx.fill();
     };
+    // Constants
+    Entity.Gravity = 100;
+    Entity.MaxSpeed = 100;
     return Entity;
 }());
-var ENTITY_TYPE;
-(function (ENTITY_TYPE) {
-    ENTITY_TYPE[ENTITY_TYPE["PLAYER"] = 0] = "PLAYER";
-})(ENTITY_TYPE || (ENTITY_TYPE = {}));
+var EntityType;
+(function (EntityType) {
+    EntityType[EntityType["Player"] = 0] = "Player";
+})(EntityType || (EntityType = {}));
 /// <reference path="./app.ts"/>
 /// <reference path="./Socket.ts"/>
 /// <reference path="./GameRoom.ts"/>
@@ -291,7 +387,7 @@ var lastTickCount = new Date().getTime();
 /**
  * Connect to the server
  */
-var socket = new Socket("ws:localhost/", function () {
+var socket = new Socket("ws:192.168.0.16/", function () {
     // Runs on succesful connection
     init();
     room = new GameRoom();
@@ -329,12 +425,15 @@ function step() {
 }
 var PlayerEntity = (function (_super) {
     __extends(PlayerEntity, _super);
-    function PlayerEntity(id, entityData) {
-        _super.call(this, id, entityData);
+    function PlayerEntity(id, room, entityData) {
+        _super.call(this, id, room, entityData);
+        this.hasGravity = true;
         this.height = 60;
         this.width = 30;
         this.color = "aquaMarine";
     }
+    PlayerEntity.moveSpeed = 0;
+    PlayerEntity.jumpForce = 0;
     return PlayerEntity;
 }(Entity));
 /**
@@ -342,40 +441,49 @@ var PlayerEntity = (function (_super) {
  */
 var MainPlayerEntity = (function (_super) {
     __extends(MainPlayerEntity, _super);
-    function MainPlayerEntity(id, entityData) {
-        _super.call(this, id, entityData);
+    function MainPlayerEntity(id, room, entityData) {
+        _super.call(this, id, room, entityData);
         this.color = "red";
     }
     MainPlayerEntity.prototype.step = function (timeScale) {
         _super.prototype.step.call(this, timeScale);
-        var oldXSpeed = this.xSpeed;
-        var oldYSpeed = this.ySpeed;
-        if (Keyboard.isKeyDown("ArrowRight")) {
-            this.xSpeed = 300;
+        // Prepare a packet in case it should be sent
+        var actionPacket = new DataView(new ArrayBuffer(3));
+        actionPacket.setUint8(0, PacketType.PlayerAction);
+        if (Keyboard.isKeyDown("ArrowLeft")) {
+            if (this.xSpeed != -PlayerEntity.moveSpeed) {
+                this.xSpeed = -PlayerEntity.moveSpeed;
+                actionPacket.setUint8(1, PlayerActionType.MoveLeft);
+                socket.sendPacket(actionPacket);
+            }
         }
-        else if (Keyboard.isKeyDown("ArrowLeft")) {
-            this.xSpeed = -300;
+        else if (Keyboard.isKeyDown("ArrowRight")) {
+            if (this.xSpeed != PlayerEntity.moveSpeed) {
+                this.xSpeed = PlayerEntity.moveSpeed;
+                actionPacket.setUint8(1, PlayerActionType.MoveRight);
+                socket.sendPacket(actionPacket);
+            }
         }
-        else {
+        else if (this.xSpeed != 0) {
             this.xSpeed = 0;
+            actionPacket.setUint8(1, PlayerActionType.StopMove);
+            socket.sendPacket(actionPacket);
         }
-        if (Keyboard.isKeyDown("ArrowUp")) {
-            this.ySpeed = -300;
-        }
-        else if (Keyboard.isKeyDown("ArrowDown")) {
-            this.ySpeed = 300;
-        }
-        else {
-            this.ySpeed = 0;
-        }
-        if (oldXSpeed != this.xSpeed || oldYSpeed != this.ySpeed) {
-            var actionPacket = new DataView(new ArrayBuffer(5));
-            actionPacket.setUint8(0, PACKET_TYPE.PLAYER_ACTION);
-            actionPacket.setInt16(1, this.xSpeed, true);
-            actionPacket.setInt16(3, this.ySpeed, true);
+        if (Keyboard.isKeyDown("ArrowUp") && this.onGround) {
+            this.ySpeed = -PlayerEntity.jumpForce;
+            actionPacket = new DataView(new ArrayBuffer(3));
+            actionPacket.setUint8(0, PacketType.PlayerAction);
+            actionPacket.setUint8(1, PlayerActionType.Jump);
             socket.sendPacket(actionPacket);
         }
     };
     return MainPlayerEntity;
 }(PlayerEntity));
+var PlayerActionType;
+(function (PlayerActionType) {
+    PlayerActionType[PlayerActionType["MoveLeft"] = 0] = "MoveLeft";
+    PlayerActionType[PlayerActionType["MoveRight"] = 1] = "MoveRight";
+    PlayerActionType[PlayerActionType["StopMove"] = 2] = "StopMove";
+    PlayerActionType[PlayerActionType["Jump"] = 3] = "Jump";
+})(PlayerActionType || (PlayerActionType = {}));
 //# sourceMappingURL=app.js.map

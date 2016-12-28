@@ -20,7 +20,7 @@ namespace Server
         // Number of frames per second in the simulation
         public const int TARGET_FRAMERATE = 60;
         // Number of entity update packets per second
-        public const int TARGET_UPDATE_RATE = 1;
+        public const double TARGET_UPDATE_RATE = 1;
 
         static void Main(string[] args)
         {
@@ -62,15 +62,15 @@ namespace Server
                 e.Data.CopyTo(memStream);
                 memStream.Position = 0;
 
-                PACKET_TYPE packetType = (PACKET_TYPE)reader.ReadByte();
+                PacketType packetType = (PacketType)reader.ReadByte();
                 Packet packet;
 
                 switch (packetType)
                 {
-                    case PACKET_TYPE.PLAYER_ACTION:
+                    case PacketType.PlayerAction:
                         packet = PlayerActionPacket.Parse(reader);
                         break;
-                    case PACKET_TYPE.PING:
+                    case PacketType.Ping:
                         packet = PingPacket.Parse(reader);
                         break;
                     default:

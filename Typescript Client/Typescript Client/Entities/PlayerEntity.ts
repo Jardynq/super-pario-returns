@@ -1,4 +1,7 @@
 ﻿class PlayerEntity extends Entity {
+    public static moveSpeed: number = 0;
+    public static jumpForce: number = 0;
+
     constructor(id: number, room: GameRoom, entityData: any) {
         super(id, room, entityData);
 
@@ -22,27 +25,42 @@ class MainPlayerEntity extends PlayerEntity {
     public step(timeScale: number): void {
         super.step(timeScale);
 
-        var oldXSpeed: number = this.xSpeed;
-        var oldYSpeed: number = this.ySpeed;
+        // Prepare a packet in case it should be sent
+        var actionPacket = new DataView(new ArrayBuffer(3));
+        actionPacket.setUint8(0, PacketType.PlayerAction);
 
-        if (Keyboard.isKeyDown("ArrowRight")) {
-            this.xSpeed = 500;
-        } else if (Keyboard.isKeyDown("ArrowLeft")) {
-            this.xSpeed = -500;
-        } else {
+        if (Keyboard.isKeyDown("ArrowLeft")) {
+            if (this.xSpeed != -PlayerEntity.moveSpeed) {
+                this.xSpeed = -PlayerEntity.moveSpeed;
+                actionPacket.setUint8(1, PlayerActionType.MoveLeft);
+                socket.sendPacket(actionPacket);
+            }
+        } else if (Keyboard.isKeyDown("ArrowRight")) {
+            if (this.xSpeed != PlayerEntity.moveSpeed) {
+                this.xSpeed = PlayerEntity.moveSpeed;
+                actionPacket.setUint8(1, PlayerActionType.MoveRight);
+                socket.sendPacket(actionPacket);
+            }
+        } else if (this.xSpeed != 0) {
             this.xSpeed = 0;
+            actionPacket.setUint8(1, PlayerActionType.StopMove);
+            socket.sendPacket(actionPacket);
+
         }
 
         if (Keyboard.isKeyDown("ArrowUp") && this.onGround) {
-            this.ySpeed = -1000;
-        }
-
-        if (oldXSpeed != this.xSpeed || oldYSpeed != this.ySpeed) {
-            var actionPacket = new DataView(new ArrayBuffer(5));
-            actionPacket.setUint8(0, PACKET_TYPE.PLAYER_ACTION);
-            actionPacket.setInt16(1, this.xSpeed, true);
-            actionPacket.setInt16(3, this.ySpeed, true);
+            this.ySpeed = -PlayerEntity.jumpForce;
+            actionPacket = new DataView(new ArrayBuffer(3));
+            actionPacket.setUint8(0, PacketType.PlayerAction);
+            actionPacket.setUint8(1, PlayerActionType.Jump);
             socket.sendPacket(actionPacket);
         }
     }
+}
+
+enum PlayerActionType {
+    MoveLeft,
+    MoveRight,
+    StopMove,
+    Jump
 }
