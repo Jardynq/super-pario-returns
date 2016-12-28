@@ -16,7 +16,7 @@ namespace Server.Packets
         {
             get
             {
-                return Player.entity.ID;
+                return Player.Entity.ID;
             }
         }
 
@@ -34,7 +34,7 @@ namespace Server.Packets
                 writer.Write((float)Entity.MAX_SPEED);
                 writer.Write((short)PlayerEntity.MOVE_SPEED);
                 writer.Write((short)PlayerEntity.JUMP_FORCE);
-                writer.Write(Player.entity.Serialize());
+                writer.Write(Player.Entity.Serialize());
 
                 return stream.ToArray();
             }

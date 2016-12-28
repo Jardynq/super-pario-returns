@@ -8,7 +8,7 @@ using System.IO;
 
 namespace Server.Entities
 {
-    public class Entity
+    public class Entity : IDisposable
     {
         public const float GRAVITY = 2000;
         public const float MAX_SPEED = 3000;
@@ -100,6 +100,10 @@ namespace Server.Entities
                 WriteToBinary(writer);
                 return stream.ToArray();
             }
+        }
+
+        public virtual void Dispose () {
+            
         }
     }
 

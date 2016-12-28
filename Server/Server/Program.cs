@@ -22,9 +22,13 @@ namespace Server
         // Number of frames per second in the simulation
         public const int TARGET_FRAMERATE = 60;
         // Number of entity update packets per second
+<<<<<<< HEAD
         public const double TARGET_UPDATE_RATE = 30;
 <<<<<<< HEAD
 =======
+=======
+        public const double TARGET_UPDATE_RATE = 15;
+>>>>>>> 19a904eba6a27cf516e9b703782e54aa84720252
         public static Stopwatch Timer = new Stopwatch();
 >>>>>>> 98b1771e0cc4339bab01ae5d5e8ce19fe3ccb5c5
 
@@ -45,11 +49,17 @@ namespace Server
 
         public static void Send(string id, byte[] data)
         {
-            server.WebSocketServices["/"].Sessions[id].Context.WebSocket.Send(data);
+            if (server.WebSocketServices.Paths.Contains("/") && server.WebSocketServices["/"].Sessions.Ds.Contains(id))
+            {
+                server.WebSocketServices["/"].Sessions[id].Context.WebSocket.Send(data);
+            }
         }
         public static void Broadcast(byte[] data)
         {
-            server.WebSocketServices["/"].Sessions.Broadcast(data);
+            if (server.WebSocketServices.Paths.Contains("/"))
+            {
+                server.WebSocketServices["/"].Sessions.Broadcast(data);
+            }
         }
     }
 

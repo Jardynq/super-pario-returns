@@ -35,13 +35,13 @@ namespace Server
             Players[id] = player;
 
             new MapPacket(TileMap).Send(player);
-            new EntityPacket(Entities).Send(player);
+            new EntityPacket(Entities, true).Send(player);
             new JoinPacket(player).Send(player);
         }
 
         public void RemovePlayer(string id)
         {
-            Players.Remove(id);
+            Players[id].Remove();
         }
 
         public void AddEntity (Entity entity)
@@ -49,6 +49,12 @@ namespace Server
             _lastEntityID++;
             entity.ID = _lastEntityID;
             Entities[entity.ID] = entity;
+        }
+
+        public void RemoveEntity (Entity entity) {
+            Entities.Remove(entity.ID);
+            entity.Dispose();
+            new EntityPacket(Entities, true);
         }
 
         private void FrameLoop()
@@ -85,8 +91,7 @@ namespace Server
             }
 
             if (++_framesPassed > Program.TARGET_FRAMERATE / Program.TARGET_UPDATE_RATE) {
-                new EntityPacket(Entities).Send();
-                new PingPacket().Send();
+                new EntityPacket(Entities, true).Send();
                 _framesPassed = 0;
             }
         }

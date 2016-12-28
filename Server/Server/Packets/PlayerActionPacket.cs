@@ -21,24 +21,24 @@ namespace Server.Packets
             Player player = session.Room.Players[session.Id];
 
             // Move the player forward before resetting their speed
-            player.entity.Room.Step();
+            player.Entity.Room.Step();
 
             if (Type == PlayerActionType.MoveLeft) {
-                player.entity.XSpeed = -PlayerEntity.MOVE_SPEED;
+                player.Entity.XSpeed = -PlayerEntity.MOVE_SPEED;
             } else if (Type == PlayerActionType.MoveRight) {
-                player.entity.XSpeed = PlayerEntity.MOVE_SPEED;
+                player.Entity.XSpeed = PlayerEntity.MOVE_SPEED;
             } else if (Type == PlayerActionType.StopMove) {
-                player.entity.XSpeed = 0;
+                player.Entity.XSpeed = 0;
             }
 
             if (Type == PlayerActionType.Jump) {
-                player.entity.YSpeed = -PlayerEntity.JUMP_FORCE;
+                player.Entity.YSpeed = -PlayerEntity.JUMP_FORCE;
             }
 
             // Send an entity update packet containing only this entity
             var entities = new Dictionary<ushort, Entities.Entity>();
-            entities[player.entity.ID] = player.entity;
-            new EntityPacket(entities).Send();
+            entities[player.Entity.ID] = player.Entity;
+            new EntityPacket(entities, false).Send();
 
             base.Handle(session);
         }
