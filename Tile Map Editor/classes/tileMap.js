@@ -12,7 +12,7 @@ TileMap = (function () {
       ns.Map.prototype.generateMap = function () {
             for (var y = 0; y < this.height; y++) {
                   for (var x = 0; x < this.width; x++) {
-                        this.tiles[x + (y * this.width)] = new Tile.ColorTile("blue", x, y, "0");
+                        this.tiles[x + (y * this.width)] = new Tile.ColorTile("black", x, y, "1");
                   }
             }
       };

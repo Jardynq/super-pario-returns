@@ -44,9 +44,11 @@ GameRoom.prototype.loadMap = function (reader) {
       this.entityRenderer.addToRenderQueue(this.render.renderQueue);
 };
 GameRoom.prototype.updateEntities = function (reader) {
-      var amount = reader.getUint16(9, true);
+      var amount = reader.getUint16(1, true);
 
-      var offset = 11;
+      var containsAllEntities = (reader.getUint8(2, true) === 1);
+
+      var offset = 4;
       for (i = 0; i < amount; i++) {
             // The length in bytes of this entity
             var entityLength = reader.getUint8(offset, true);

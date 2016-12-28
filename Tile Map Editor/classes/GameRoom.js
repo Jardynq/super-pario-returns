@@ -10,7 +10,7 @@ var GameRoom = function () {
       this.isMouseDown = null;
 
       this.activeTile = null;
-      this.activeTileNum = 0;
+      this.activeTileNum = 1;
 
       // Amount of tile types
       this.tileAmount = 2;
