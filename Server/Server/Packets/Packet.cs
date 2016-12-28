@@ -49,6 +49,7 @@ namespace Server.Packets
         Join,
         PlayerAction,
         Entity,
-        Ping
+        Ping,
+        EntityRemove
     }
 }

@@ -13,11 +13,13 @@ namespace Server.Packets
     {
 
         public Dictionary<ushort, Entity> Entities;
+        public bool ContainsAllEntities;
 
-        public EntityPacket (Dictionary<ushort, Entity> entities)
+        public EntityPacket (Dictionary<ushort, Entity> entities, bool containsAllEntities)
         {
             Entities = entities.ToDictionary(entry => entry.Key, entry => entry.Value);
             PacketType = PacketType.Entity;
+            ContainsAllEntities = containsAllEntities;
         }
 
         public override byte[] Serialize()
@@ -25,6 +27,7 @@ namespace Server.Packets
             using (MemoryStream stream = new MemoryStream())
             using (BinaryWriter writer = new BinaryWriter(stream)) {
                 writer.Write((ushort)Entities.Count);
+                writer.Write(ContainsAllEntities);
                 foreach (ushort id in Entities.Keys) {
                     byte[] entityData = Entities[id].Serialize();
                     writer.Write((byte)entityData.Length);

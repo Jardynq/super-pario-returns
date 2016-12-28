@@ -15,6 +15,7 @@ class Entity implements iRenderable {
     public width: number = 0;
     public height: number = 0;
     public onGround: boolean = false;
+    public onWall: boolean = false;
 
     public room: GameRoom;
     public hasGravity: boolean = false;
@@ -36,6 +37,8 @@ class Entity implements iRenderable {
         }
 
         this.onGround = false;
+        this.onWall = false;
+
         this.x += this.xSpeed * timeScale;
         this.HandleCollision(true);
         this.y += this.ySpeed * timeScale;
@@ -82,6 +85,7 @@ class Entity implements iRenderable {
                         this.x = tile.x * this.room.map.tilesize + this.room.map.tilesize + this.width * 0.5;
                     }
                     this.xSpeed = 0;
+                    this.onWall = true;
                 } else {
                     if (speed > 0) {
                         this.y = tile.y * this.room.map.tilesize - this.height * 0.5;
@@ -108,6 +112,10 @@ class Entity implements iRenderable {
 
         ctx.stroke();
         ctx.fill();
+    }
+
+    public dispose (): void {
+
     }
 }
 

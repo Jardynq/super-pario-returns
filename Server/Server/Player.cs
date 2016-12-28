@@ -10,13 +10,20 @@ namespace Server
     public class Player
     {
         public readonly string ID;
-        public PlayerEntity entity;
+        public PlayerEntity Entity;
         public int Ping = 0;
+        public GameRoom Room;
 
         public Player (string id, GameRoom room)
         {
+            Room = room;
             ID = id;
-            entity = new PlayerEntity(this, room);
+            Entity = new PlayerEntity(this, room);
         }
+
+        public void Remove () {
+            Room.Players.Remove(ID);
+            Room.RemoveEntity(Entity);
+        } 
     }
 }

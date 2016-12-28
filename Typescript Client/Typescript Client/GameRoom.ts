@@ -9,7 +9,7 @@ class GameRoom {
     public player: MainPlayerEntity;
 
     // Dejitter buffer
-    public jitterbuffer: EntityUpdatePacket[] = [];
+    public jitterbuffer: DataView[] = [];
     private lastEntityPacketProcessed: number = 0;
 
     constructor() {
@@ -33,7 +33,7 @@ class GameRoom {
         if (this.jitterbuffer.length > 0) {
             var currentTime = new Date().getTime();
             if (currentTime > this.lastEntityPacketProcessed + 20) {
-                this.updateEntities(this.jitterbuffer[this.jitterbuffer.length - 1].data);
+                this.updateEntities(this.jitterbuffer[this.jitterbuffer.length - 1]);
                 this.jitterbuffer = [];
                 this.lastEntityPacketProcessed = currentTime;
             }
@@ -77,14 +77,17 @@ class GameRoom {
     }
 
     public entityPacketReceived(data: DataView) {
-        this.jitterbuffer.push(new EntityUpdatePacket(Math.floor(data.getFloat64(1, true)), data));
+        this.jitterbuffer.push(data);
     }
 
     public updateEntities(reader: DataView): void {
         // The total number of entities in the game
-        var entityCount = reader.getUint16(1, true);
-        var offset = 3;
+        var entityCount: number = reader.getUint16(1, true);
+        var containsAllEntities: boolean = reader.getUint8(3) == 1;
+        var offset = 4;
 
+        // Used to mark which entities this packet contained
+        var receivedEntities: { [id: number]: boolean } = {};
         for (var i = 0; i < entityCount; i++) {
             // The length in bytes of this entity
             var entityLength: number = reader.getUint8(offset);
@@ -92,6 +95,7 @@ class GameRoom {
             var entityView = new DataView(entityData);
             var id = entityView.getUint16(1, true);
             offset += entityData.byteLength;
+            receivedEntities[id] = true;
 
             if (this.entities[id] === undefined) {
                 var type = entityView.getUint8(2);
@@ -108,6 +112,15 @@ class GameRoom {
                 this.entities[id].update(entityView);
             }
         }
+
+        // Remove the entities, that weren't in this packet
+        if (containsAllEntities) {
+            for (var entID in this.entities) {
+                if (receivedEntities[Number(entID)] !== true) {
+                    this.removeEntity(Number(entID));
+                }
+            }
+        }
     }
 
     public onJoin(reader: DataView): void {
@@ -120,14 +133,9 @@ class GameRoom {
         this.player = new MainPlayerEntity(playerID, this, reader);
         this.entities[playerID] = this.player;
     }
-}
 
-class EntityUpdatePacket {
-    public timestamp: number;
-    public data: DataView;
-
-    constructor(timestamp: number, data: DataView) {
-        this.timestamp = timestamp;
-        this.data = data;
+    public removeEntity(id: number): void {
+        this.entities[id].dispose();
+        delete this.entities[id];
     }
 }
