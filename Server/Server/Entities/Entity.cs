@@ -10,8 +10,8 @@ namespace Server.Entities
 {
     public class Entity
     {
-        const float GRAVITY = 60;
-        const float MAX_SPEED = 3000;
+        public const float GRAVITY = 2000;
+        public const float MAX_SPEED = 3000;
 
         public double X = 0;
         public double Y = 0;
@@ -52,28 +52,28 @@ namespace Server.Entities
 
             List<Tile.Tile> collisionTiles = new List<Tile.Tile>();
 
-            collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5), (float)(Y - Height * 0.5)));
-            collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5), (float)(Y - Height * 0.5)));
-            collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5), (float)(Y + Height * 0.5)));
-            collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5), (float)(Y + Height * 0.5)));
+            collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5 + 0.3), (float)(Y - Height * 0.5 + 0.3)));
+            collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5 - 0.3), (float)(Y - Height * 0.5 + 0.3)));
+            collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5 + 0.3), (float)(Y + Height * 0.5 - 0.3)));
+            collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5 - 0.3), (float)(Y + Height * 0.5 - 0.3)));
 
             foreach (Tile.Tile tile in collisionTiles) {
                 if (tile != null && tile.HasCollision) {
                     if (x) {
                         if (speed > 0) {
-                            X = tile.X * TileMap.TILE_SIZE - Width * 0.5 - 1;
+                            X = tile.X * TileMap.TILE_SIZE - Width * 0.5;
                         } else if (speed < 0) {
-                            X = tile.X * TileMap.TILE_SIZE + TileMap.TILE_SIZE + Width * 0.5 + 1;
+                            X = tile.X * TileMap.TILE_SIZE + TileMap.TILE_SIZE + Width * 0.5 ;
                         }
                         XSpeed = 0;
                     } else {
                         if (speed > 0)
                         {
-                            Y = tile.Y * TileMap.TILE_SIZE - Height * 0.5 - 1;
+                            Y = tile.Y * TileMap.TILE_SIZE - Height * 0.5;
                         }
                         else if (speed < 0)
                         {
-                            Y = tile.Y * TileMap.TILE_SIZE + TileMap.TILE_SIZE + Height * 0.5 + 1;
+                            Y = tile.Y * TileMap.TILE_SIZE + TileMap.TILE_SIZE + Height * 0.5;
                         }
                         YSpeed = 0;
                     }

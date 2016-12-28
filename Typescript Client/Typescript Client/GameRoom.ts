@@ -5,7 +5,6 @@ class GameRoom {
     public entities: { [id: number]: Entity } = {};
     public map: TileMap;
     public camera: Camera = new Camera(this);
-    public tilesize: number = 50;
 
     // Related to syncronisation
     public lastEntityUpdateLocalTimestamp = 0;
@@ -54,7 +53,7 @@ class GameRoom {
     /**
      * Handles scrolling
      */
-    public onScroll(e: WheelEvent) {
+    public onScroll(e: WheelEvent): void {
         if (e.deltaY < 0) {
             this.camera.zoom = Math.min(this.camera.zoom * 1.1, this.camera.maxZoom);
         } else {
@@ -63,7 +62,7 @@ class GameRoom {
     }
 
     public loadMap(reader: DataView): void {
-        this.map = new TileMap();
+        this.map = new TileMap(50);
         this.map.parseMapPacket(reader);
     }
 
@@ -87,7 +86,7 @@ class GameRoom {
                 var entity: Entity;
 
                 if (type === ENTITY_TYPE.PLAYER) {
-                    entity = new PlayerEntity(Number(id), entityView);
+                    entity = new PlayerEntity(Number(id), this, entityView);
                 } else {
                     throw "Unknown entity recieved. Type is: " + type;
                 }
@@ -100,9 +99,11 @@ class GameRoom {
     }
 
     public onJoin(reader: DataView): void {
-        var playerID: number = reader.getUint16(1, true);
+        Entity.GRAVITY = reader.getFloat32(1, true);
+        Entity.MAX_SPEED = reader.getFloat32(5, true);
+        var playerID: number = reader.getUint16(9, true);
 
-        this.player = new MainPlayerEntity(playerID, reader);
+        this.player = new MainPlayerEntity(playerID, this, reader);
         this.entities[playerID] = this.player;
     }
 }
