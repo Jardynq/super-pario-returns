@@ -6,15 +6,15 @@ class GameRoom {
     public map: TileMap;
     public camera: Camera = new Camera(this);
 
-    // Related to syncronisation
-    public lastEntityUpdateLocalTimestamp = 0;
-    public lastEntityUpdateServertimestamp = 0;
-
     public player: MainPlayerEntity;
+
+    // Dejitter buffer
+    public jitterbuffer: EntityUpdatePacket[] = [];
+    private lastEntityPacketProcessed: number = 0;
 
     constructor() {
         socket.registerHandler(PacketType.Map, this.loadMap.bind(this));
-        socket.registerHandler(PacketType.Entity, this.updateEntities.bind(this));
+        socket.registerHandler(PacketType.Entity, this.entityPacketReceived.bind(this));
         socket.registerHandler(PacketType.Join, this.onJoin.bind(this));
         socket.registerHandler(PacketType.Ping, (reader) => socket.sendPacket(reader));
 
@@ -29,7 +29,15 @@ class GameRoom {
         for (var id in this.entities) {
             this.entities[id].step(timeScale);
         }
-        this.camera.step();
+
+        if (this.jitterbuffer.length > 0) {
+            var currentTime = new Date().getTime();
+            if (currentTime > this.lastEntityPacketProcessed + 20) {
+                this.updateEntities(this.jitterbuffer[this.jitterbuffer.length - 1].data);
+                this.jitterbuffer = [];
+                this.lastEntityPacketProcessed = currentTime;
+            }
+        }
     }
 
     public renderAll(ctx: CanvasRenderingContext2D): void {
@@ -38,8 +46,8 @@ class GameRoom {
 
         // Update the camera
         if (this.player !== undefined) {
-            this.camera.targetOffset.x = -this.player.x + (ctx.canvas.width * 0.5 / this.camera.zoom);
-            this.camera.targetOffset.y = -this.player.y + (ctx.canvas.height * 0.5 / this.camera.zoom);
+            this.camera.offset.x = -this.player.renderX + (ctx.canvas.width * 0.5 / this.camera.zoom);
+            this.camera.offset.y = -this.player.renderY + (ctx.canvas.height * 0.5 / this.camera.zoom);
         }
 
         if (this.map !== undefined) {
@@ -68,12 +76,14 @@ class GameRoom {
         this.map.parseMapPacket(reader);
     }
 
+    public entityPacketReceived(data: DataView) {
+        this.jitterbuffer.push(new EntityUpdatePacket(Math.floor(data.getFloat64(1, true)), data));
+    }
+
     public updateEntities(reader: DataView): void {
-        var timestamp: number = reader.getFloat64(1, true);
-        
         // The total number of entities in the game
-        var entityCount = reader.getUint16(9, true);
-        var offset = 11;
+        var entityCount = reader.getUint16(1, true);
+        var offset = 3;
 
         for (var i = 0; i < entityCount; i++) {
             // The length in bytes of this entity
@@ -109,5 +119,15 @@ class GameRoom {
 
         this.player = new MainPlayerEntity(playerID, this, reader);
         this.entities[playerID] = this.player;
+    }
+}
+
+class EntityUpdatePacket {
+    public timestamp: number;
+    public data: DataView;
+
+    constructor(timestamp: number, data: DataView) {
+        this.timestamp = timestamp;
+        this.data = data;
     }
 }

@@ -9,14 +9,6 @@ class Camera {
         y: 0
     };
 
-    public targetOffset: {
-        x: number,
-        y: number
-    } = {
-        x: 0,
-        y: 0
-    };
-
     public zoom: number = 1;
     public room: GameRoom;
 
@@ -27,9 +19,11 @@ class Camera {
         this.room = room;
     }
 
-    public step() {
-        this.offset.x += (this.targetOffset.x - this.offset.x) * 0.5;
-        this.offset.y += (this.targetOffset.y - this.offset.y) * 0.5;
+    public worldToScreen(point: { x: number, y: number }): { x: number, y: number } {
+        return {
+            x: (point.x + this.offset.x) * this.zoom,
+            y: (point.y + this.offset.y) * this.zoom
+        };
     }
 }
 

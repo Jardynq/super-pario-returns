@@ -6,17 +6,21 @@ var ctx: CanvasRenderingContext2D;
 var map: TileMap;
 var room: GameRoom;
 var lastTickCount: number = new Date().getTime();
+var socket: Socket;
 
 /**
  * Connect to the server
  */
-var socket: Socket = new Socket("ws:192.168.0.16/", () => {
-    // Runs on succesful connection
+window.onload = () => {
+    socket = new Socket("ws:188.176.12.23:1337/", () => {
+    //socket = new Socket("ws:192.168.0.20/", () => {
+        // Runs on succesful connection
 
-    init();
-    room = new GameRoom();
-    step();
-});
+        init();
+        room = new GameRoom();
+        step();
+    });
+};
 
 /**
  * Initialises the game

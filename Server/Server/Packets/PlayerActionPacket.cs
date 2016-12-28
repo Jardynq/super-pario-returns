@@ -30,7 +30,6 @@ namespace Server.Packets
             } else if (Type == PlayerActionType.StopMove) {
                 player.entity.XSpeed = 0;
             }
-            Console.WriteLine(player.entity.XSpeed);
 
             if (Type == PlayerActionType.Jump) {
                 player.entity.YSpeed = -PlayerEntity.JUMP_FORCE;
