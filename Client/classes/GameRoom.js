@@ -15,8 +15,6 @@ var GameRoom = function () {
       this.mouseY = null;
 
       this.player = null;
-
-      this.maxFallSpeed = 3000;
 };
 // Main step function
 GameRoom.prototype.step = function (timeScale) {
@@ -75,7 +73,9 @@ GameRoom.prototype.updateEntities = function (reader) {
       }
 };
 GameRoom.prototype.onJoin = function (reader) {
-      this.player = this.entities[reader.getUint16(1, true)];
+      Entity.gravity = reader.getFloat32(1, true);
+      Entity.maxFallSpeed = reader.getFloat32(5, true);
+      this.player = this.entities[reader.getUint16(9, true)];
       this.player.setMain();
 };
 GameRoom.prototype.ping = function (reader) {
@@ -119,7 +119,7 @@ GameRoom.prototype.removeFromEntities = function (entity) {
 
 // Inputs
 GameRoom.prototype.onKeyDown = function (e) {
-      this.player.onKeyDown();
+
 };
 GameRoom.prototype.onKeyUp = function (e) {      
       

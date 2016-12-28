@@ -1,12 +1,12 @@
 Tile = (function () {
       var ns = {};
 
-      ns.ColorTile = function ColorTile(color, x, y, collision) {
+      ns.ColorTile = function ColorTile(color, x, y, hasCollision) {
             this.color = color;
             this.x = x;
             this.y = y;
 
-            this.collision = collision;
+            this.hasCollision = hasCollision;
       };
       ns.ColorTile.prototype.render = function (ctx, render, tilesize) {
             ctx.beginPath();

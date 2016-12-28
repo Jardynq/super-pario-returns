@@ -46,6 +46,16 @@ TileMap = (function () {
                   return this.tiles[x + (y * this.width)];
             }
       };
+      ns.Map.prototype.getTileAt = function (x, y) {
+            x = Math.floor(x / this.tilesize);
+            y = Math.floor(y / this.tilesize);
+            
+            if (this.getTile(x, y) === undefined) {
+                  return null;
+            }
+
+            return this.getTile(x, y);
+      };
 
       return ns;
 })();

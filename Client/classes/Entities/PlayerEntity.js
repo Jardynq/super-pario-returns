@@ -6,28 +6,24 @@ var PlayerEntity = function (reader) {
       this.isMain = false;
 
       this.walkSpeed = 500;
-      this.jumpHeight = 1200;
+      this.jumpHeight = 1000;
 
       this.width = 30;
       this.height = 60;
 
       this.hasGravity = true;
-      this.gravity = 60;
 };
 PlayerEntity.prototype = Object.create(Entity.prototype); // PlayerEntity inherits Entity
 PlayerEntity.prototype.step = function (timescale) {
       Entity.prototype.step.call(this, timescale);
       
       if (this.isMain) {
-            this.oldXSpeed = this.xSpeed;
-            this.oldYSpeed = this.ySpeed;
+            oldXSpeed = this.xSpeed;
+            oldYSpeed = this.ySpeed;
 
             this.updateMovement();
 
-            this.updateCollisionX();
-            this.updateCollisionY();
-
-            this.sendActionPacket();
+            this.sendActionPacket(oldXSpeed, oldYSpeed);
       }
 };
 
@@ -41,24 +37,14 @@ PlayerEntity.prototype.updateMovement = function () {
       } else {
             this.xSpeed = 0;
       }
-};
-PlayerEntity.prototype.onKeyDown = function () {
-      if (Input.isKeyDown("KeyW")) {
-            this.ySpeed = -this.jumpHeight;
-            this.sendActionPacket();
-      }
-};
-PlayerEntity.prototype.updateCollisionX = function() {
 
-};
-PlayerEntity.prototype.updateCollisionY = function() {
-      if (this.y >= 1500) {
-            this.y = 1500;
-            this.ySpeed = 0;
+      // Jumping
+      if (this.onGround && Input.isKeyDown("KeyW")) {
+            this.ySpeed = -this.jumpHeight;
       }
 };
-PlayerEntity.prototype.sendActionPacket = function () {
-      if (this.oldXSpeed != this.xSpeed || this.oldYSpeed != this.ySpeed) {
+PlayerEntity.prototype.sendActionPacket = function (oldXSpeed, oldYSpeed) {
+      if (oldXSpeed != this.xSpeed || oldYSpeed != this.ySpeed) {
             var actionPacket = new DataView(new ArrayBuffer(5));
             actionPacket.setUint8(0, Socket.PACKET_TYPES.playerAction);
             actionPacket.setInt16(1, this.xSpeed, true);
