@@ -75,8 +75,10 @@ GameRoom.prototype.updateEntities = function (reader) {
 GameRoom.prototype.onJoin = function (reader) {
       Entity.gravity = reader.getFloat32(1, true);
       Entity.maxFallSpeed = reader.getFloat32(5, true);
-      this.player = this.entities[reader.getUint16(9, true)];
+      this.player = this.entities[reader.getUint16(13, true)];
       this.player.setMain();
+      this.player.walkSpeed = reader.getInt16(9, true);
+      this.player.jumpForce = reader.getInt16(11, true);
 };
 GameRoom.prototype.ping = function (reader) {
       Socket.sendPacket(reader.buffer);

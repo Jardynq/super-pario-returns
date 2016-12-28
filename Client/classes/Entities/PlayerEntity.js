@@ -6,7 +6,7 @@ var PlayerEntity = function (reader) {
       this.isMain = false;
 
       this.walkSpeed = 500;
-      this.jumpHeight = 1000;
+      this.jumpForce = null;
 
       this.width = 30;
       this.height = 60;
@@ -18,8 +18,6 @@ PlayerEntity.prototype.step = function (timescale) {
       Entity.prototype.step.call(this, timescale);
       
       if (this.isMain) {
-            oldXSpeed = this.xSpeed;
-            oldYSpeed = this.ySpeed;
 
             this.updateMovement();
 
@@ -40,10 +38,20 @@ PlayerEntity.prototype.updateMovement = function () {
 
       // Jumping
       if (this.onGround && Input.isKeyDown("KeyW")) {
-            this.ySpeed = -this.jumpHeight;
+            this.ySpeed = -this.jumpForce;
       }
 };
-PlayerEntity.prototype.sendActionPacket = function (oldXSpeed, oldYSpeed) {
+PlayerEntity.prototype.sendActionPacket = function () {
+      if (this.xSpeed > 0) {
+            
+      } else if (this.xSpeed < 0) {
+            
+      }
+      if (this.xSpeed > 0) {
+            
+      } else if (this.xSpeed < 0) {
+            
+      }
       if (oldXSpeed != this.xSpeed || oldYSpeed != this.ySpeed) {
             var actionPacket = new DataView(new ArrayBuffer(5));
             actionPacket.setUint8(0, Socket.PACKET_TYPES.playerAction);

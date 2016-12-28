@@ -49,7 +49,9 @@ Entity.prototype.handleCollision = function (x) {
                   room.map.getTileAt(this.x - this.width * 0.5 + 0.3, this.y - this.height * 0.5 + 0.3),
                   room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y - this.height * 0.5 + 0.3),
                   room.map.getTileAt(this.x - this.width * 0.5 + 0.3, this.y + this.height * 0.5 - 0.3),
-                  room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y + this.height * 0.5 - 0.3)
+                  room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y + this.height * 0.5 - 0.3),
+                  room.map.getTileAt(this.x - this.width * 0.5 + 0.3, this.y),
+                  room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y)
             ];
 
             for (var i = 0; i < collisionTiles.length; i++) {
