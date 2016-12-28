@@ -78,5 +78,5 @@ window.addEventListener("keyup", Input.onKeyUp);
 // Event handlers for the game
 window.addEventListener('keydown', onKeyDown);
 window.addEventListener("keyup", onKeyUp);
-window.addEventListener('mousewheel', onMouseWheel);
+window.addEventListener('wheel', onMouseWheel);
 window.addEventListener('mousemove', onMouseMove);

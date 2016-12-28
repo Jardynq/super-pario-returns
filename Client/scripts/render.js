@@ -66,11 +66,15 @@ var Render = (function () {
 
             var endTile = this.tileMap.getTile(canvas.width / (this.tileMap.tilesize * render.zoom) - (render.offsetX / this.tileMap.tilesize), canvas.height / (this.tileMap.tilesize * render.zoom) - (render.offsetY / this.tileMap.tilesize));
 
-            // Makes sure that if the endtile.y is bigger than the bottom of the map set it to the bottom of the map
+            // Makes sure that if the endtile is bigger than the bottom of the map set it to the bottom of the map
             if (endTile === null) {
                   endTile = this.tileMap.getTile(this.tileMap.width - 1, this.tileMap.height - 1);
             }
 
+            // Makes sure that if the starttile is smaller than the top of the map then set it to the top of the map
+            if (startTile === null) {
+                  startTile = this.tileMap.getTile(0, 0);
+            }
 
             // Renders all of the tile that are in between endtile and startTile, aka on render on screen
             for (var i = startTile.y; i <= endTile.y; i++) {

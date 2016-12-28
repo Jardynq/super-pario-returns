@@ -26,8 +26,6 @@ TileMap = (function () {
                   }
             }
 
-            console.log(this.tiles);
-
             // Sets the height var
             this.height = this.tiles.length / this.width;
       };

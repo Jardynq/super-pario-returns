@@ -19,11 +19,15 @@ Entity.prototype.update = function (reader) {
       this.x = reader.getInt16(4, true);
       this.y = reader.getInt16(6, true);
 
-      this.xSpeed = reader.getInt16(8, true);
-      this.ySpeed = reader.getInt16(10, true);
+      this.xSpeed = reader.getFlaot32(8, true);
+      this.ySpeed = reader.getFloat32(12, true);
 };
 
 Entity.prototype.step = function (timeScale) {
+      if (this.hasGravity) {
+            this.ySpeed = Math.min(this.gravity, room.maxFallSpeed);
+      }
+
       this.x += this.xSpeed * timeScale;
       this.y += this.ySpeed * timeScale;
 };
