@@ -83,25 +83,23 @@ namespace Server.Entities
             }
         }
 
-        public virtual byte[] Serialize (MemoryStream stream = null) {
-            if (stream == null) {
-                stream = new MemoryStream();
+        public virtual BinaryWriter WriteToBinary (BinaryWriter writer) {
+            writer.Write(ID);
+            writer.Write((byte)Type);
+            writer.Write((short)X);
+            writer.Write((short)Y);
+            writer.Write((float)XSpeed);
+            writer.Write((float)YSpeed);
+            
+            return writer;
+        }
+
+        public byte[] Serialize () {
+            using (MemoryStream stream = new MemoryStream())
+            using (BinaryWriter writer = new BinaryWriter(stream)) {
+                WriteToBinary(writer);
+                return stream.ToArray();
             }
-
-            using (BinaryWriter writer = new BinaryWriter(stream))
-            {
-                writer.Write(ID);
-                writer.Write((byte)Type);
-                writer.Write((short)X);
-                writer.Write((short)Y);
-                writer.Write((float)XSpeed);
-                writer.Write((float)YSpeed);
-            }
-
-            byte[] output = stream.ToArray();
-
-            stream.Dispose();
-            return output;
         }
     }
 

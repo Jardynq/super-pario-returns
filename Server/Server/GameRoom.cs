@@ -19,12 +19,14 @@ namespace Server
 
         // Related to frame loop
         private int _framesPassed = 0;
-        private int _lastTickCount = 0;
+        private long _lastTickCount = 0;
 
         public GameRoom (TileMap map)
         {
             TileMap = map;
-            new Thread(new ThreadStart(FrameLoop)).Start();
+            Thread loop = new Thread(new ThreadStart(FrameLoop));
+            loop.Priority = ThreadPriority.Highest;
+            loop.Start();
         }
 
         public void AddPlayer (string id)
@@ -53,9 +55,9 @@ namespace Server
         {
             while (true)
             {
-                int tickCount = Environment.TickCount;
+                long tickCount = Program.Timer.ElapsedMilliseconds;
                 int targetFrameLength = (int)(1000f / Program.TARGET_FRAMERATE);
-                int elapsedMilliseconds = tickCount - _lastTickCount;
+                int elapsedMilliseconds = (int)(tickCount - _lastTickCount);
 
                 if (elapsedMilliseconds < targetFrameLength)
                 {
@@ -67,8 +69,12 @@ namespace Server
 
         public void Step ()
         {
-            int elapsedMilliseconds = Environment.TickCount - _lastTickCount;
-            _lastTickCount = Environment.TickCount;
+            int elapsedMilliseconds = (int)(Program.Timer.ElapsedMilliseconds - _lastTickCount);
+            _lastTickCount = Program.Timer.ElapsedMilliseconds;
+            int framerate = (int)(1000f / elapsedMilliseconds);
+            if (framerate > 0 && framerate < Program.TARGET_FRAMERATE - 5) {
+                Console.WriteLine("FRAMERATE DROP: {0} FPS", framerate);
+            }
 
             float timeScale = elapsedMilliseconds / 1000f;
 

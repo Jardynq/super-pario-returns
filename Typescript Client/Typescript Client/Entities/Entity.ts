@@ -41,11 +41,11 @@ class Entity implements iRenderable {
         this.y += this.ySpeed * timeScale;
         this.HandleCollision(false);
 
-        this.renderX += (this.x - this.renderX) * 0.5;
-        this.renderY += (this.y - this.renderY) * 0.5;
+        this.renderX += (this.x - this.renderX) * 0.8;
+        this.renderY += (this.y - this.renderY) * 0.8;
     }
 
-    public update(data: DataView) {
+    public update(data: DataView):number {
         var offset = 4; // To compensate for LENGTH, ID and TYPE
         this.x = data.getInt16(offset, true);
         offset += 2;
@@ -56,6 +56,8 @@ class Entity implements iRenderable {
         offset += 4;
         this.ySpeed = data.getFloat32(offset, true);
         offset += 4;
+
+        return offset;
     }
 
     private HandleCollision(x: boolean) {
@@ -95,8 +97,13 @@ class Entity implements iRenderable {
     }
 
     public render(ctx: CanvasRenderingContext2D, camera: Camera): void {
+        var screenPos = camera.worldToScreen({
+            x: this.renderX - this.width * 0.5,
+            y: this.renderY - this.height * 0.5
+        });
+
         ctx.beginPath();
-        ctx.rect((this.renderX + camera.offset.x - this.width * 0.5) * camera.zoom, (this.renderY + camera.offset.y - this.height * 0.5) * camera.zoom, this.width * camera.zoom, this.height * camera.zoom);
+        ctx.rect(screenPos.x, screenPos.y, this.width * camera.zoom, this.height * camera.zoom);
         ctx.fillStyle = this.color;
 
         ctx.stroke();

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.IO;
 
 namespace Server.Entities
 {
@@ -12,16 +13,26 @@ namespace Server.Entities
         public const short MOVE_SPEED = 500;
         public const short JUMP_FORCE = 1000;
 
-        public PlayerEntity (GameRoom room) : base(room)
+        public Player Player;
+
+        public PlayerEntity (Player player, GameRoom room) : base(room)
         {
             Height = 60;
             Width = 30;
             HasGravity = true;
+            Player = player;
 
             X = Program.rnd.Next(500);
             Y = Program.rnd.Next(500);
 
             Type = EntityType.Player;
+        }
+
+        public override BinaryWriter WriteToBinary(BinaryWriter writer = null)
+        {
+            base.WriteToBinary(writer);
+            writer.Write((ushort)Player.Ping);
+            return writer;
         }
     }
 }

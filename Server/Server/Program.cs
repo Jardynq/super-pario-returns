@@ -8,6 +8,8 @@ using WebSocketSharp.Server;
 using Newtonsoft.Json;
 using Server.Packets;
 using System.Reflection;
+using System.Diagnostics;
+using System.Net;
 
 namespace Server
 {
@@ -20,7 +22,8 @@ namespace Server
         // Number of frames per second in the simulation
         public const int TARGET_FRAMERATE = 60;
         // Number of entity update packets per second
-        public const double TARGET_UPDATE_RATE = 1;
+        public const double TARGET_UPDATE_RATE = 30;
+        public static Stopwatch Timer = new Stopwatch();
 
         static void Main(string[] args)
         {
@@ -28,8 +31,9 @@ namespace Server
             var map = new TileMap();
             map.LoadMap(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/../../../../Map.txt");
             Room = new GameRoom(map);
+            Timer.Start();
 
-            server = new WebSocketServer();
+            server = new WebSocketServer(IPAddress.Any, 1337);
             server.AddWebSocketService<GameService>("/");
             server.Start();
             Console.ReadKey(true);

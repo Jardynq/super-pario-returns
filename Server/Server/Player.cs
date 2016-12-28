@@ -16,7 +16,7 @@ namespace Server
         public Player (string id, GameRoom room)
         {
             ID = id;
-            entity = new PlayerEntity(room);
+            entity = new PlayerEntity(this, room);
         }
     }
 }
