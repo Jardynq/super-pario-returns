@@ -20,7 +20,7 @@ namespace Server
         // Number of frames per second in the simulation
         public const int TARGET_FRAMERATE = 60;
         // Number of entity update packets per second
-        public const double TARGET_UPDATE_RATE = 1;
+        public const double TARGET_UPDATE_RATE = 30;
 
         static void Main(string[] args)
         {

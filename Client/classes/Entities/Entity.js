@@ -4,13 +4,16 @@ var Entity = function (reader) {
 
       this.onGround = false;
 
+      this.renderX = 0;
+      this.renderY = 0;
+
       this.update(reader);
 };
 Entity.prototype = Object.create(Render.RenderObject.prototype); // Entity inherits RenderObject
 Entity.prototype.constructor = Entity;
 Entity.prototype.render = function (ctx, render) {
       ctx.beginPath();
-      ctx.rect((this.x - this.width * 0.5 + render.offsetX) * render.zoom, (this.y - this.height * 0.5 + render.offsetY) * render.zoom, this.width * render.zoom, this.height * render.zoom);
+      ctx.rect((this.renderX - this.width * 0.5 + render.offsetX) * render.zoom, (this.renderY - this.height * 0.5 + render.offsetY) * render.zoom, this.width * render.zoom, this.height * render.zoom);
       ctx.fillStyle = this.color;
 
       ctx.stroke();      
@@ -40,6 +43,10 @@ Entity.prototype.step = function (timeScale) {
       this.handleCollision(true);
       this.y += this.ySpeed * timeScale;
       this.handleCollision(false);
+
+      // Easing
+      this.renderX += ((this.x - this.renderX) * 0.7);
+      this.renderY += ((this.y - this.renderY) * 0.7);
 };
 
 Entity.prototype.handleCollision = function (x) {

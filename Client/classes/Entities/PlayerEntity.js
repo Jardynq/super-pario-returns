@@ -5,9 +5,6 @@ var PlayerEntity = function (reader) {
       this.color = "aquaMarine";
       this.isMain = false;
 
-      this.walkSpeed = 500;
-      this.jumpForce = null;
-
       this.width = 30;
       this.height = 60;
 
@@ -21,7 +18,7 @@ PlayerEntity.prototype.step = function (timescale) {
 
             this.updateMovement();
 
-            this.sendActionPacket(oldXSpeed, oldYSpeed);
+            //this.sendActionPacket();
       }
 };
 
@@ -29,39 +26,58 @@ PlayerEntity.prototype.step = function (timescale) {
 PlayerEntity.prototype.updateMovement = function () {
       // Left - right movement
       if (Input.isKeyDown("KeyD")) {
-            this.xSpeed = this.walkSpeed;
+            if (this.xSpeed <= 0) {
+                  this.xSpeed = this.walkSpeed;
+                  this.sendActionPacket("KeyD");   
+            }
       } else if (Input.isKeyDown("KeyA")) {
-            this.xSpeed = -this.walkSpeed;
-      } else {
+            if (this.xSpeed >= 0) {
+                  this.xSpeed = -this.walkSpeed;
+                  this.sendActionPacket("KeyA");   
+            }
+      } else if (this.xSpeed < 0 || this.xSpeed > 0){
             this.xSpeed = 0;
+            this.sendActionPacket(null);            
       }
 
       // Jumping
       if (this.onGround && Input.isKeyDown("KeyW")) {
-            this.ySpeed = -this.jumpForce;
+            if (this.ySpeed >= 0) {
+                  this.ySpeed = -this.jumpForce;
+                  this.sendActionPacket("KeyW");
+            }
       }
 };
-PlayerEntity.prototype.sendActionPacket = function () {
-      if (this.xSpeed > 0) {
-            
-      } else if (this.xSpeed < 0) {
-            
+PlayerEntity.prototype.sendActionPacket = function (key) {
+      var actionPacket = new DataView(new ArrayBuffer(5)); 
+      actionPacket.setUint8(0, Socket.PACKET_TYPES.playerAction); 
+
+      if (key === "KeyW") {
+            actionPacket.setUint8(1, PlayerEntity.ACTION_TYPES.jump);   
+            Socket.sendPacket(actionPacket);            
       }
-      if (this.xSpeed > 0) {
-            
-      } else if (this.xSpeed < 0) {
-            
+
+      if (key === "KeyA" && this.xSpeed < 0) {
+            actionPacket.setUint8(1, PlayerEntity.ACTION_TYPES.moveLeft);   
+            Socket.sendPacket(actionPacket);       
+      } else if (key === "KeyD" && this.xSpeed > 0) {
+            actionPacket.setUint8(1, PlayerEntity.ACTION_TYPES.moveRight);
+            Socket.sendPacket(actionPacket);                      
       }
-      if (oldXSpeed != this.xSpeed || oldYSpeed != this.ySpeed) {
-            var actionPacket = new DataView(new ArrayBuffer(5));
-            actionPacket.setUint8(0, Socket.PACKET_TYPES.playerAction);
-            actionPacket.setInt16(1, this.xSpeed, true);
-            actionPacket.setInt16(3, this.ySpeed, true);
-            Socket.sendPacket(actionPacket);
+      if (key === null && this.xSpeed === 0) {
+            actionPacket.setUint8(1, PlayerEntity.ACTION_TYPES.stopMove); 
+            Socket.sendPacket(actionPacket);             
       }
 };
 
 PlayerEntity.prototype.setMain  = function () {
       this.color = "red";
       this.isMain = true;
+};
+
+PlayerEntity.ACTION_TYPES = {
+      "moveLeft": 0,
+      "moveRight": 1,
+      "stopMove": 2,
+      "jump": 3,
 };

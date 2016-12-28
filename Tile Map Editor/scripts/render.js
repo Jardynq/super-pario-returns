@@ -89,22 +89,5 @@ var Render = (function () {
             }
       };
 
-
-
-
-      /**
-       * Special renderer for tiles
-       * 
-       */
-      ns.EntityRenderer = function EntityRenderer(room) {
-            this.room = room;
-      };
-      ns.EntityRenderer.prototype = Object.create(ns.RenderObject.prototype); // EntityRenderer inherits RenderObject
-      ns.EntityRenderer.prototype.render = function (ctx, render) {
-            for (var id in this.room.entities) {
-                  this.room.entities[id].render(ctx, render);
-            }
-      };
-
       return ns;
 })();

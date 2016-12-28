@@ -97,6 +97,7 @@ GameRoom.prototype.updateScreenOffset = function () {
             this.render.offsetY = -this.player.y + canvas.height * (0.5 / this.render.zoom);
       }
 
+      /*
       // View space position limits
       if (-this.render.offsetX <= 0) {
             this.render.offsetX = -0;
@@ -107,7 +108,7 @@ GameRoom.prototype.updateScreenOffset = function () {
             this.render.offsetY = -0;
       } else if (-this.render.offsetY * this.render.zoom >= this.map.tiles.length / this.map.width * this.map.tilesize * this.render.zoom - canvas.height) {
             this.render.offsetY = -(this.map.tiles.length / this.map.width * (this.map.tilesize * this.render.zoom) - canvas.height) / this.render.zoom;
-      }
+      }*/
 
 };
 

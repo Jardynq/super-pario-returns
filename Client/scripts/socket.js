@@ -8,7 +8,7 @@ var Socket = (function () {
        * 
        */
       ns.connect = function (callback) {
-            ns.socket = new WebSocket("ws:192.168.0.16");
+            ns.socket = new WebSocket("ws:192.168.0.20");
             ns.socket.onmessage = ns.onMessage;
             ns.socket.onopen = callback;
             ns.socket.binaryType = "arraybuffer";
@@ -49,7 +49,8 @@ var Socket = (function () {
             "map": 0,
             "join": 1,
             "playerAction": 2,
-            "entity": 3
+            "entity": 3,
+            "ping": 4
       };
 
       return ns;
