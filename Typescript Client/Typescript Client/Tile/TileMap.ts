@@ -4,6 +4,11 @@ class TileMap implements iRenderable {
     public width: number;
     public height: number;
     public tiles: Tile[] = [];
+    public tilesize: number;
+
+    constructor(tilesize: number) {
+        this.tilesize = tilesize;
+    }
 
     public parseMapPacket(reader: DataView): void {
         // Get the width of the map
@@ -26,10 +31,10 @@ class TileMap implements iRenderable {
     }
 
     public render(ctx: CanvasRenderingContext2D, camera: Camera) {
-        var xStart: number = Math.floor(-camera.offset.x / camera.room.tilesize);
-        var yStart: number = Math.floor(-camera.offset.y / camera.room.tilesize);
-        var screenWidth: number = ctx.canvas.width / camera.room.tilesize / camera.zoom + 1;
-        var screenHeight: number = ctx.canvas.height / camera.room.tilesize / camera.zoom + 1;
+        var xStart: number = Math.floor(-camera.offset.x / camera.room.map.tilesize);
+        var yStart: number = Math.floor(-camera.offset.y / camera.room.map.tilesize);
+        var screenWidth: number = ctx.canvas.width / camera.room.map.tilesize / camera.zoom + 1;
+        var screenHeight: number = ctx.canvas.height / camera.room.map.tilesize / camera.zoom + 1;
 
         for (var x: number = Math.max(0, xStart); x < Math.min(xStart + screenWidth, this.width); x++) {
             for (var y: number = Math.max(0, yStart); y < Math.min(yStart + screenHeight, this.height); y++) {
@@ -38,7 +43,20 @@ class TileMap implements iRenderable {
         }
     }
 
+    /**
+     * Returns the tile at the specified tile coordinates (1.1, 1.2, 1.3 etc.)
+     */
     public getTile(x: number, y: number): Tile {
+        if (x < 0 || x >= this.width) return null;
+        if (y < 0 || y * this.width + x >= this.tiles.length) return null;
+
         return this.tiles[y * this.width + x];
+    }
+
+    /**
+     * Returns the tile at the specified world coordinates
+     */
+    public getTileAt(x: number, y: number): Tile {
+        return this.getTile(Math.floor(x / this.tilesize), Math.floor(y / this.tilesize));
     }
 }

@@ -1,6 +1,6 @@
 ﻿class PlayerEntity extends Entity {
-    constructor(id: number, entityData: any) {
-        super(id, entityData);
+    constructor(id: number, room: GameRoom, entityData: any) {
+        super(id, room, entityData);
 
         this.hasGravity = true;
         this.height = 60;
@@ -13,8 +13,8 @@
  * The entity of the controlled player
  */
 class MainPlayerEntity extends PlayerEntity {
-    constructor(id: number, entityData: any) {
-        super(id, entityData);
+    constructor(id: number, room: GameRoom, entityData: any) {
+        super(id, room, entityData);
 
         this.color = "red";
     }
@@ -26,11 +26,15 @@ class MainPlayerEntity extends PlayerEntity {
         var oldYSpeed: number = this.ySpeed;
 
         if (Keyboard.isKeyDown("ArrowRight")) {
-            this.xSpeed = 300;
+            this.xSpeed = 500;
         } else if (Keyboard.isKeyDown("ArrowLeft")) {
-            this.xSpeed = -300;
+            this.xSpeed = -500;
         } else {
             this.xSpeed = 0;
+        }
+
+        if (Keyboard.isKeyDown("ArrowUp") && this.onGround) {
+            this.ySpeed = -1000;
         }
 
         if (oldXSpeed != this.xSpeed || oldYSpeed != this.ySpeed) {
