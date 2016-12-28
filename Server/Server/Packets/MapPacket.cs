@@ -27,7 +27,7 @@ namespace Server.Packets
             {
                 for (int x = 0; x < Map.Tiles.GetLength(0); x++)
                 {
-                    byte tile = Map.Tiles[x, y];
+                    byte tile = Map.Tiles[x, y].Type;
                     output[y * Map.Tiles.GetLength(0) + x + 1] = tile;
                 }
             }
