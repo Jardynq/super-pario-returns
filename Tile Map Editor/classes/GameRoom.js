@@ -10,7 +10,7 @@ var GameRoom = function () {
       this.isMouseDown = null;
 
       this.activeTile = null;
-      this.activeTileNum = 1;
+      this.activeTileId = 0;
 
       // Amount of tile types
       this.tileAmount = 2;
@@ -35,7 +35,7 @@ GameRoom.prototype.loadMap = function () {
 
       this.activeTilePreview.addToRenderQueue(this.render.renderQueue);
 
-      this.activeTile = this.map.tiles[0];
+      this.activeTile = new Tile.ColorTile("blue", 0, 0, "0");
 
       // Fixes camera      
       this.cameraSpeed = this.map.tilesize * 0.25;
@@ -59,32 +59,32 @@ GameRoom.prototype.formatAndSave = function () {
 };
 
 GameRoom.prototype.getActiveTile = function (x, y) {
-      if (this.activeTileNum === 0) {
+      if (this.activeTileId === 0) {
             this.activeTile = new Tile.ColorTile("blue", x, y, "0");
       }
-      if (this.activeTileNum === 1) {
+      if (this.activeTileId === 1) {
             this.activeTile = new Tile.ColorTile("black", x, y, "1");
       }
 };
 GameRoom.prototype.updateActiveTile = function () {
       if (Input.isKeyDown("KeyE")) {
-            if (this.activeTileNum >= this.tileAmount - 1) {
-                  this.activeTileNum = 0;
+            if (this.activeTileId >= this.tileAmount - 1) {
+                  this.activeTileId = 0;
             } else {
-                  this.activeTileNum += 1;
+                  this.activeTileId += 1;
             }
       } else if (Input.isKeyDown("KeyQ")) {
-            if (this.activeTileNum <= 0) {
-                  this.activeTileNum = this.tileAmount - 1;
+            if (this.activeTileId <= 0) {
+                  this.activeTileId = this.tileAmount - 1;
             } else {
-                  this.activeTileNum -= 1;
+                  this.activeTileId -= 1;
             }
       }
 
-      if (this.activeTileNum === 0) {
+      if (this.activeTileId === 0) {
             this.activeTile = new Tile.ColorTile("blue", 0, 0, "0");
       }
-      if (this.activeTileNum === 1) {
+      if (this.activeTileId === 1) {
             this.activeTile = new Tile.ColorTile("black", 0, 0, "1");
       }
 };

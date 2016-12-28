@@ -9,6 +9,9 @@ var PlayerEntity = function (reader) {
       this.height = 60;
 
       this.hasGravity = true;
+
+      this.pingDisplay = new PingDisplay(this);
+      this.pingDisplay.addToRenderQueue(room.render.renderQueue);
 };
 PlayerEntity.prototype = Object.create(Entity.prototype); // PlayerEntity inherits Entity
 PlayerEntity.prototype.step = function (timescale) {
@@ -68,6 +71,10 @@ PlayerEntity.prototype.sendActionPacket = function (key) {
             actionPacket.setUint8(1, PlayerEntity.ACTION_TYPES.stopMove); 
             Socket.sendPacket(actionPacket);             
       }
+};
+
+PlayerEntity.prototype.updatePingDisplay = function () {
+      this.pingDisplay.playerEntity = this;
 };
 
 PlayerEntity.prototype.setMain  = function () {

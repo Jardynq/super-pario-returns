@@ -31,7 +31,7 @@ Entity.prototype.update = function (reader) {
       this.xSpeed = reader.getFloat32(8, true);
       this.ySpeed = reader.getFloat32(12, true);
 
-      if (reader.getUint8(0) === Entity.ENTITY_TYPES.player) {
+      if (reader.getUint8(2) === Entity.ENTITY_TYPES.player) {
             this.ping = reader.getUint16(16, true);
       }
 };
