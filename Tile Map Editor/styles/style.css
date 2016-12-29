@@ -1,6 +1,46 @@
+html {
+    height: 100%;
+}
+
 body {
     margin: 0;
     overflow: hidden;
+    height: 100%;
+    background-color: #EEE;
+    font-family: "Oswald", Arial, Helvetica, sans-serif;
+}
+
+#UI {
+    max-width: 800px;
+    margin: 2rem auto;
+    background: white;
+    padding: 1rem;
+}
+#UI label {
+    display: inline-block;
+    font-weight: bold;
+    width: 100px;
+    margin-bottom: 0.5rem;
+}
+#UI input[type='button'],
+#UI .file-upload {
+    background-color: #333;
+    color: white;
+    padding: 0.5rem;
+    border: 0;
+    font-weight: bold;
+    cursor: pointer;
+    width: auto;
+    font-size: 14px;
+}
+#UI .file-upload:after {
+    content: "Choose File";
+}
+#UI .file-upload input[type='file'] {
+    display: none;
+}
+#UI input[type='button']:hover {
+    background-color: #555;
 }
 
 .wrapper {

@@ -6,15 +6,42 @@ TileMap = (function () {
             this.width = width;
             this.height = height;
             this.tiles = [];
-            
-            this.generateMap();
       };
       ns.Map.prototype.generateMap = function () {
             for (var y = 0; y < this.height; y++) {
                   for (var x = 0; x < this.width; x++) {
-                        this.tiles[x + (y * this.width)] = new Tile.ColorTile("blue", x, y, "0");
+                        this.tiles[x + (y * this.width)] = new Tile.ColorTile("black", x, y, "1");
                   }
             }
+      };
+      ns.Map.prototype.loadMap = function (data) {
+            data =  data.replace(/\r\n*/g, '\n');
+            var rows = data.split("\n");
+
+            var offset = 0;
+            if (rows[rows.length - 1] === "") {
+                  offset = 1;
+            }
+
+            this.width = rows[0].split(",").length;
+            this.height = rows.length - offset;
+
+            for (y = 0; y < this.height; y++) {
+                  var tileRow = rows[y].split(",");
+                  for (x = 0; x < this.width; x++) {
+                        var tile = tileRow[x];
+
+                        if (tile === "0") { // Sky
+                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("blue", x, y, "0");
+                        }
+                        if (tile === "1") { // Ground
+                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("black", x, y, "1");
+                        }
+                  }
+            }
+            console.log(this.width);
+            console.log(this.height);
+            console.log(this.tiles);
       };
       ns.Map.prototype.updateTile = function(tile, newTile) {
             this.tiles[tile.x + (tile.y * this.width)] = newTile;

@@ -44,9 +44,11 @@ GameRoom.prototype.loadMap = function (reader) {
       this.entityRenderer.addToRenderQueue(this.render.renderQueue);
 };
 GameRoom.prototype.updateEntities = function (reader) {
-      var amount = reader.getUint16(9, true);
+      var amount = reader.getUint16(1, true);
 
-      var offset = 11;
+      var containsAllEntities = (reader.getUint8(2, true) === 1);
+
+      var offset = 4;
       for (i = 0; i < amount; i++) {
             // The length in bytes of this entity
             var entityLength = reader.getUint8(offset, true);
@@ -97,7 +99,7 @@ GameRoom.prototype.updateScreenOffset = function () {
             this.render.offsetY = -this.player.y + canvas.height * (0.5 / this.render.zoom);
       }
 
-      /*
+      
       // View space position limits
       if (-this.render.offsetX <= 0) {
             this.render.offsetX = -0;
@@ -108,7 +110,7 @@ GameRoom.prototype.updateScreenOffset = function () {
             this.render.offsetY = -0;
       } else if (-this.render.offsetY * this.render.zoom >= this.map.tiles.length / this.map.width * this.map.tilesize * this.render.zoom - canvas.height) {
             this.render.offsetY = -(this.map.tiles.length / this.map.width * (this.map.tilesize * this.render.zoom) - canvas.height) / this.render.zoom;
-      }*/
+      }
 
 };
 

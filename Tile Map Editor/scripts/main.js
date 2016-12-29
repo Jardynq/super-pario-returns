@@ -30,12 +30,38 @@ function init () {
       window.addEventListener("resize", fixCanvas); 
 
       // Create the game room
-      room = new GameRoom();
+      document.getElementById("btn-new-map").addEventListener("click", function () {
+            document.getElementById("UI").style.display = "none";
 
-      room.loadMap();
+            var width = document.getElementById("inp-width").value;
+            var height = document.getElementById("inp-height").value;
+            var tilesize = document.getElementById("inp-tilesize").value;
+            var map = new TileMap.Map(width, height, tilesize);
 
-      // Start the main loop
-      step();
+            map.generateMap();
+            room = new TileEditorRoom(map);
+
+            // Starts the main loop
+            step();
+      });
+      document.getElementById("map-file-input").onchange = function () {
+            document.getElementById("UI").style.display = "none";
+            var input = document.getElementById("map-file-input");
+            if (input.files.length === 1) {
+                  var file = input.files[0];
+                  var reader = new FileReader();
+                  reader.readAsText(file);
+                  reader.onloadend = function (e) {
+                        var tilesize = document.getElementById("inp-tilesize").value;
+                        var map = new TileMap.Map(0, 0, tilesize);
+                        map.loadMap(e.currentTarget.result);
+
+                        room = new TileEditorRoom(map);
+                        // Starts the main loop
+                        step();
+                  }
+            }
+      };
 }
 
 // Adapts canvas to screen size
@@ -64,42 +90,18 @@ function download(filename, text) {
       document.body.removeChild(element);
 }
 
-
-
-
 /**
- * Checking for input
+ * Set attributes for html elements
  * 
  */
-function onKeyDown (e) {
+function setAttributes(el, options) {
+      Object.keys(options).forEach(function(attr) {
+            el.setAttribute(attr, options[attr]);
+      });
+}
 
-      room.onKeyDown(e);
-}
-function onKeyUp (e) {
-      room.onKeyUp(e);
-}
-function onMouseWheel (e) {
-      room.onMouseWheel(e);
-}
-function onMouseMove (e) {
-      room.onMouseMove(e);      
-}
-function onMouseDown (e) {
-      room.onMouseDown(e);
-}
-function onMouseUp (e) {
-      room.onMouseUp(e);
-}
 window.addEventListener("load", init);
 
 // Event handlers for Input.js that is used to check which key is down or up
 window.addEventListener('keydown', Input.onKeyDown);
 window.addEventListener("keyup", Input.onKeyUp);
-
-// Event handlers for the game
-window.addEventListener('keydown', onKeyDown);
-window.addEventListener("keyup", onKeyUp);
-window.addEventListener('wheel', onMouseWheel);
-window.addEventListener('mousemove', onMouseMove);
-window.addEventListener("mousedown", onMouseDown);
-window.addEventListener("mouseup", onMouseUp);

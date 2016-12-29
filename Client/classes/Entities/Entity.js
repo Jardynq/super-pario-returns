@@ -21,10 +21,6 @@ Entity.prototype.render = function (ctx, render) {
 };
 
 Entity.prototype.update = function (reader) {
-      if (this.x === undefined) {
-            this.x = this.y = 200;
-            this.ySpeed = this.xSpeed = 0;
-      }
       this.x = reader.getInt16(4, true);
       this.y = reader.getInt16(6, true);
 
