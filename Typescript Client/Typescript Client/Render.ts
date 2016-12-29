@@ -27,6 +27,16 @@ class Camera {
     }
 }
 
+class EasingFunction {
+    public static CubicIn(x, start, easingAmount, duration) {
+        if (x > 0) {
+            return Math.pow(x / duration, easingAmount) + start;
+        } else {
+            return -(Math.pow(x / duration, easingAmount) + start);
+        }
+    }
+}
+
 interface iRenderable {
     render: (context: CanvasRenderingContext2D, camera: Camera) => void;
 }

@@ -19,10 +19,6 @@ namespace Server
         public static Random rnd = new Random();
         private static WebSocketServer server;
 
-        // Number of frames per second in the simulation
-        public const int TARGET_FRAMERATE = 60;
-        // Number of entity update packets per second
-        public const double TARGET_UPDATE_RATE = 15;
         public static Stopwatch Timer = new Stopwatch();
 
         static void Main(string[] args)
@@ -82,6 +78,9 @@ namespace Server
                         break;
                     case PacketType.Ping:
                         packet = PingPacket.Parse(reader);
+                        break;
+                    case PacketType.PlayerUpdate:
+                        packet = PlayerUpdatePacket.Parse(reader, this);
                         break;
                     default:
                         return base.OnMessage(e); // Packet not recognized. Ignore it.

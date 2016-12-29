@@ -53,12 +53,12 @@ class MainPlayerEntity extends PlayerEntity {
     public step(timeScale: number): void {
         super.step(timeScale);
 
-        if (Keyboard.isKeyDown("ArrowLeft")) {
+        if (Input.isKeyDown("KeyA")) {
             if (this.xSpeed != -PlayerEntity.moveSpeed) {
                 this.xSpeed = -PlayerEntity.moveSpeed;
                 this.sendAction(PlayerActionType.MoveLeft);
             }
-        } else if (Keyboard.isKeyDown("ArrowRight")) {
+        } else if (Input.isKeyDown("KeyD")) {
             if (this.xSpeed != PlayerEntity.moveSpeed) {
                 this.xSpeed = PlayerEntity.moveSpeed;
                 this.sendAction(PlayerActionType.MoveRight);
@@ -68,7 +68,7 @@ class MainPlayerEntity extends PlayerEntity {
             this.sendAction(PlayerActionType.StopMove);
         }
 
-        if (Keyboard.isKeyDown("ArrowUp")) {
+        if (Input.isKeyDown("KeyW")) {
             if (this.onGround) {
                 this.ySpeed = -PlayerEntity.jumpForce;
                 this.sendAction(PlayerActionType.Jump);
@@ -76,6 +76,13 @@ class MainPlayerEntity extends PlayerEntity {
 
             }
         }
+
+        // Send an update packet to the server
+        var updatePacket = new DataView(new ArrayBuffer(13));
+        updatePacket.setUint8(0, PacketType.PlayerUpdate);
+        updatePacket.setInt16(1, this.x, true);
+        updatePacket.setInt16(3, this.y, true);
+        socket.sendPacket(updatePacket);
     }
 
     public sendAction(actionType: PlayerActionType): void {
@@ -83,6 +90,18 @@ class MainPlayerEntity extends PlayerEntity {
         actionPacket.setUint8(0, PacketType.PlayerAction);
         actionPacket.setUint8(1, actionType);
         socket.sendPacket(actionPacket);
+    }
+
+    public update(data: DataView, forceUpdate: boolean = false): number {
+        if (!forceUpdate) {
+            var oldX = this.x;
+            var oldY = this.y;
+            super.update(data);
+            this.x = oldX;
+            this.y = oldY;
+        } else {
+            return super.update(data);
+        }
     }
 }
 

@@ -78,6 +78,7 @@
     <Compile Include="Packets\Packet.cs" />
     <Compile Include="Packets\PingPacket.cs" />
     <Compile Include="Packets\PlayerActionPacket.cs" />
+    <Compile Include="Packets\PlayerUpdatePacket.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

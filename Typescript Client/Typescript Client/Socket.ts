@@ -45,5 +45,5 @@ enum PacketType {
     PlayerAction,
     Entity,
     Ping,
-    EntityRemove
+    PlayerUpdate
 }

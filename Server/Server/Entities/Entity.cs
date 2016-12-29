@@ -47,7 +47,7 @@ namespace Server.Entities
             HandleCollision(false);
         }
 
-        private void HandleCollision (bool x) {
+        public void HandleCollision (bool x) {
             double speed = x ? XSpeed : YSpeed;
 
             List<Tile.Tile> collisionTiles = new List<Tile.Tile>();

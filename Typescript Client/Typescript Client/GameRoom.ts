@@ -17,6 +17,8 @@ class GameRoom {
         socket.registerHandler(PacketType.Entity, this.entityPacketReceived.bind(this));
         socket.registerHandler(PacketType.Join, this.onJoin.bind(this));
         socket.registerHandler(PacketType.Ping, (reader) => socket.sendPacket(reader));
+        // If we get a playerupdate from the server, we better act upon it
+        socket.registerHandler(PacketType.PlayerUpdate, (data: DataView) => this.player.update(new DataView(data.buffer, 1), true));
 
         window.addEventListener("wheel", this.onScroll.bind(this));
     }
@@ -32,7 +34,7 @@ class GameRoom {
 
         if (this.jitterbuffer.length > 0) {
             var currentTime = new Date().getTime();
-            if (currentTime > this.lastEntityPacketProcessed + 20) {
+            if (currentTime > this.lastEntityPacketProcessed + 30) {
                 this.updateEntities(this.jitterbuffer[this.jitterbuffer.length - 1]);
                 this.jitterbuffer = [];
                 this.lastEntityPacketProcessed = currentTime;
@@ -46,8 +48,11 @@ class GameRoom {
 
         // Update the camera
         if (this.player !== undefined) {
-            this.camera.offset.x = -this.player.renderX + (ctx.canvas.width * 0.5 / this.camera.zoom);
-            this.camera.offset.y = -this.player.renderY + (ctx.canvas.height * 0.5 / this.camera.zoom);
+            var panDistance: number = 500;
+            var xPan: number = -EasingFunction.CubicIn((Input.mouseX - ctx.canvas.width * 0.5) / ctx.canvas.width, 0, 2, 1) * panDistance;
+            var yPan: number = -EasingFunction.CubicIn((Input.mouseY - ctx.canvas.height * 0.5) / ctx.canvas.height, 0, 2, 1) * panDistance;
+            this.camera.offset.x = -this.player.renderX + (ctx.canvas.width * 0.5 / this.camera.zoom) + xPan;
+            this.camera.offset.y = -this.player.renderY + (ctx.canvas.height * 0.5 / this.camera.zoom) + yPan;
         }
 
         if (this.map !== undefined) {
@@ -77,7 +82,12 @@ class GameRoom {
     }
 
     public entityPacketReceived(data: DataView) {
-        this.jitterbuffer.push(data);
+        // Single entity packets should be processed immediately
+        if (data.getUint8(3) != 1) {
+            this.updateEntities(data);
+        } else {
+            this.jitterbuffer.push(data);
+        }
     }
 
     public updateEntities(reader: DataView): void {
@@ -91,10 +101,10 @@ class GameRoom {
         for (var i = 0; i < entityCount; i++) {
             // The length in bytes of this entity
             var entityLength: number = reader.getUint8(offset);
-            var entityData: ArrayBuffer = reader.buffer.slice(offset, offset + entityLength + 1);
+            var entityData: ArrayBuffer = reader.buffer.slice(offset + 1, offset + entityLength + 1);
             var entityView = new DataView(entityData);
-            var id = entityView.getUint16(1, true);
-            offset += entityData.byteLength;
+            var id = entityView.getUint16(0, true);
+            offset += entityData.byteLength + 1;
             receivedEntities[id] = true;
 
             if (this.entities[id] === undefined) {
@@ -130,7 +140,7 @@ class GameRoom {
         PlayerEntity.jumpForce = reader.getInt16(11, true);
         var playerID: number = reader.getUint16(13, true);
 
-        this.player = new MainPlayerEntity(playerID, this, reader);
+        this.player = new MainPlayerEntity(playerID, this, new DataView(reader.buffer, 1));
         this.entities[playerID] = this.player;
     }
 

@@ -48,8 +48,8 @@ class Entity implements iRenderable {
         this.renderY += (this.y - this.renderY) * 0.8;
     }
 
-    public update(data: DataView):number {
-        var offset = 4; // To compensate for LENGTH, ID and TYPE
+    public update(data: DataView): number {
+        var offset = 3; // To compensate for ID and TYPE
         this.x = data.getInt16(offset, true);
         offset += 2;
         this.y = data.getInt16(offset, true);

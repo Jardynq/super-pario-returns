@@ -18,8 +18,14 @@ namespace Server
         private ushort _lastEntityID = 0;
 
         // Related to frame loop
-        private int _framesPassed = 0;
+        private long _lastUpdate = 0;
+        private long _lastPing = 0;
         private long _lastTickCount = 0;
+        // Number of frames per second in the simulation
+        public const int TARGET_FRAMERATE = 60;
+        // Number of entity update packets per second
+        public const int TARGET_UPDATE_RATE = 5;
+        public const int TARGET_PING_RATE = 1;
 
         public GameRoom (TileMap map)
         {
@@ -62,7 +68,7 @@ namespace Server
             while (true)
             {
                 long tickCount = Program.Timer.ElapsedMilliseconds;
-                int targetFrameLength = (int)(1000f / Program.TARGET_FRAMERATE);
+                int targetFrameLength = (int)(1000f / TARGET_FRAMERATE);
                 int elapsedMilliseconds = (int)(tickCount - _lastTickCount);
 
                 if (elapsedMilliseconds < targetFrameLength)
@@ -78,7 +84,7 @@ namespace Server
             int elapsedMilliseconds = (int)(Program.Timer.ElapsedMilliseconds - _lastTickCount);
             _lastTickCount = Program.Timer.ElapsedMilliseconds;
             int framerate = (int)(1000f / elapsedMilliseconds);
-            if (framerate > 0 && framerate < Program.TARGET_FRAMERATE - 5) {
+            if (framerate > 0 && framerate < TARGET_FRAMERATE - 5) {
                 Console.WriteLine("FRAMERATE DROP: {0} FPS", framerate);
             }
 
@@ -90,9 +96,14 @@ namespace Server
                 Entities[id].Step(timeScale);
             }
 
-            if (++_framesPassed > Program.TARGET_FRAMERATE / Program.TARGET_UPDATE_RATE) {
+            if (Program.Timer.ElapsedMilliseconds - _lastUpdate > 1000f / TARGET_UPDATE_RATE) {
                 new EntityPacket(Entities, true).Send();
-                _framesPassed = 0;
+                _lastUpdate = Program.Timer.ElapsedMilliseconds;
+            }
+            if (Program.Timer.ElapsedMilliseconds - _lastPing > 1000f / TARGET_PING_RATE)
+            {
+                new PingPacket().Send();
+                _lastPing = Program.Timer.ElapsedMilliseconds;
             }
         }
     }
