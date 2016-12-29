@@ -51,6 +51,27 @@ function fixCanvas () {
       canvas.height = window.innerHeight;
 }
 
+function getRandomColor (redOffset, greenOffset, blueOffset) {
+      if (redOffset === undefined) {
+            redOffset = 0;
+      }
+      if (greenOffset === undefined) {
+            greenOffset = 0;
+      }
+      if (blueOffset === undefined) {
+            blueOffset = 0;
+      }
+      var red = Math.floor(Math.random() * 255);
+      var green = Math.floor(Math.random() * 255);
+      var blue = Math.floor(Math.random() * 255);
+
+      red -= redOffset;
+      green -= greenOffset;
+      blue -= blueOffset;
+
+      return "rgb(" + red +"," + green + "," + blue + ")";
+}
+
 // Event handlers for Input.js that is used to check which key is down or up
 window.addEventListener('keydown', Input.onKeyDown);
 window.addEventListener("keyup", Input.onKeyUp);

@@ -52,7 +52,7 @@ var Socket = (function () {
             "entity": 3,
             "ping": 4,
             "playerUpdate": 5,
-            "playerShoot": 5,
+            "playerShoot": 6,
       };
 
       return ns;

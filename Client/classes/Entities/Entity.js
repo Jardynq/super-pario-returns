@@ -32,6 +32,9 @@ Entity.prototype.update = function (reader) {
       this.xSpeed = reader.getFloat32(8, true);
       this.ySpeed = reader.getFloat32(12, true);
 };
+Entity.prototype.dispose = function () {
+      room.removeFromEntities(this.id);
+};
 
 Entity.prototype.step = function (timeScale) {
       if (this.hasGravity) {
@@ -46,8 +49,8 @@ Entity.prototype.step = function (timeScale) {
       this.handleCollision(false);
 
       // Easing
-      this.renderX += ((this.x - this.renderX) * 0.7);
-      this.renderY += ((this.y - this.renderY) * 0.7);
+      this.renderX += ((this.x - this.renderX) * 0.8);
+      this.renderY += ((this.y - this.renderY) * 0.8);
 };
 
 Entity.prototype.handleCollision = function (x) {
@@ -76,6 +79,7 @@ Entity.prototype.handleCollision = function (x) {
                               this.x = tile.x * room.map.tilesize + room.map.tilesize + this.width * 0.5;
                         }
                         this.xSpeed = 0;
+                        this.collidedWithTile();
                   } else {
                         if (speed > 0) {
                               this.y = tile.y * room.map.tilesize - this.height * 0.5;
@@ -85,9 +89,14 @@ Entity.prototype.handleCollision = function (x) {
                               this.y = tile.y * room.map.tilesize + room.map.tilesize + this.height * 0.5;
                         }
                         this.ySpeed = 0;
+                        this.collidedWithTile();                        
                   }
             }   
       }
+};
+
+Entity.prototype.collidedWithTile = function () {
+
 };
 
 Entity.ENTITY_TYPES = {

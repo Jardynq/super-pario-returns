@@ -11,6 +11,11 @@ Tile = (function () {
       ns.ColorTile.prototype.render = function (ctx, render, tilesize) {
             ctx.beginPath();
             ctx.rect((this.x * tilesize + render.offsetX) * render.zoom, (this.y * tilesize + render.offsetY) * render.zoom, tilesize * render.zoom, tilesize * render.zoom);
+            ctx.fillStyle = getRandomColor(200, 200, 0);
+            if (this.hasCollision) {
+                  ctx.fillStyle = getRandomColor(200, 0, 200);
+            }
+
             ctx.fillStyle = this.color;
 
             // DEBUG

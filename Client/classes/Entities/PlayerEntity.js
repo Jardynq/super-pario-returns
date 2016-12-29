@@ -25,7 +25,7 @@ PlayerEntity.prototype.render = function (ctx, render) {
 
 PlayerEntity.prototype.step = function (timescale) {
       Entity.prototype.step.call(this, timescale);
-      
+
       if (this.isMain) {
             this.updateMovement();
       }
@@ -57,9 +57,16 @@ PlayerEntity.prototype.updateMovement = function () {
             }
       }
 };
-PlayerEntity.prototype.shoot = function (e) {
-      var actionPacket = new DataView(new ArrayBuffer(1)); 
-      actionPacket.setUint8(0, Socket.PACKET_TYPES.playerAction); 
+PlayerEntity.prototype.shoot = function (e, render) {
+      var dirX = e.x / render.zoom - (this.x + render.offsetX);
+      var dirY = e.y / render.zoom - (this.y + render.offsetY);
+
+      var angle = Math.atan2(dirY, dirX);
+      
+      var shootPacket = new DataView(new ArrayBuffer(5));
+      shootPacket.setUint8(0, Socket.PACKET_TYPES.playerShoot);
+      shootPacket.setFloat32(1, angle, true);
+      Socket.sendPacket(shootPacket);
 };
 PlayerEntity.prototype.sendActionPacket = function (key) {
       var actionPacket = new DataView(new ArrayBuffer(5)); 
@@ -107,12 +114,12 @@ PlayerEntity.prototype.update  = function (reader, updatePosition) {
       }
 };
 PlayerEntity.prototype.setMain  = function () {
-      this.color = "red";
+      this.color = getRandomColor();
       this.isMain = true;
 };
 
-PlayerEntity.prototype.onMouseDown = function (e) {
-      this.shoot(e);
+PlayerEntity.prototype.onMouseDown = function (e, render) {
+      this.shoot(e, render);
 };
 
 

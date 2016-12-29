@@ -175,7 +175,7 @@ GameRoom.prototype.onMouseMove = function (e) {
       this.mouseY = e.y;
 };
 GameRoom.prototype.onMouseDown = function (e) {
-      this.player.onMouseDown(e);
+      this.player.onMouseDown(e, this.render);
 };
 GameRoom.prototype.onMouseUp = function (e) {
 

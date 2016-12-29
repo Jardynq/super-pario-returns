@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,8 @@ namespace Server.Entities
 {
     public class BulletEntity : Entity
     {
-        public BulletEntity (GameRoom room, float angle) : base(room)
+        Player Shooter;
+        public BulletEntity (GameRoom room, float angle, Player shooter) : base(room)
         {
             int bulletSpeed = 800;
             Width = 10;
@@ -18,12 +20,20 @@ namespace Server.Entities
             YSpeed = Math.Sin(Math.Max(Math.Min(angle, 1000), -1000)) * bulletSpeed;
             Type = EntityType.Bullet;
             HasGravity = true;
+            Shooter = shooter;
         }
 
         internal override void CollidedWithTile(Tile.Tile tile)
         {
             Dispose();
             base.CollidedWithTile(tile);
+        }
+
+        public override BinaryWriter WriteToBinary(BinaryWriter writer)
+        {
+            base.WriteToBinary(writer);
+            writer.Write((ushort)Shooter.Entity.ID);
+            return writer;
         }
     }
 }
