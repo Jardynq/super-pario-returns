@@ -14,9 +14,10 @@ namespace Server.Packets
 
         public override void Handle(GameService session)
         {
+            Angle += (float)(Math.PI * 0.05 * (0.5 - Program.rnd.NextDouble()));
             BulletEntity bullet = new BulletEntity(session.Room, Angle, session.Room.Players[session.Id]);
             bullet.Teleport(session.Room.Players[session.Id].Entity.X, session.Room.Players[session.Id].Entity.Y);
-            new EntityPacket(bullet);
+            new EntityPacket(bullet).Send();
 
             base.Handle(session);
         }

@@ -31,6 +31,8 @@ class Entity implements iRenderable {
         this.id = id;
         this.room = room;
         this.update(data);
+
+        // Update the renderX and renderY to prevent the object from easing in from (0, 0)
         this.renderX = this.x;
         this.renderY = this.y;
     }

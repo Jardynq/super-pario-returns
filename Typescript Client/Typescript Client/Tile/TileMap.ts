@@ -23,9 +23,9 @@ class TileMap implements iRenderable {
             this.height = y + 1; // This way the height will be set to the last y value
 
             if (tileValue == 0) {
-                this.tiles[tileIndex] = new ColorTile(x, y, false, "blue");
+                this.tiles[tileIndex] = new ColorTile(x, y, false, "#2980b9");
             } else {
-                this.tiles[tileIndex] = new ColorTile(x, y, true, "black");
+                this.tiles[tileIndex] = new ColorTile(x, y, true, "#111111");
             }
         }
     }

@@ -48,7 +48,7 @@ namespace Server.Entities
             Room.AddEntity(this);
         }
 
-        public void Step (float timeScale)
+        public virtual void Step (float timeScale)
         {
             if (HasGravity) {
                 YSpeed = Math.Min(YSpeed + GRAVITY * timeScale, MAX_SPEED);

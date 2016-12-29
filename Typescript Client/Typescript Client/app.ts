@@ -12,8 +12,8 @@ var socket: Socket;
  * Connect to the server
  */
 window.onload = () => {
-    //socket = new Socket("ws:188.176.12.23:1337/", () => {
-    socket = new Socket("ws:192.168.0.20:1337/", () => {
+    socket = new Socket("ws:188.176.12.23:1337/", () => {
+    //socket = new Socket("ws:192.168.0.20:1337/", () => {
         // Runs on succesful connection
 
         init();
