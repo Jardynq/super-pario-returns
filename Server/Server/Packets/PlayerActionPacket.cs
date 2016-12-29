@@ -20,9 +20,6 @@ namespace Server.Packets
         {
             Player player = session.Room.Players[session.Id];
 
-            // Move the player forward before resetting their speed
-            player.Entity.Room.Step();
-
             if (Type == PlayerActionType.MoveLeft) {
                 player.Entity.XSpeed = -PlayerEntity.MOVE_SPEED;
             } else if (Type == PlayerActionType.MoveRight) {

@@ -58,44 +58,61 @@ namespace Server.Entities
             Y += YSpeed * timeScale;
         }
 
-        public void UpdatePosition (bool isXPosition, double newValue) {
-            double difference = isXPosition ? newValue - X : newValue - Y;
-            if (isXPosition) {
-                _x = newValue;
-            } else {
-                _y = newValue;
-            }
+        private void UpdatePosition(bool isXPosition, double newValue)
+        {
+            // Move in increments of tilesize to prevent moving through blocks
+            double oldValue = isXPosition ? _x : _y;
+            // Can be 1 for positive or -1 for negative direction
+            int direction = newValue - oldValue > 0 ? 1 : -1;
+            while (oldValue * direction < newValue * direction)
+            {
+                oldValue += TileMap.TILE_SIZE * direction;
+                if (oldValue * direction > newValue * direction) oldValue = newValue;
+                if (isXPosition) {
+                    _x = oldValue;
+                } else {
+                    _y = oldValue;
+                }
 
-            List<Tile.Tile> collisionTiles = new List<Tile.Tile>();
+                List<Tile.Tile> collisionTiles = new List<Tile.Tile>();
 
-            collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5 + 0.3), (float)(Y - Height * 0.5 + 0.3)));
-            collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5 - 0.3), (float)(Y - Height * 0.5 + 0.3)));
-            collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5 + 0.3), (float)(Y + Height * 0.5 - 0.3)));
-            collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5 - 0.3), (float)(Y + Height * 0.5 - 0.3)));
-            collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5 + 0.3), (float)(Y)));
-            collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5 - 0.3), (float)(Y)));
+                collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5 + 0.3), (float)(Y - Height * 0.5 + 0.3)));
+                collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5 - 0.3), (float)(Y - Height * 0.5 + 0.3)));
+                collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5 + 0.3), (float)(Y + Height * 0.5 - 0.3)));
+                collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5 - 0.3), (float)(Y + Height * 0.5 - 0.3)));
+                collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5 + 0.3), (float)(Y)));
+                collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5 - 0.3), (float)(Y)));
 
-            foreach (Tile.Tile tile in collisionTiles) {
-                if (tile != null && tile.HasCollision) {
-                    if (isXPosition) {
-                        if (difference > 0) {
-                            _x = tile.X * TileMap.TILE_SIZE - Width * 0.5;
-                        } else if (difference < 0) {
-                            _x = tile.X * TileMap.TILE_SIZE + TileMap.TILE_SIZE + Width * 0.5 ;
-                        }
-                        XSpeed = 0;
-                    } else {
-                        if (difference > 0)
+                foreach (Tile.Tile tile in collisionTiles)
+                {
+                    if (tile != null && tile.HasCollision)
+                    {
+                        if (isXPosition)
                         {
-                            _y = tile.Y * TileMap.TILE_SIZE - Height * 0.5;
+                            if (direction > 0)
+                            {
+                                _x = newValue = tile.X * TileMap.TILE_SIZE - Width * 0.5;
+                            }
+                            else if (direction < 0)
+                            {
+                                _x = newValue = tile.X * TileMap.TILE_SIZE + TileMap.TILE_SIZE + Width * 0.5;
+                            }
+                            XSpeed = 0;
                         }
-                        else if (difference < 0)
+                        else
                         {
-                            _y = tile.Y * TileMap.TILE_SIZE + TileMap.TILE_SIZE + Height * 0.5;
+                            if (direction > 0)
+                            {
+                                _y = newValue = tile.Y * TileMap.TILE_SIZE - Height * 0.5;
+                            }
+                            else if (direction < 0)
+                            {
+                                _y = newValue = tile.Y * TileMap.TILE_SIZE + TileMap.TILE_SIZE + Height * 0.5;
+                            }
+                            YSpeed = 0;
                         }
-                        YSpeed = 0;
                     }
-                }   
+                }
             }
         }
 

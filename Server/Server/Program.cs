@@ -34,18 +34,22 @@ namespace Server
             server.Start();
             Console.ReadKey(true);
             server.Stop();
+            Console.WriteLine("SERVER STOPPED");
         }
 
         public static void Send(string id, byte[] data)
         {
-            if (server.WebSocketServices.Paths.Contains("/") && server.WebSocketServices["/"].Sessions.Ds.Contains(id))
+            if (server.WebSocketServices.Paths.Contains("/")
+             && server.WebSocketServices["/"].Sessions.Ds.Contains(id)
+             && server.WebSocketServices["/"].Sessions != null)
             {
                 server.WebSocketServices["/"].Sessions[id].Context.WebSocket.Send(data);
             }
         }
         public static void Broadcast(byte[] data)
         {
-            if (server.WebSocketServices.Paths.Contains("/"))
+            if (server.WebSocketServices.Paths.Contains("/")
+             && server.WebSocketServices["/"].Sessions != null)
             {
                 server.WebSocketServices["/"].Sessions.Broadcast(data);
             }
