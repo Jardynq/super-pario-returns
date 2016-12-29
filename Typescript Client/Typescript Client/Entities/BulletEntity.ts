@@ -1,11 +1,11 @@
 ﻿class BulletEntity extends Entity {
     private _oldPositions: { x: number, y: number }[] = [];
+    public owner: PlayerEntity;
 
     constructor(id: number, room: GameRoom, data: DataView) {
         super(id, room, data);
-        this.width = 10;
-        this.height = 10;
-        this.hasGravity = true;
+        this.width = 5;
+        this.height = 5;
         this.color = "olive";
     }
 
@@ -37,8 +37,12 @@
         }
 
         ctx.beginPath();
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 10;
+        if (this.owner.id == this.room.player.id) {
+            ctx.strokeStyle = "#2ecc71";
+        } else {
+            ctx.strokeStyle = "#e74c3c";
+        }
+        ctx.lineWidth = 10 * camera.zoom;
         ctx.lineCap = "round";
         var screenPos = camera.worldToScreen({ x: this._oldPositions[0].x, y: this._oldPositions[0].y });
         ctx.moveTo(screenPos.x, screenPos.y);
@@ -51,11 +55,16 @@
     }
 
     public update(data: DataView): number {
+        // Add the first position to make sure it gets displayed
         if (this._oldPositions === undefined) {
             this._oldPositions = [];
         }
         this._oldPositions.push({ x: this.x, y: this.y });
-        return super.update(data);
+
+        // Read the owner
+        var offset: number = super.update(data);
+        this.owner = this.room.entities[data.getUint16(offset, true)] as PlayerEntity;
+        return offset + 2;
     }
 
     protected collidedWithTile(tile: Tile) {

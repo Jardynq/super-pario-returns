@@ -10,7 +10,7 @@
         this.hasGravity = true;
         this.height = 60;
         this.width = 30;
-        this.color = "aquaMarine";
+        this.color = "#8e44ad";
     }
 
     public update(data: DataView): number {
@@ -43,7 +43,7 @@ class MainPlayerEntity extends PlayerEntity {
     constructor(id: number, room: GameRoom, entityData: any) {
         super(id, room, entityData);
 
-        this.color = "red";
+        this.color = "#f39c12";
 
         window.addEventListener("click", this.onClick.bind(this));
     }
@@ -113,17 +113,21 @@ class MainPlayerEntity extends PlayerEntity {
 
     }
 
+    private lastShot = 0;
     public shoot(): void {
-        var screenPos = this.room.camera.worldToScreen({ x: this.x, y: this.y });
-        var dirX = Input.mouseX - screenPos.x;
-        var dirY = Input.mouseY - screenPos.y;
+        if (new Date().getTime() > this.lastShot + 200) {
+            var screenPos = this.room.camera.worldToScreen({ x: this.x, y: this.y });
+            var dirX = Input.mouseX - screenPos.x;
+            var dirY = Input.mouseY - screenPos.y;
 
-        // Calculate the angle of the player click
-        var angle = Math.atan2(dirY, dirX);
-        var packet = new DataView(new ArrayBuffer(5));
-        packet.setUint8(0, PacketType.PlayerShoot);
-        packet.setFloat32(1, angle, true);
-        socket.sendPacket(packet);
+            // Calculate the angle of the player click
+            var angle = Math.atan2(dirY, dirX);
+            var packet = new DataView(new ArrayBuffer(5));
+            packet.setUint8(0, PacketType.PlayerShoot);
+            packet.setFloat32(1, angle, true);
+            socket.sendPacket(packet);
+            this.lastShot = new Date().getTime();
+        }
     }
 }
 

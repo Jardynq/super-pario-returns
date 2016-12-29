@@ -29,13 +29,15 @@ class ColorTile extends Tile {
         var tilesize = camera.room.map.tilesize;
 
         ctx.beginPath();
-        ctx.rect((this.x * tilesize + camera.offset.x) * camera.zoom, (this.y * tilesize + camera.offset.y) * camera.zoom, tilesize * camera.zoom, tilesize * camera.zoom);
+        ctx.rect((this.x * tilesize + camera.offset.x) * camera.zoom, (this.y * tilesize + camera.offset.y) * camera.zoom, Math.ceil(tilesize * camera.zoom) + 1, Math.ceil(tilesize * camera.zoom) + 1);
         ctx.fillStyle = this.color;
-        ctx.strokeStyle = "black";
+        ctx.strokeStyle = "#2c3e50";
         ctx.lineWidth = 1;
         ctx.closePath();
 
-        ctx.stroke();
+        if (! this.hasCollision) {
+            ctx.stroke();
+        }
         ctx.fill();
     }
 }
