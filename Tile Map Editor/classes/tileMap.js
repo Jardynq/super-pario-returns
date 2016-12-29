@@ -7,10 +7,15 @@ TileMap = (function () {
             this.height = height;
             this.tiles = [];
       };
-      ns.Map.prototype.generateMap = function () {
+      ns.Map.prototype.generateMap = function (chosenStartTile) {
             for (var y = 0; y < this.height; y++) {
                   for (var x = 0; x < this.width; x++) {
-                        this.tiles[x + (y * this.width)] = new Tile.ColorTile("black", x, y, "1");
+
+                        if (chosenStartTile === "0") { // Sky
+                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("blue", x, y, "0");
+                        } else if (chosenStartTile === "1") { // Ground
+                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("black", x, y, "1");
+                        }
                   }
             }
       };

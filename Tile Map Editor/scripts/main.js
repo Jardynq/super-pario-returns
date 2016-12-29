@@ -36,9 +36,10 @@ function init () {
             var width = document.getElementById("inp-width").value;
             var height = document.getElementById("inp-height").value;
             var tilesize = document.getElementById("inp-tilesize").value;
+            var chosenStartTile = document.getElementById("inp-start-tile").value;
             var map = new TileMap.Map(width, height, tilesize);
 
-            map.generateMap();
+            map.generateMap(chosenStartTile);
             room = new TileEditorRoom(map);
 
             // Starts the main loop

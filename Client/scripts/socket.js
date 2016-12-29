@@ -50,7 +50,8 @@ var Socket = (function () {
             "join": 1,
             "playerAction": 2,
             "entity": 3,
-            "ping": 4
+            "ping": 4,
+            "playerUpdate": 4,
       };
 
       return ns;

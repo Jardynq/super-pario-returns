@@ -4,6 +4,7 @@ var GameRoom = function () {
       Socket.registerHandler(Socket.PACKET_TYPES.entity, this, this.updateEntities);
       Socket.registerHandler(Socket.PACKET_TYPES.join, this, this.onJoin);
       Socket.registerHandler(Socket.PACKET_TYPES.ping, this, this.ping);
+      Socket.registerHandler(Socket.PACKET_TYPES.playerUpdate, this, this.playerUpdate);
 
       this.render = new Render.Render();
       this.tileRenderer = null;
@@ -85,7 +86,9 @@ GameRoom.prototype.onJoin = function (reader) {
 GameRoom.prototype.ping = function (reader) {
       Socket.sendPacket(reader.buffer);
 };
-
+GameRoom.prototype.playerUpdate = function (reader) {
+      
+};
 
 
 // Rendering functions
