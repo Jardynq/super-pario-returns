@@ -15,19 +15,32 @@ var BulletEntity = function (reader) {
 };
 BulletEntity.prototype = Object.create(Entity.prototype); // Bullet inherits Entity
 BulletEntity.prototype.render = function (ctx, render) {
-
-      this.oldPositionsX.push(this.renderX);
-      this.oldPositionsY.push(this.renderY);      
-
+      ctx.beginPath();
 
       for (x = 0; x < this.oldPositionsX.length; x++) {
-            ctx.beginPath();
-            ctx.rect((this.renderX - this.width * 0.5 + render.offsetX) * render.zoom, (this.renderY - this.height * 0.5 + render.offsetY) * render.zoom, this.width * render.zoom, this.height * render.zoom);
-            ctx.fillStyle = this.color;
-      
-            ctx.fill();
+            var oldX = this.oldPositionsX[x];
+            var oldY = this.oldPositionsY[x];
+            
+            ctx.moveTo(oldX, oldY);
+            ctx.lineTo(this.x, this.y);
+            ctx.stroke();
+
       }
-      
+
+      //ctx.beginPath();
+      //ctx.rect((this.x - this.width * 0.5 + render.offsetX) * render.zoom, (this.y - this.height * 0.5 + render.offsetY) * render.zoom, this.width * render.zoom, this.height * render.zoom);
+      //ctx.fillStyle = this.color;
+
+      //ctx.fill();
+};
+
+BulletEntity.prototype.step = function () {
+      Entity.prototype.step.call(this);
+
+      this.oldPositionsX.push(this.renderX);
+      this.oldPositionsY.push(this.renderY);
+
+      if (this.oldPositionsX.length + this.oldPositionsY.length > 5) 
 };
 
 BulletEntity.prototype.collidedWithTile = function () {
