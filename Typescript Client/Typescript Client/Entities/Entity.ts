@@ -21,6 +21,8 @@ class Entity implements iRenderable {
     public hasGravity: boolean = false;
     public color: string;
 
+    public isDisposed = false;
+
     // Constants
     public static Gravity: number = 100;
     public static MaxSpeed: number = 100;
@@ -29,6 +31,8 @@ class Entity implements iRenderable {
         this.id = id;
         this.room = room;
         this.update(data);
+        this.renderX = this.x;
+        this.renderY = this.y;
     }
 
     public step(timeScale: number): void {
@@ -86,6 +90,7 @@ class Entity implements iRenderable {
                     }
                     this.xSpeed = 0;
                     this.onWall = true;
+                    this.collidedWithTile(tile);
                 } else {
                     if (speed > 0) {
                         this.y = tile.y * this.room.map.tilesize - this.height * 0.5;
@@ -95,6 +100,7 @@ class Entity implements iRenderable {
                         this.y = tile.y * this.room.map.tilesize + this.room.map.tilesize + this.height * 0.5;
                     }
                     this.ySpeed = 0;
+                    this.collidedWithTile(tile);
                 }
             }
         }
@@ -106,19 +112,21 @@ class Entity implements iRenderable {
             y: this.renderY - this.height * 0.5
         });
 
-        ctx.beginPath();
-        ctx.rect(screenPos.x, screenPos.y, this.width * camera.zoom, this.height * camera.zoom);
         ctx.fillStyle = this.color;
-
-        ctx.stroke();
-        ctx.fill();
+        ctx.fillRect(screenPos.x, screenPos.y, this.width * camera.zoom, this.height * camera.zoom);
     }
 
-    public dispose (): void {
+    protected collidedWithTile(tile: Tile) {
 
+    }
+
+    public dispose(): void {
+        this.isDisposed = true;
+        this.room.removeEntity(this.id);
     }
 }
 
 enum EntityType {
-    Player
+    Player,
+    Bullet
 }

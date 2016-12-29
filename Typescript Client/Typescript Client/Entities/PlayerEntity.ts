@@ -21,22 +21,18 @@
     }
 
     public render(ctx: CanvasRenderingContext2D, camera: Camera): void {
-        var screenPos = camera.worldToScreen({
-            x: this.renderX - this.width * 0.5,
+        var pingScreenPos = camera.worldToScreen({
+            x: this.renderX,
             y: this.renderY - this.height * 0.5
         });
 
-        ctx.beginPath();
-        ctx.rect(screenPos.x, screenPos.y, this.width * camera.zoom, this.height * camera.zoom);
-        ctx.fillStyle = this.color;
-
+        ctx.fillStyle = "white";
         ctx.textAlign = "center";
         ctx.textBaseline = "bottom";
-        ctx.font = "16px arial";
-        ctx.fillText(this.ping.toString(), screenPos.x + this.width * 0.5 * camera.zoom, screenPos.y);
+        ctx.font = "16px arial bold";
+        ctx.fillText(this.ping.toString(), pingScreenPos.x, pingScreenPos.y);
 
-        ctx.stroke();
-        ctx.fill();
+        super.render(ctx, camera);
     }
 }
 
@@ -48,6 +44,8 @@ class MainPlayerEntity extends PlayerEntity {
         super(id, room, entityData);
 
         this.color = "red";
+
+        window.addEventListener("click", this.onClick.bind(this));
     }
 
     public step(timeScale: number): void {
@@ -102,6 +100,24 @@ class MainPlayerEntity extends PlayerEntity {
         } else {
             return super.update(data);
         }
+    }
+
+    public dispose(): void {
+        window.removeEventListener("click", this.onClick.bind(this));
+        super.dispose();
+    }
+
+    public onClick(e: MouseEvent): void {
+        var screenPos = this.room.camera.worldToScreen({ x: this.x, y: this.y });
+        var dirX = e.clientX - screenPos.x;
+        var dirY = e.clientY - screenPos.y;
+
+        // Calculate the angle of the player click
+        var angle = Math.atan2(dirY, dirX);
+        var packet = new DataView(new ArrayBuffer(5));
+        packet.setUint8(0, PacketType.PlayerShoot);
+        packet.setFloat32(1, angle, true);
+        socket.sendPacket(packet);
     }
 }
 
