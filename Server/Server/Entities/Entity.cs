@@ -98,6 +98,7 @@ namespace Server.Entities
                                 _x = newValue = tile.X * TileMap.TILE_SIZE + TileMap.TILE_SIZE + Width * 0.5;
                             }
                             XSpeed = 0;
+                            CollidedWithTile(tile);
                         }
                         else
                         {
@@ -110,6 +111,7 @@ namespace Server.Entities
                                 _y = newValue = tile.Y * TileMap.TILE_SIZE + TileMap.TILE_SIZE + Height * 0.5;
                             }
                             YSpeed = 0;
+                            CollidedWithTile(tile);
                         }
                     }
                 }
@@ -144,12 +146,18 @@ namespace Server.Entities
         }
 
         public virtual void Dispose () {
-            
+            Room.RemoveEntity(this);
+        }
+
+        internal virtual void CollidedWithTile (Tile.Tile tile)
+        {
+
         }
     }
 
     public enum EntityType : byte
     {
-        Player
+        Player,
+        Bullet
     }
 }

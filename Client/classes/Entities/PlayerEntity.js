@@ -57,6 +57,10 @@ PlayerEntity.prototype.updateMovement = function () {
             }
       }
 };
+PlayerEntity.prototype.shoot = function (e) {
+      var actionPacket = new DataView(new ArrayBuffer(1)); 
+      actionPacket.setUint8(0, Socket.PACKET_TYPES.playerAction); 
+};
 PlayerEntity.prototype.sendActionPacket = function (key) {
       var actionPacket = new DataView(new ArrayBuffer(5)); 
       actionPacket.setUint8(0, Socket.PACKET_TYPES.playerAction); 
@@ -79,15 +83,6 @@ PlayerEntity.prototype.sendActionPacket = function (key) {
       }
 };
 
-PlayerEntity.prototype.updatePingDisplay = function () {
-      this.pingDisplay.playerEntity = this;
-};
-
-PlayerEntity.prototype.setMain  = function () {
-      this.color = "red";
-      this.isMain = true;
-};
-
 PlayerEntity.prototype.update  = function (reader, updatePosition) {
       if (updatePosition === undefined) updatePosition = false;
 
@@ -98,16 +93,26 @@ PlayerEntity.prototype.update  = function (reader, updatePosition) {
 
       this.ping = reader.getUint16(16, true);
 
-      if (this.isMain && updatePosition) {
-            this.x = oldX;
-            this.y = oldY;
+      if (this.isMain) {
+            if (! updatePosition) {
+                  this.x = oldX;
+                  this.y = oldY;
 
-            var updatePacket = new DataView(new ArrayBuffer(5));
-            updatePacket.setUint8(0, Socket.PACKET_TYPES.playerUpdate);             
-            updatePacket.setInt16(1, this.x); 
-            updatePacket.setInt16(3, this.y);   
-            Socket.sendPacket(updatePacket);            
+                  var updatePacket = new DataView(new ArrayBuffer(5));
+                  updatePacket.setUint8(0, Socket.PACKET_TYPES.playerUpdate);             
+                  updatePacket.setInt16(1, this.x, true); 
+                  updatePacket.setInt16(3, this.y, true);   
+                  Socket.sendPacket(updatePacket);
+            }
       }
+};
+PlayerEntity.prototype.setMain  = function () {
+      this.color = "red";
+      this.isMain = true;
+};
+
+PlayerEntity.prototype.onMouseDown = function (e) {
+      this.shoot(e);
 };
 
 

@@ -16,14 +16,14 @@ var GameRoom = function () {
       this.mouseY = null;
 
       this.player = null;
-
-
       
       // Event handlers for the game
       window.addEventListener('keydown', this.onKeyDown.bind(this));
       window.addEventListener("keyup", this.onKeyUp.bind(this));
       window.addEventListener('wheel', this.onMouseWheel.bind(this));
       window.addEventListener('mousemove', this.onMouseMove.bind(this));
+      window.addEventListener("mousedown", this.onMouseDown.bind(this));
+      window.addEventListener("mouseup", this.onMouseUp.bind(this));
 };
 // Main step function
 GameRoom.prototype.step = function (timeScale) {
@@ -72,11 +72,13 @@ GameRoom.prototype.updateEntities = function (reader) {
 
             if (this.entities[id] === undefined) {
 
-                  var type = entityView.getUint8(2, true);
+                  var type = entityView.getUint8(3, true);
                   var entity;
 
                   if (type === Entity.ENTITY_TYPES.player) {
                         entity = new PlayerEntity(entityView);
+                  } else if (type === Entity.ENTITY_TYPES.bullet) {
+                        entity = new BulletEntity(entityView);
                   } else {
                         throw "Unknown entity recieved. Type is: " + type;
                   }
@@ -162,13 +164,19 @@ GameRoom.prototype.onMouseWheel = function (e) {
         }
 
         if (e.wheelDelta > 0) {
-            this.render.zoom += 0.075;
+            this.render.zoom *= 1.11;
         } else if (e.wheelDelta < 0) {
-            this.render.zoom -= 0.075;
+            this.render.zoom /= 1.11;
         }    
       
 };
 GameRoom.prototype.onMouseMove = function (e) {
       this.mouseX = e.x;
       this.mouseY = e.y;
+};
+GameRoom.prototype.onMouseDown = function (e) {
+      this.player.onMouseDown(e);
+};
+GameRoom.prototype.onMouseUp = function (e) {
+
 };

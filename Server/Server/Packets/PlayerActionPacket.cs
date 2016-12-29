@@ -33,9 +33,7 @@ namespace Server.Packets
             }
 
             // Send an entity update packet containing only this entity
-            var entities = new Dictionary<ushort, Entities.Entity>();
-            entities[player.Entity.ID] = player.Entity;
-            new EntityPacket(entities, false).Send();
+            new EntityPacket(player.Entity).Send();
 
             base.Handle(session);
         }

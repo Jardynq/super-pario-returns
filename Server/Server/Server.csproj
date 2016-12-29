@@ -69,6 +69,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\BulletEntity.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\PlayerEntity.cs" />
     <Compile Include="GameRoom.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Packets\Packet.cs" />
     <Compile Include="Packets\PingPacket.cs" />
     <Compile Include="Packets\PlayerActionPacket.cs" />
+    <Compile Include="Packets\PlayerShootPacket.cs" />
     <Compile Include="Packets\PlayerUpdatePacket.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />

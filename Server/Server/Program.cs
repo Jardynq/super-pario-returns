@@ -86,6 +86,9 @@ namespace Server
                     case PacketType.PlayerUpdate:
                         packet = PlayerUpdatePacket.Parse(reader, this);
                         break;
+                    case PacketType.PlayerShoot:
+                        packet = PlayerShootPacket.Parse(reader);
+                        break;
                     default:
                         return base.OnMessage(e); // Packet not recognized. Ignore it.
                 }

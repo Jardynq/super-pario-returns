@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.IO;
+using System.Collections.Concurrent;
 
 namespace Server.Packets
 {
@@ -15,11 +16,19 @@ namespace Server.Packets
         public Dictionary<ushort, Entity> Entities;
         public bool ContainsAllEntities;
 
-        public EntityPacket (Dictionary<ushort, Entity> entities, bool containsAllEntities)
+        public EntityPacket (ConcurrentDictionary<ushort, Entity> entities, bool containsAllEntities)
         {
             Entities = entities.ToDictionary(entry => entry.Key, entry => entry.Value);
             PacketType = PacketType.Entity;
             ContainsAllEntities = containsAllEntities;
+        }
+
+        public EntityPacket (Entity entity)
+        {
+            Entities = new Dictionary<ushort, Entity>();
+            Entities[entity.ID] = entity;
+            PacketType = PacketType.Entity;
+            ContainsAllEntities = false;
         }
 
         public override byte[] Serialize()

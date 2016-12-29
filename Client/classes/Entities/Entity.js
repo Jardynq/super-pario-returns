@@ -7,6 +7,8 @@ var Entity = function (reader) {
       this.renderX = 0;
       this.renderY = 0;
 
+      this.xSpeed = 0;
+      this.ySpeed = 0;
       this.x = 0;
       this.y = 0;
 
@@ -49,41 +51,46 @@ Entity.prototype.step = function (timeScale) {
 };
 
 Entity.prototype.handleCollision = function (x) {
-            speed = x ? this.xSpeed : this.ySpeed;
+      speed = x ? this.xSpeed : this.ySpeed;
 
-            var collisionTiles = [
-                  room.map.getTileAt(this.x - this.width * 0.5 + 0.3, this.y - this.height * 0.5 + 0.3),
-                  room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y - this.height * 0.5 + 0.3),
-                  room.map.getTileAt(this.x - this.width * 0.5 + 0.3, this.y + this.height * 0.5 - 0.3),
-                  room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y + this.height * 0.5 - 0.3),
-                  room.map.getTileAt(this.x - this.width * 0.5 + 0.3, this.y),
-                  room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y)
-            ];
+      var collisionTiles = [
+            room.map.getTileAt(this.x - this.width * 0.5 + 0.3, this.y - this.height * 0.5 + 0.3),
+            room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y - this.height * 0.5 + 0.3),
+            room.map.getTileAt(this.x - this.width * 0.5 + 0.3, this.y + this.height * 0.5 - 0.3),
+            room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y + this.height * 0.5 - 0.3),
+            room.map.getTileAt(this.x - this.width * 0.5 + 0.3, this.y),
+            room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y)
+      ];
 
-            for (var i = 0; i < collisionTiles.length; i++) {
-                  var tile = collisionTiles[i];
-                  if (tile !== null && tile.hasCollision) {
-                        if (x) {
-                              if (speed > 0) {
-                                    this.x = tile.x * room.map.tilesize - this.width * 0.5;
-                              } else if (speed < 0) {
-                                    this.x = tile.x * room.map.tilesize + room.map.tilesize + this.width * 0.5;
-                              }
-                              this.xSpeed = 0;
-                        } else {
-                              if (speed > 0) {
-                                    this.y = tile.y * room.map.tilesize - this.height * 0.5;
-                                    this.onGround = true;
-                              }
-                              else if (speed < 0) {
-                                    this.y = tile.y * room.map.tilesize + room.map.tilesize + this.height * 0.5;
-                              }
-                              this.ySpeed = 0;
-                        }
-                  }   
+      for (var i = 0; i < collisionTiles.length; i++) {
+            var tile = collisionTiles[i];
+            if (tile === null) {
+                  continue;
             }
+
+            if (tile !== null && tile.hasCollision) {
+                  if (x) {
+                        if (speed > 0) {
+                              this.x = tile.x * room.map.tilesize - this.width * 0.5;
+                        } else if (speed < 0) {
+                              this.x = tile.x * room.map.tilesize + room.map.tilesize + this.width * 0.5;
+                        }
+                        this.xSpeed = 0;
+                  } else {
+                        if (speed > 0) {
+                              this.y = tile.y * room.map.tilesize - this.height * 0.5;
+                              this.onGround = true;
+                        }
+                        else if (speed < 0) {
+                              this.y = tile.y * room.map.tilesize + room.map.tilesize + this.height * 0.5;
+                        }
+                        this.ySpeed = 0;
+                  }
+            }   
+      }
 };
 
 Entity.ENTITY_TYPES = {
       "player": 0,
+      "bullet": 1,
 };

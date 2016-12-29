@@ -50,6 +50,7 @@ namespace Server.Packets
         PlayerAction,
         Entity,
         Ping,
-        PlayerUpdate
+        PlayerUpdate,
+        PlayerShoot
     }
 }

@@ -6,15 +6,16 @@ using System.Threading.Tasks;
 using Server.Entities;
 using Server.Packets;
 using System.Threading;
+using System.Collections.Concurrent;
 
 namespace Server
 {
     public class GameRoom
     {
-        public Dictionary<string, Player> Players = new Dictionary<string, Player>();
+        public ConcurrentDictionary<string, Player> Players = new ConcurrentDictionary<string, Player>();
         public TileMap TileMap;
 
-        public Dictionary<ushort, Entity> Entities = new Dictionary<ushort, Entity>();
+        public ConcurrentDictionary<ushort, Entity> Entities = new ConcurrentDictionary<ushort, Entity>();
         private ushort _lastEntityID = 0;
 
         // Related to frame loop
@@ -58,8 +59,8 @@ namespace Server
         }
 
         public void RemoveEntity (Entity entity) {
-            Entities.Remove(entity.ID);
-            entity.Dispose();
+            Entity ent;
+            Entities.TryRemove(entity.ID, out ent);
             new EntityPacket(Entities, true);
         }
 

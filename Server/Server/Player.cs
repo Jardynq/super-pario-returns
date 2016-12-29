@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Server.Entities;
+using System.Threading;
 
 namespace Server
 {
@@ -22,8 +23,9 @@ namespace Server
         }
 
         public void Remove () {
-            Room.Players.Remove(ID);
-            Room.RemoveEntity(Entity);
+            Player player;
+            Room.Players.TryRemove(ID, out player);
+            Entity.Dispose();
         } 
     }
 }
