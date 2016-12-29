@@ -113,10 +113,11 @@ class GameRoom {
 
                 if (type === EntityType.Player) {
                     entity = new PlayerEntity(Number(id), this, entityView);
+                } else if (type === EntityType.Bullet) {
+                    entity = new BulletEntity(Number(id), this, entityView);
                 } else {
                     throw "Unknown entity recieved. Type is: " + type;
                 }
-
                 this.entities[id] = entity;
             } else {
                 this.entities[id].update(entityView);
@@ -127,7 +128,7 @@ class GameRoom {
         if (containsAllEntities) {
             for (var entID in this.entities) {
                 if (receivedEntities[Number(entID)] !== true) {
-                    this.removeEntity(Number(entID));
+                    this.entities[entID].dispose();
                 }
             }
         }
@@ -145,7 +146,6 @@ class GameRoom {
     }
 
     public removeEntity(id: number): void {
-        this.entities[id].dispose();
         delete this.entities[id];
     }
 }

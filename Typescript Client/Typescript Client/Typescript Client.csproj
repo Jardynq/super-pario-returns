@@ -30,6 +30,7 @@
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="declarations.ts" />
     <TypeScriptCompile Include="Entities\Entity.ts" />
+    <TypeScriptCompile Include="Entities\BulletEntity.ts" />
     <TypeScriptCompile Include="Entities\PlayerEntity.ts" />
     <TypeScriptCompile Include="GameRoom.ts" />
     <TypeScriptCompile Include="Input.ts" />
