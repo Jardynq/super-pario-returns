@@ -8,6 +8,9 @@ var PlayerEntity = function (reader) {
       this.width = 30;
       this.height = 60;
 
+      this.x = 0;
+      this.y = 0;
+
       this.hasGravity = true;
 
       this.pingDisplay = new PingDisplay(this);
@@ -81,6 +84,19 @@ PlayerEntity.prototype.setMain  = function () {
       this.color = "red";
       this.isMain = true;
 };
+
+PlayerEntity.prototype.update  = function (reader) {
+      var oldX = this.x;
+      var oldY = this.y;
+
+      Entity.prototype.update.call(this, reader);
+
+      this.x = oldX;
+      this.y = oldY;
+
+      this.ping = reader.getUint16(16, true);
+};
+
 
 PlayerEntity.ACTION_TYPES = {
       "moveLeft": 0,

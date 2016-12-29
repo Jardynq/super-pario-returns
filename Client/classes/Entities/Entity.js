@@ -21,19 +21,11 @@ Entity.prototype.render = function (ctx, render) {
 };
 
 Entity.prototype.update = function (reader) {
-      if (this.x === undefined) {
-            this.x = this.y = 200;
-            this.ySpeed = this.xSpeed = 0;
-      }
       this.x = reader.getInt16(4, true);
       this.y = reader.getInt16(6, true);
 
       this.xSpeed = reader.getFloat32(8, true);
       this.ySpeed = reader.getFloat32(12, true);
-
-      if (reader.getUint8(2) === Entity.ENTITY_TYPES.player) {
-            this.ping = reader.getUint16(16, true);
-      }
 };
 
 Entity.prototype.step = function (timeScale) {

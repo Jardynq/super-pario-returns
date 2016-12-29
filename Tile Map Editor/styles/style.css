@@ -34,7 +34,7 @@ body {
     font-size: 14px;
 }
 #UI .file-upload:after {
-    content: "Vælg fil";
+    content: "Choose File";
 }
 #UI .file-upload input[type='file'] {
     display: none;
