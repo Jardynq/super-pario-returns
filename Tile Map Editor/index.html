@@ -1,15 +1,39 @@
 <!doctype html>
 <html>
 <head>
-    <title>Super Pario</title>
+    <title>Tile Map Editor</title>
     <link rel="stylesheet" href="styles/style.css">
+
 </head>
 <body>
     <div class="wrapper">
+        <div id="UI" >
+            <h1>Tile Editor</h1>
+            <div>
+                <label for="inp-tilesize">Tilesize:</label>
+                <input name="tilesize" id="inp-tilesize" placeholder="tilesize" value="50">
+
+                <h2>Ny bane</h2>
+                <label for="inp-tilesize">Width:</label>
+                <input name="width" id="inp-width" placeholder="tilesize" value="100">
+                <br>
+                <label for="inp-tilesize">Height:</label>
+                <input name="height" id="inp-height" placeholder="tilesize" value="100">
+                <br>
+                <input type="button" value="Lav bane" id="btn-new-map">
+
+                <h2>Indlæs bane</h2>
+                <label class="file-upload">
+                    <input type="file" id="map-file-input">
+                </label>
+            </div>
+        </div>
         <canvas id="game-canvas"></canvas>
     </div>
 
-    <script src="classes/GameRoom.js"></script>    
+    
+
+    <script src="classes/TileEditorRoom.js"></script>    
     <script src="scripts/Render.js"></script>
     <script src="scripts/Input.js"></script>
     

@@ -6,7 +6,9 @@ PingDisplay.prototype = Object.create(Render.RenderObject.prototype); // EntityR
 PingDisplay.prototype.render = function (ctx, render) {
       ctx.beginPath();
       ctx.fillStyle = this.color;
-      ctx.font = "18px serif";
+      ctx.font = "15px Oswald";
 
-      ctx.fillText(this.playerEntity.ping + " ms", this.playerEntity.renderX + room.render.offsetX * room.render.zoom - this.playerEntity.width * 0.5 - 5, (this.playerEntity.renderY + room.render.offsetY - this.playerEntity.height * 0.5 - 5) * room.render.zoom);
+      ctx.textAlign = "center";
+
+      ctx.fillText(this.playerEntity.ping, this.playerEntity.renderX + room.render.offsetX * room.render.zoom, (this.playerEntity.renderY + room.render.offsetY - this.playerEntity.height * 0.5 - 5) * room.render.zoom);
 };
