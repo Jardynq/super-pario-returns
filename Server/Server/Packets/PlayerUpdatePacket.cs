@@ -44,7 +44,7 @@ namespace Server.Packets
         public override void Handle(GameService session)
         {
             // TODO: Make a property for desync threshold
-            int DesyncThreshold = 40;
+            int DesyncThreshold = 100;
             PlayerEntity p = Player.Entity;
             double posDif = (X - p.X) * (X - p.X) + (Y - p.Y) * (Y - p.Y);
             //double speedDif = (XSpeed - p.XSpeed) * (XSpeed - p.XSpeed) + (YSpeed - p.YSpeed) * (YSpeed - p.YSpeed);
@@ -57,9 +57,7 @@ namespace Server.Packets
             {
                 // Don't allow the player to glitch himself through blocks
                 p.X = X;
-                p.HandleCollision(true);
                 p.Y = Y;
-                p.HandleCollision(false);
             }
         }
     }

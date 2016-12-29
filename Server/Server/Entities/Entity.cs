@@ -13,8 +13,21 @@ namespace Server.Entities
         public const float GRAVITY = 2000;
         public const float MAX_SPEED = 3000;
 
-        public double X = 0;
-        public double Y = 0;
+        private double _x = 0;
+        public double X {
+            get { return _x; }
+            set {
+                UpdatePosition(true, value);
+            }
+        }
+
+        private double _y = 0;
+        public double Y {
+            get { return _y; }
+            set {
+                UpdatePosition(false, value);
+            }
+        }
 
         public int Width = 0;
         public int Height = 0;
@@ -42,44 +55,64 @@ namespace Server.Entities
             }
 
             X += XSpeed * timeScale;
-            HandleCollision(true);
             Y += YSpeed * timeScale;
-            HandleCollision(false);
         }
 
-        public void HandleCollision (bool x) {
-            double speed = x ? XSpeed : YSpeed;
+        private void UpdatePosition(bool isXPosition, double newValue)
+        {
+            // Move in increments of tilesize to prevent moving through blocks
+            double oldValue = isXPosition ? _x : _y;
+            // Can be 1 for positive or -1 for negative direction
+            int direction = newValue - oldValue > 0 ? 1 : -1;
+            while (oldValue * direction < newValue * direction)
+            {
+                oldValue += TileMap.TILE_SIZE * direction;
+                if (oldValue * direction > newValue * direction) oldValue = newValue;
+                if (isXPosition) {
+                    _x = oldValue;
+                } else {
+                    _y = oldValue;
+                }
 
-            List<Tile.Tile> collisionTiles = new List<Tile.Tile>();
+                List<Tile.Tile> collisionTiles = new List<Tile.Tile>();
 
-            collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5 + 0.3), (float)(Y - Height * 0.5 + 0.3)));
-            collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5 - 0.3), (float)(Y - Height * 0.5 + 0.3)));
-            collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5 + 0.3), (float)(Y + Height * 0.5 - 0.3)));
-            collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5 - 0.3), (float)(Y + Height * 0.5 - 0.3)));
-            collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5 + 0.3), (float)(Y)));
-            collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5 - 0.3), (float)(Y)));
+                collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5 + 0.3), (float)(Y - Height * 0.5 + 0.3)));
+                collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5 - 0.3), (float)(Y - Height * 0.5 + 0.3)));
+                collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5 + 0.3), (float)(Y + Height * 0.5 - 0.3)));
+                collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5 - 0.3), (float)(Y + Height * 0.5 - 0.3)));
+                collisionTiles.Add(Room.TileMap.GetTile((float)(X - Width * 0.5 + 0.3), (float)(Y)));
+                collisionTiles.Add(Room.TileMap.GetTile((float)(X + Width * 0.5 - 0.3), (float)(Y)));
 
-            foreach (Tile.Tile tile in collisionTiles) {
-                if (tile != null && tile.HasCollision) {
-                    if (x) {
-                        if (speed > 0) {
-                            X = tile.X * TileMap.TILE_SIZE - Width * 0.5;
-                        } else if (speed < 0) {
-                            X = tile.X * TileMap.TILE_SIZE + TileMap.TILE_SIZE + Width * 0.5 ;
-                        }
-                        XSpeed = 0;
-                    } else {
-                        if (speed > 0)
+                foreach (Tile.Tile tile in collisionTiles)
+                {
+                    if (tile != null && tile.HasCollision)
+                    {
+                        if (isXPosition)
                         {
-                            Y = tile.Y * TileMap.TILE_SIZE - Height * 0.5;
+                            if (direction > 0)
+                            {
+                                _x = newValue = tile.X * TileMap.TILE_SIZE - Width * 0.5;
+                            }
+                            else if (direction < 0)
+                            {
+                                _x = newValue = tile.X * TileMap.TILE_SIZE + TileMap.TILE_SIZE + Width * 0.5;
+                            }
+                            XSpeed = 0;
                         }
-                        else if (speed < 0)
+                        else
                         {
-                            Y = tile.Y * TileMap.TILE_SIZE + TileMap.TILE_SIZE + Height * 0.5;
+                            if (direction > 0)
+                            {
+                                _y = newValue = tile.Y * TileMap.TILE_SIZE - Height * 0.5;
+                            }
+                            else if (direction < 0)
+                            {
+                                _y = newValue = tile.Y * TileMap.TILE_SIZE + TileMap.TILE_SIZE + Height * 0.5;
+                            }
+                            YSpeed = 0;
                         }
-                        YSpeed = 0;
                     }
-                }   
+                }
             }
         }
 
@@ -100,6 +133,14 @@ namespace Server.Entities
                 WriteToBinary(writer);
                 return stream.ToArray();
             }
+        }
+
+        /// <summary>
+        /// Moves to the specified point without checking collision along the way
+        /// </summary>
+        public void Teleport (double newX, double newY) {
+            _x = newX;
+            _y = newY;
         }
 
         public virtual void Dispose () {

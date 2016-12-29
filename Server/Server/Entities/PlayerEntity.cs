@@ -22,8 +22,7 @@ namespace Server.Entities
             HasGravity = true;
             Player = player;
 
-            X = Program.rnd.Next(500);
-            Y = Program.rnd.Next(500);
+            Teleport(Program.rnd.Next(500), Program.rnd.Next(500));
 
             Type = EntityType.Player;
         }
