@@ -16,6 +16,14 @@ var GameRoom = function () {
       this.mouseY = null;
 
       this.player = null;
+
+
+      
+      // Event handlers for the game
+      window.addEventListener('keydown', this.onKeyDown.bind(this));
+      window.addEventListener("keyup", this.onKeyUp.bind(this));
+      window.addEventListener('wheel', this.onMouseWheel.bind(this));
+      window.addEventListener('mousemove', this.onMouseMove.bind(this));
 };
 // Main step function
 GameRoom.prototype.step = function (timeScale) {
@@ -47,7 +55,9 @@ GameRoom.prototype.loadMap = function (reader) {
 GameRoom.prototype.updateEntities = function (reader) {
       var amount = reader.getUint16(1, true);
 
-      var containsAllEntities = (reader.getUint8(2, true) === 1);
+      var containsAllEntities = (reader.getUint8(3, true) === 1);
+
+      var recievedEntities = {};
 
       var offset = 4;
       for (i = 0; i < amount; i++) {
@@ -55,10 +65,13 @@ GameRoom.prototype.updateEntities = function (reader) {
             var entityLength = reader.getUint8(offset, true);
             var entityData = reader.buffer.slice(offset, offset + entityLength + 1);
             var entityView = new DataView(entityData);
-            var id = entityView.getUint16(1, true);
+            id = entityView.getUint16(1, true);
             offset += entityData.byteLength;
 
+            recievedEntities[id] = true;
+
             if (this.entities[id] === undefined) {
+
                   var type = entityView.getUint8(2, true);
                   var entity;
 
@@ -74,6 +87,14 @@ GameRoom.prototype.updateEntities = function (reader) {
                   this.entities[id].update(entityView);
             }
       }
+
+      if (containsAllEntities) {
+            for (var entId in this.entities) {
+                  if (recievedEntities[entId] !== true) {
+                        this.removeFromEntities(entId);
+                  }
+            }
+      }
 };
 GameRoom.prototype.onJoin = function (reader) {
       Entity.gravity = reader.getFloat32(1, true);
@@ -87,7 +108,7 @@ GameRoom.prototype.ping = function (reader) {
       Socket.sendPacket(reader.buffer);
 };
 GameRoom.prototype.playerUpdate = function (reader) {
-      
+      this.player.update(reader, true);
 };
 
 
@@ -121,8 +142,8 @@ GameRoom.prototype.updateScreenOffset = function () {
 GameRoom.prototype.addToEntities = function (entity) {
       this.entities[entity.id] = entity;
 };
-GameRoom.prototype.removeFromEntities = function (entity) {
-      delete this.entities[entity.id];
+GameRoom.prototype.removeFromEntities = function (id) {
+      delete this.entities[id];
 };
 
 // Inputs

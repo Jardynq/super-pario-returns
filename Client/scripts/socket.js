@@ -9,6 +9,7 @@ var Socket = (function () {
        */
       ns.connect = function (callback) {
             ns.socket = new WebSocket("ws:192.168.0.20:1337/");
+            //ns.socket = new WebSocket("ws:192.168.0.20:1337/");
             ns.socket.onmessage = ns.onMessage;
             ns.socket.onopen = callback;
             ns.socket.binaryType = "arraybuffer";
@@ -51,7 +52,7 @@ var Socket = (function () {
             "playerAction": 2,
             "entity": 3,
             "ping": 4,
-            "playerUpdate": 4,
+            "playerUpdate": 5,
       };
 
       return ns;

@@ -5,6 +5,11 @@ var ctx = null;
 var map = null;
 var room = null;
 
+var tileTypes = {
+      "0": ("blue", 0, 0, "0"),
+      "1": ("black", 0, 0, "1"),
+};
+
 /**
  * Main game loop
  * 
@@ -60,7 +65,7 @@ function init () {
                         room = new TileEditorRoom(map);
                         // Starts the main loop
                         step();
-                  }
+                  };
             }
       };
 }

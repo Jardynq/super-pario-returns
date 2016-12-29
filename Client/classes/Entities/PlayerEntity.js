@@ -8,23 +8,26 @@ var PlayerEntity = function (reader) {
       this.width = 30;
       this.height = 60;
 
-      this.x = 0;
-      this.y = 0;
-
       this.hasGravity = true;
-
-      this.pingDisplay = new PingDisplay(this);
-      this.pingDisplay.addToRenderQueue(room.render.renderQueue);
 };
 PlayerEntity.prototype = Object.create(Entity.prototype); // PlayerEntity inherits Entity
+PlayerEntity.prototype.render = function (ctx, render) {
+      Entity.prototype.render.call(this, ctx, render);    
+        
+      ctx.beginPath();
+      ctx.fillStyle = this.color;
+      ctx.font = 15 * render.zoom + "px Oswald";
+
+      ctx.textAlign = "center";
+
+      ctx.fillText(this.ping, (this.renderX + render.offsetX) * render.zoom, (this.renderY + render.offsetY - this.height * 0.5 - 5) * render.zoom);
+};
+
 PlayerEntity.prototype.step = function (timescale) {
       Entity.prototype.step.call(this, timescale);
       
       if (this.isMain) {
-
             this.updateMovement();
-
-            //this.sendActionPacket();
       }
 };
 
@@ -85,16 +88,26 @@ PlayerEntity.prototype.setMain  = function () {
       this.isMain = true;
 };
 
-PlayerEntity.prototype.update  = function (reader) {
+PlayerEntity.prototype.update  = function (reader, updatePosition) {
+      if (updatePosition === undefined) updatePosition = false;
+
       var oldX = this.x;
       var oldY = this.y;
 
-      Entity.prototype.update.call(this, reader);
-
-      this.x = oldX;
-      this.y = oldY;
+      Entity.prototype.update.call(this, reader);      
 
       this.ping = reader.getUint16(16, true);
+
+      if (this.isMain && updatePosition) {
+            this.x = oldX;
+            this.y = oldY;
+
+            var updatePacket = new DataView(new ArrayBuffer(5));
+            updatePacket.setUint8(0, Socket.PACKET_TYPES.playerUpdate);             
+            updatePacket.setInt16(1, this.x); 
+            updatePacket.setInt16(3, this.y);   
+            Socket.sendPacket(updatePacket);            
+      }
 };
 
 

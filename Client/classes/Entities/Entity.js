@@ -7,6 +7,9 @@ var Entity = function (reader) {
       this.renderX = 0;
       this.renderY = 0;
 
+      this.x = 0;
+      this.y = 0;
+
       this.update(reader);
 };
 Entity.prototype = Object.create(Render.RenderObject.prototype); // Entity inherits RenderObject

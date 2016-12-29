@@ -10,5 +10,5 @@ PingDisplay.prototype.render = function (ctx, render) {
 
       ctx.textAlign = "center";
 
-      ctx.fillText(this.playerEntity.ping, this.playerEntity.renderX + room.render.offsetX * room.render.zoom, (this.playerEntity.renderY + room.render.offsetY - this.playerEntity.height * 0.5 - 5) * room.render.zoom);
+      ctx.fillText(this.playerEntity.ping, (this.playerEntity.renderX + room.render.offsetX) * room.render.zoom, (this.playerEntity.renderY + room.render.offsetY - this.playerEntity.height * 0.5 - 5) * room.render.zoom);
 };
