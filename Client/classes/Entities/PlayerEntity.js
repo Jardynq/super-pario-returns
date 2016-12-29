@@ -2,19 +2,22 @@ var PlayerEntity = function (reader) {
       // Run the the constructor from Entity
       Entity.prototype.constructor.call(this, reader);
 
-      this.color = "aquaMarine";
+      this.color = "red";
       this.isMain = false;
 
       this.width = 30;
       this.height = 60;
 
       this.hasGravity = true;
+
+      this.lastShot = 0;
 };
 PlayerEntity.prototype = Object.create(Entity.prototype); // PlayerEntity inherits Entity
 PlayerEntity.prototype.render = function (ctx, render) {
       Entity.prototype.render.call(this, ctx, render);    
         
-      ctx.beginPath();
+      render.resetCtx(ctx);
+
       ctx.fillStyle = this.color;
       ctx.font = 15 * render.zoom + "px Oswald";
 
@@ -28,6 +31,12 @@ PlayerEntity.prototype.step = function (timescale) {
 
       if (this.isMain) {
             this.updateMovement();
+
+            // Shooting
+            if (Input.isMouseDown) {
+                  this.shoot();
+            }
+
       }
 };
 
@@ -57,17 +66,21 @@ PlayerEntity.prototype.updateMovement = function () {
             }
       }
 };
-PlayerEntity.prototype.shoot = function (e, render) {
-      var dirX = e.x / render.zoom - (this.x + render.offsetX);
-      var dirY = e.y / render.zoom - (this.y + render.offsetY);
+PlayerEntity.prototype.shoot = function () {
+      if (new Date().getTime() > this.lastShot + 200) {
+            var dirX = Input.mouseX / room.render.zoom - (this.x + room.render.offsetX);
+            var dirY = Input.mouseY / room.render.zoom - (this.y + room.render.offsetY);
 
-      var angle = Math.atan2(dirY, dirX);
-      
-      var shootPacket = new DataView(new ArrayBuffer(5));
-      shootPacket.setUint8(0, Socket.PACKET_TYPES.playerShoot);
-      shootPacket.setFloat32(1, angle, true);
-      Socket.sendPacket(shootPacket);
+            var angle = Math.atan2(dirY, dirX);
+
+            var shootPacket = new DataView(new ArrayBuffer(5));
+            shootPacket.setUint8(0, Socket.PACKET_TYPES.playerShoot);
+            shootPacket.setFloat32(1, angle, true);
+            Socket.sendPacket(shootPacket);
+            this.lastShot = new Date().getTime();
+      }
 };
+
 PlayerEntity.prototype.sendActionPacket = function (key) {
       var actionPacket = new DataView(new ArrayBuffer(5)); 
       actionPacket.setUint8(0, Socket.PACKET_TYPES.playerAction); 
@@ -114,12 +127,12 @@ PlayerEntity.prototype.update  = function (reader, updatePosition) {
       }
 };
 PlayerEntity.prototype.setMain  = function () {
-      this.color = getRandomColor();
+      this.color = "orange";
       this.isMain = true;
 };
 
-PlayerEntity.prototype.onMouseDown = function (e, render) {
-      this.shoot(e, render);
+PlayerEntity.prototype.onMouseDown = function (e) {
+      this.shoot(e);
 };
 
 

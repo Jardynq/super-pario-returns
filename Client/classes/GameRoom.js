@@ -11,17 +11,13 @@ var GameRoom = function () {
       this.entityRenderer = null;
 
       this.entities = {};
-
-      this.mouseX = null;
-      this.mouseY = null;
-
+      
       this.player = null;
       
       // Event handlers for the game
       window.addEventListener('keydown', this.onKeyDown.bind(this));
       window.addEventListener("keyup", this.onKeyUp.bind(this));
       window.addEventListener('wheel', this.onMouseWheel.bind(this));
-      window.addEventListener('mousemove', this.onMouseMove.bind(this));
       window.addEventListener("mousedown", this.onMouseDown.bind(this));
       window.addEventListener("mouseup", this.onMouseUp.bind(this));
 };
@@ -170,12 +166,8 @@ GameRoom.prototype.onMouseWheel = function (e) {
         }    
       
 };
-GameRoom.prototype.onMouseMove = function (e) {
-      this.mouseX = e.x;
-      this.mouseY = e.y;
-};
 GameRoom.prototype.onMouseDown = function (e) {
-      this.player.onMouseDown(e, this.render);
+      this.player.onMouseDown(e);
 };
 GameRoom.prototype.onMouseUp = function (e) {
 

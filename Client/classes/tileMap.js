@@ -19,7 +19,7 @@ TileMap = (function () {
                   var y = (i - 2 - x) / this.width;
 
                   if (tile === 0) { // Sky
-                        this.tiles[i - 2] = new Tile.ColorTile("blue", x, y, false);
+                        this.tiles[i - 2] = new Tile.ColorTile("#008CFF", x, y, false);
                   }
                   if (tile == 1) { // Ground
                         this.tiles[i - 2] = new Tile.ColorTile("black", x, y, true);

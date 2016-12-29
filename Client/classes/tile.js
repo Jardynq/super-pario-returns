@@ -9,18 +9,15 @@ Tile = (function () {
             this.hasCollision = hasCollision;
       };
       ns.ColorTile.prototype.render = function (ctx, render, tilesize) {
-            ctx.beginPath();
+            render.resetCtx(ctx);
+
             ctx.rect((this.x * tilesize + render.offsetX) * render.zoom, (this.y * tilesize + render.offsetY) * render.zoom, tilesize * render.zoom, tilesize * render.zoom);
-            ctx.fillStyle = getRandomColor(200, 200, 0);
-            if (this.hasCollision) {
-                  ctx.fillStyle = getRandomColor(200, 0, 200);
-            }
+      
 
             ctx.fillStyle = this.color;
+            ctx.strokeStyle = this.color;
 
-            // DEBUG
             ctx.stroke();
-            // DEBUG          
 
             ctx.fill();
       };

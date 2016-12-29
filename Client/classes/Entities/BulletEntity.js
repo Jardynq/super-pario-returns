@@ -1,46 +1,56 @@
 var BulletEntity = function (reader) {
       // Run the the constructor from Entity
       Entity.prototype.constructor.call(this, reader);
-      this.hasGravity = true;
+      this.hasGravity = false;
       this.width = 10;
       this.height = 10;
       
-      this.color = getRandomColor();
+      this.color = "red";
+      if (room.entities[this.shooter].isMain) {
+            this.color = "green";
+      }
 
-      this.oldPositionsX = [];
-      this.oldPositionsY = [];
+      this.oldPositions = [];
 
       this.renderX = this.x;
       this.renderY = this.y;
 };
 BulletEntity.prototype = Object.create(Entity.prototype); // Bullet inherits Entity
 BulletEntity.prototype.render = function (ctx, render) {
-      ctx.beginPath();
+      if (this.oldPositions.length < 2) {
+            return;
+      }
+      
+      if (this.oldPositions.length > 10) {
+            this.oldPositions.shift();
+      }
 
-      for (x = 0; x < this.oldPositionsX.length; x++) {
-            var oldX = this.oldPositionsX[x];
-            var oldY = this.oldPositionsY[x];
+      render.resetCtx(ctx);
+
+      ctx.moveTo(this.oldPositions[0].x + render.offsetX, this.oldPositions[0].y + render.offsetY);
+      for (i = 1; i < this.oldPositions.length; i++) {
+            var oldX = this.oldPositions[i].x;
+            var oldY = this.oldPositions[i].y;
             
-            ctx.moveTo(oldX, oldY);
-            ctx.lineTo(this.x, this.y);
+            ctx.lineWidth = 10;
+            ctx.strokeStyle = this.color;
+            ctx.lineCap = "round";
+            ctx.lineTo(oldX + render.offsetX, oldY + render.offsetY);
             ctx.stroke();
 
       }
-
-      //ctx.beginPath();
-      //ctx.rect((this.x - this.width * 0.5 + render.offsetX) * render.zoom, (this.y - this.height * 0.5 + render.offsetY) * render.zoom, this.width * render.zoom, this.height * render.zoom);
-      //ctx.fillStyle = this.color;
-
-      //ctx.fill();
 };
 
-BulletEntity.prototype.step = function () {
-      Entity.prototype.step.call(this);
+BulletEntity.prototype.step = function (timeScale) {
+      Entity.prototype.step.call(this, timeScale);
 
-      this.oldPositionsX.push(this.renderX);
-      this.oldPositionsY.push(this.renderY);
+      this.oldPositions.push({x: this.x, y: this.y});
+};
 
-      if (this.oldPositionsX.length + this.oldPositionsY.length > 5) 
+BulletEntity.prototype.update = function (reader) {
+      Entity.prototype.update.call(this, reader);
+
+      this.shooter = reader.getUint16(16, true);
 };
 
 BulletEntity.prototype.collidedWithTile = function () {

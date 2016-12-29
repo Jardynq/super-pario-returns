@@ -17,7 +17,8 @@ var Entity = function (reader) {
 Entity.prototype = Object.create(Render.RenderObject.prototype); // Entity inherits RenderObject
 Entity.prototype.constructor = Entity;
 Entity.prototype.render = function (ctx, render) {
-      ctx.beginPath();
+      render.resetCtx(ctx);
+      
       ctx.rect((this.renderX - this.width * 0.5 + render.offsetX) * render.zoom, (this.renderY - this.height * 0.5 + render.offsetY) * render.zoom, this.width * render.zoom, this.height * render.zoom);
       ctx.fillStyle = this.color;
 
