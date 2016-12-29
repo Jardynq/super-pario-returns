@@ -14,6 +14,11 @@
             super.step(timeScale);
             this._oldPositions.push({ x: this.x, y: this.y });
         }
+
+        if (this.x < 0 || this.x > this.room.map.width * this.room.map.tilesize
+            || this.y < 0 || this.y > this.room.map.height * this.room.map.tilesize) {
+            this.dispose();
+        }
     }
 
     public dispose(): void {
@@ -45,9 +50,12 @@
         ctx.stroke();
     }
 
-    public update(data: DataView) {
+    public update(data: DataView): number {
+        if (this._oldPositions === undefined) {
+            this._oldPositions = [];
+        }
         this._oldPositions.push({ x: this.x, y: this.y });
-        super.update(data);
+        return super.update(data);
     }
 
     protected collidedWithTile(tile: Tile) {

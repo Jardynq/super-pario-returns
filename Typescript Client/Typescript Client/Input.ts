@@ -5,6 +5,8 @@
     public static mouseX: number = 0;
     public static mouseY: number = 0;
 
+    public static mouseDown: boolean = false;
+
     /**
      * Adds necessary event listeners
      */
@@ -13,6 +15,8 @@
             window.addEventListener("keydown", Input.onKeyDown);
             window.addEventListener("keyup", Input.onKeyUp);
             window.addEventListener("mousemove", Input.onMouseMove);
+            window.addEventListener("mousedown", Input.onMouseDown);
+            window.addEventListener("mouseup", Input.onMouseUp);
             Input.initialized = true;
         }
     }
@@ -37,6 +41,14 @@
     private static onMouseMove = function (e: MouseEvent) {
         Input.mouseX = e.clientX;
         Input.mouseY = e.clientY;
+    }
+
+    private static onMouseDown = function (e: MouseEvent) {
+        Input.mouseDown = true;
+    }
+
+    private static onMouseUp = function (e: MouseEvent) {
+        Input.mouseDown = false;
     }
 
     /**

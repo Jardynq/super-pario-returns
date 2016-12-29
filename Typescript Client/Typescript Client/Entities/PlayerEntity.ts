@@ -75,6 +75,8 @@ class MainPlayerEntity extends PlayerEntity {
             }
         }
 
+        if (Input.mouseDown) this.shoot();
+
         // Send an update packet to the server
         var updatePacket = new DataView(new ArrayBuffer(13));
         updatePacket.setUint8(0, PacketType.PlayerUpdate);
@@ -107,10 +109,14 @@ class MainPlayerEntity extends PlayerEntity {
         super.dispose();
     }
 
-    public onClick(e: MouseEvent): void {
+    public onClick(): void {
+
+    }
+
+    public shoot(): void {
         var screenPos = this.room.camera.worldToScreen({ x: this.x, y: this.y });
-        var dirX = e.clientX - screenPos.x;
-        var dirY = e.clientY - screenPos.y;
+        var dirX = Input.mouseX - screenPos.x;
+        var dirY = Input.mouseY - screenPos.y;
 
         // Calculate the angle of the player click
         var angle = Math.atan2(dirY, dirX);
