@@ -57,9 +57,7 @@ namespace Server.Packets
             {
                 // Don't allow the player to glitch himself through blocks
                 p.X = X;
-                p.HandleCollision(true);
                 p.Y = Y;
-                p.HandleCollision(false);
             }
         }
     }

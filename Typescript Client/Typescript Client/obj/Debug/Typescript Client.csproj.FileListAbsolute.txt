@@ -1,6 +1,0 @@
-C:\Users\alexa\Documents\GitHub\super-pario-returns\Typescript Client\Typescript Client\bin\Typescript Client.dll.config
-C:\Users\alexa\Documents\GitHub\super-pario-returns\Typescript Client\Typescript Client\bin\Typescript Client.dll
-C:\Users\alexa\Documents\GitHub\super-pario-returns\Typescript Client\Typescript Client\bin\Typescript Client.pdb
-C:\Users\alexa\Documents\GitHub\super-pario-returns\Typescript Client\Typescript Client\obj\Debug\Typescript Client.csprojResolveAssemblyReference.cache
-C:\Users\alexa\Documents\GitHub\super-pario-returns\Typescript Client\Typescript Client\obj\Debug\Typescript Client.dll
-C:\Users\alexa\Documents\GitHub\super-pario-returns\Typescript Client\Typescript Client\obj\Debug\Typescript Client.pdb
