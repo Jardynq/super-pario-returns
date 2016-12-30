@@ -45,22 +45,13 @@ TileMap = (function () {
             x = Math.floor(x);
             y = Math.floor(y);
 
-            if (x < 0) {
+            if (x < 0 || x >= this.width ||
+                y < 0 || y >= this.height||
+                this.tiles[x + (y * this.width)] === undefined) {
                   return null;                  
-            } else if (x >= this.width) {
-                  return null;
             }
-            if (y < 0) {
-                  return null;
-            } else if (y >= this.height) {
-                  return null;
-            }
-
-            if (this.tiles[x + (y * this.width)] === undefined) {
-                  return null;
-            } else {
-                  return this.tiles[x + (y * this.width)];
-            }
+            
+            return this.tiles[x + (y * this.width)];
       };
 
       return ns;

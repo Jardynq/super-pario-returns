@@ -14,7 +14,7 @@ namespace Server.Entities
         Player Owner;
         public BulletEntity (GameRoom room, float angle, Player owner) : base(room)
         {
-            int bulletSpeed = 1000;
+            int bulletSpeed = 800;
             Width = 5;
             Height = 5;
             XSpeed = Math.Cos(Math.Max(Math.Min(angle, 1000), -1000)) * bulletSpeed;

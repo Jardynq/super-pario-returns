@@ -93,6 +93,14 @@ var Render = (function () {
                   startTile = this.tileMap.getTile(0, 0);
             }
 
+            ctx.beginPath();
+
+            ctx.font = 20 * render.zoom + "px Oswald";
+            ctx.fillText(startTile.x, 250, 250);
+            ctx.fillText(startTile.y, 300, 250);
+            ctx.fillText(endTile.x, 250, 300);
+            ctx.fillText(endTile.y, 300, 300);
+
             // Renders all of the tile that are in between endtile and startTile, aka on render on screen
             for (var i = startTile.y; i <= endTile.y; i++) {
                   for (var g = startTile.x; g <= endTile.x; g++) {

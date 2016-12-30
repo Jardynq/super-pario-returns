@@ -14,6 +14,9 @@ var GameRoom = function () {
       
       this.player = null;
       
+      // Debug HUD such as fps ping and position
+      this.isDebugMenuActive = false;
+
       // Event handlers for the game
       window.addEventListener('keydown', this.onKeyDown.bind(this));
       window.addEventListener("keyup", this.onKeyUp.bind(this));
@@ -141,7 +144,9 @@ GameRoom.prototype.removeFromEntities = function (id) {
 
 // Inputs
 GameRoom.prototype.onKeyDown = function (e) {
-
+      if (Input.isKeyDown("Backquote")) {
+            this.isDebugMenuActive = !this.isDebugMenuActive;
+      }
 };
 GameRoom.prototype.onKeyUp = function (e) {      
       

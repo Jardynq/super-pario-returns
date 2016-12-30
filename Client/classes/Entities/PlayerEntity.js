@@ -26,18 +26,22 @@ PlayerEntity.prototype.render = function (ctx, render) {
       ctx.beginPath();
 
       ctx.fillStyle = this.color;
-      ctx.font = 20 * render.zoom + "px Oswald";
-
       ctx.textAlign = "center";
-
       ctx.lineWidth = 1;
 
-      ctx.strokeText(this.ping, (this.renderX + render.offsetX) * render.zoom, (this.renderY + render.offsetY - this.height * 0.5 - 5) * render.zoom);
-      ctx.fillText(this.ping, (this.renderX + render.offsetX) * render.zoom, (this.renderY + render.offsetY - this.height * 0.5 - 5) * render.zoom);
-
-      ctx.font = 35 + "px Oswald";
-      ctx.fillText(fps, 40, 50);
-      ctx.strokeText(fps, 40 ,50);
+      // Debugging info
+      if (room.isDebugMenuActive) {
+            // Ping
+            ctx.font = 20 * render.zoom + "px Oswald";
+            ctx.strokeText(this.ping, (this.renderX + render.offsetX) * render.zoom, (this.renderY + render.offsetY - this.height * 0.5 - 5) * render.zoom);
+            ctx.fillText(this.ping, (this.renderX + render.offsetX) * render.zoom, (this.renderY + render.offsetY - this.height * 0.5 - 5) * render.zoom);
+      }
+      if (this.isMain && room.isDebugMenuActive) {
+            // Fps Counter
+            ctx.font = 35 + "px Oswald";
+            ctx.fillText(fps, 35, 50);
+            ctx.strokeText(fps, 35 ,50);
+      } 
 };
 
 PlayerEntity.prototype.step = function (timescale) {
