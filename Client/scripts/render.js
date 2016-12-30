@@ -24,56 +24,22 @@ var Render = (function () {
                   renderObject.render(ctx, this);
             }
       };
-      ns.Render.prototype.getRandomColor = function  (redOffset, greenOffset, blueOffset, allowOverUnderFlow) {
+      ns.Render.prototype.getRandomColor = function  (redOffset, greenOffset, blueOffset) {
             if (redOffset === undefined) {
-                  redOffset = 0;
+                  redOffset = 1;
             }
             if (greenOffset === undefined) {
-                  greenOffset = 0;
+                  greenOffset = 1;
             }
             if (blueOffset === undefined) {
-                  blueOffset = 0;
-            }
-            if (allowOverUnderFlow === undefined) {
-                  allowOverUnderFlow = false;
+                  blueOffset = 1;
             }
 
-            var red = Math.floor(Math.random() * 255);
-            var green = Math.floor(Math.random() * 255);
-            var blue = Math.floor(Math.random() * 255);
-
-            red -= redOffset;
-            green -= greenOffset;
-            blue -= blueOffset;
-
-            if (allowOverUnderFlow) {
-                  if (red > 255 ) {
-                        red = 255;
-                  }
-                  if (red < 0 ) {
-                        red = 0;
-                  }
-                  if (green > 255 ) {
-                        green = 255;
-                  }
-                  if (green < 0 ) {
-                        green = 0;
-                  }
-                  if (blue > 255 ) {
-                        blue = 255;
-                  }
-                  if (blue < 0 ) {
-                        blue = 0;
-                  }
-            }
+            var red = Math.floor(Math.random() * 2 * redOffset);
+            var green = Math.floor(Math.random() * 2 * greenOffset);
+            var blue = Math.floor(Math.random() * 2 * blueOffset);
 
             return "rgb(" + red +"," + green + "," + blue + ")";
-      };
-      ns.Render.prototype.resetCtx = function (ctx) {
-            ctx.beginPath();
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = null;
-            ctx.fillStyle = null;
       };
 
 

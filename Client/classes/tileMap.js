@@ -19,10 +19,14 @@ TileMap = (function () {
                   var y = (i - 2 - x) / this.width;
 
                   if (tile === 0) { // Sky
-                        this.tiles[i - 2] = new Tile.ColorTile("#008CFF", x, y, false);
-                  }
-                  if (tile == 1) { // Ground
-                        this.tiles[i - 2] = new Tile.ColorTile("black", x, y, true);
+                        this.tiles[i - 2] = new Tile.ColorTile(x, y, false, "0");
+                        continue;
+                  } else if (tile == 1) { // Dirt
+                        this.tiles[i - 2] = new Tile.ColorTile(x, y, true, "1");
+                        continue;
+                  } else if (tile == 2) { // Grass
+                        this.tiles[i - 2] = new Tile.ColorTile(x, y, true, "2");
+                        continue;
                   }
             }
 
@@ -53,13 +57,6 @@ TileMap = (function () {
             x = Math.floor(x / this.tilesize);
             y = Math.floor(y / this.tilesize);
             
-            if (x < 0) {
-                  x  = 0;
-            }
-            if (this.getTile(x, y) === undefined) {
-                  return null;
-            }
-
             return this.getTile(x, y);
       };
 

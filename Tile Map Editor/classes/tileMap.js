@@ -12,9 +12,14 @@ TileMap = (function () {
                   for (var x = 0; x < this.width; x++) {
 
                         if (chosenStartTile === "0") { // Sky
-                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("blue", x, y, "0");
-                        } else if (chosenStartTile === "1") { // Ground
-                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("black", x, y, "1");
+                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#4876FF", x, y, "0");
+                              continue;                              
+                        } else if (chosenStartTile === "1") { // Dirt
+                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#5E2612", x, y, "1");
+                              continue;                              
+                        } else if (chosenStartTile === "2") { // Grass
+                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#458B00", x, y, "2");
+                              continue;                              
                         }
                   }
             }
@@ -37,10 +42,14 @@ TileMap = (function () {
                         var tile = tileRow[x];
 
                         if (tile === "0") { // Sky
-                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("blue", x, y, "0");
-                        }
-                        if (tile === "1") { // Ground
-                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("black", x, y, "1");
+                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#4876FF", x, y, "0");
+                              continue;                              
+                        } else if (tile === "1") { // Ground
+                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#5E2612", x, y, "1");
+                              continue;
+                        } else if (tile === "2") { // Ground
+                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#458B00", x, y, "2");
+                              continue;
                         }
                   }
             }

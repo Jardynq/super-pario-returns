@@ -12,18 +12,25 @@ var Entity = function (reader) {
       this.x = 0;
       this.y = 0;
 
+      Entity.gravity = 1000;
+      Entity.maxFallSpeed = 1000;
+
       this.update(reader);
 };
 Entity.prototype = Object.create(Render.RenderObject.prototype); // Entity inherits RenderObject
 Entity.prototype.constructor = Entity;
 Entity.prototype.render = function (ctx, render) {
-      render.resetCtx(ctx);
+      ctx.beginPath();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "black";
       
       ctx.rect((this.renderX - this.width * 0.5 + render.offsetX) * render.zoom, (this.renderY - this.height * 0.5 + render.offsetY) * render.zoom, this.width * render.zoom, this.height * render.zoom);
       ctx.fillStyle = this.color;
 
-      ctx.stroke();      
+      ctx.strokeStyle = "black";
+     
       ctx.fill();
+      ctx.stroke(); 
 };
 
 Entity.prototype.update = function (reader) {

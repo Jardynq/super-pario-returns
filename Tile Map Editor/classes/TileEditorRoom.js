@@ -13,7 +13,7 @@ var TileEditorRoom = function (map) {
       this.activeTileId = 0;
 
       // Amount of tile types
-      this.tileAmount = 2;
+      this.tileAmount = 3;
 
       this.map = map;
       this.cameraSpeed = null;
@@ -23,7 +23,7 @@ var TileEditorRoom = function (map) {
 
       this.activeTilePreview.addToRenderQueue(this.render.renderQueue);
 
-      this.activeTile = new Tile.ColorTile("blue", 0, 0, "0");
+      this.activeTile = new Tile.ColorTile("#4876FF", 0, 0, "0");
 
       // Fixes camera      
       this.cameraSpeed = this.map.tilesize * 0.25;
@@ -61,10 +61,13 @@ TileEditorRoom.prototype.formatAndSave = function () {
 
 TileEditorRoom.prototype.getActiveTile = function (x, y) {
       if (this.activeTileId === 0) {
-            this.activeTile = new Tile.ColorTile("blue", x, y, "0");
+            this.activeTile = new Tile.ColorTile("#4876FF", x, y, "0");
       }
       if (this.activeTileId === 1) {
-            this.activeTile = new Tile.ColorTile("black", x, y, "1");
+            this.activeTile = new Tile.ColorTile("#5E2612", x, y, "1");
+      }
+      if (this.activeTileId === 2) {
+            this.activeTile = new Tile.ColorTile("#458B00", x, y, "2");
       }
 };
 TileEditorRoom.prototype.updateActiveTile = function () {
@@ -83,10 +86,11 @@ TileEditorRoom.prototype.updateActiveTile = function () {
       }
 
       if (this.activeTileId === 0) {
-            this.activeTile = new Tile.ColorTile("blue", 0, 0, "0");
-      }
-      if (this.activeTileId === 1) {
-            this.activeTile = new Tile.ColorTile("black", 0, 0, "1");
+            this.activeTile = new Tile.ColorTile("#4876FF", 0, 0, "0");
+      } else if (this.activeTileId === 1) {
+            this.activeTile = new Tile.ColorTile("#5E2612", 0, 0, "1");
+      } else if (this.activeTileId === 2) {
+            this.activeTile = new Tile.ColorTile("#458B00", 0, 0, "2");
       }
 };
 

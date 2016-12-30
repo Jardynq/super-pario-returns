@@ -6,6 +6,9 @@ var map = null;
 var room = null;
 
 var lastTickCount = new Date().getTime();
+var lastLoop = new Date();
+
+var fps = null;
 
 Socket.connect(init);
 
@@ -19,8 +22,12 @@ function step () {
       var timeScale = elapsedMilliseconds / 1000;
       lastTickCount = newTickCount;
 
+      var newLoop = new Date();
+      fps = Math.round(1000 / (newLoop - lastLoop));
+      lastLoop = newLoop;
+
       room.step(timeScale);
-      room.renderAll(ctx);      
+      room.render.renderAll(ctx);    
       window.requestAnimationFrame(step); // Request next frame
 }
 

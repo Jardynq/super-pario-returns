@@ -5,6 +5,9 @@ var PlayerEntity = function (reader) {
       this.color = "red";
       this.isMain = false;
 
+      this.renderX = this.x;
+      this.renderY = this.y;
+
       this.width = 30;
       this.height = 60;
 
@@ -16,7 +19,7 @@ PlayerEntity.prototype = Object.create(Entity.prototype); // PlayerEntity inheri
 PlayerEntity.prototype.render = function (ctx, render) {
       Entity.prototype.render.call(this, ctx, render);    
         
-      render.resetCtx(ctx);
+      ctx.beginPath();
 
       ctx.fillStyle = this.color;
       ctx.font = 15 * render.zoom + "px Oswald";
@@ -24,6 +27,9 @@ PlayerEntity.prototype.render = function (ctx, render) {
       ctx.textAlign = "center";
 
       ctx.fillText(this.ping, (this.renderX + render.offsetX) * render.zoom, (this.renderY + render.offsetY - this.height * 0.5 - 5) * render.zoom);
+
+      ctx.font = 35 * render.zoom + "px Oswald";
+      ctx.fillText(fps, 40, 50);
 };
 
 PlayerEntity.prototype.step = function (timescale) {
@@ -43,15 +49,15 @@ PlayerEntity.prototype.step = function (timescale) {
 // Movement
 PlayerEntity.prototype.updateMovement = function () {
       // Left - right movement
-      if (Input.isKeyDown("KeyD")) {
+      if (Input.isKeyDown("KeyA")) {
+            if (this.xSpeed >= 0) {
+                  this.xSpeed = -this.walkSpeed;
+                  this.sendActionPacket("KeyA");
+            }   
+      } else if (Input.isKeyDown("KeyD")) {
             if (this.xSpeed <= 0) {
                   this.xSpeed = this.walkSpeed;
                   this.sendActionPacket("KeyD");   
-            }
-      } else if (Input.isKeyDown("KeyA")) {
-            if (this.xSpeed >= 0) {
-                  this.xSpeed = -this.walkSpeed;
-                  this.sendActionPacket("KeyA");   
             }
       } else if (this.xSpeed < 0 || this.xSpeed > 0){
             this.xSpeed = 0;
@@ -114,7 +120,7 @@ PlayerEntity.prototype.update  = function (reader, updatePosition) {
       this.ping = reader.getUint16(16, true);
 
       if (this.isMain) {
-            if (! updatePosition) {
+            if (!updatePosition) {
                   this.x = oldX;
                   this.y = oldY;
 

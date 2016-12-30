@@ -39,7 +39,7 @@ namespace Server
                 for (int x = 0; x < tileIndices[y].Count; x++)
                 {
                     var tileType = tileIndices[y][x];
-                    var tile = new Tile.Tile(tileType, x, y, tileType == 1);
+                    var tile = new Tile.Tile(tileType, x, y, tileType == 1 || tileType == 2);
                     this.Tiles[x, y] = tile;
                 }
             }
