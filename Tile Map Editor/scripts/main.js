@@ -5,11 +5,6 @@ var ctx = null;
 var map = null;
 var room = null;
 
-var tileTypes = {
-      "0": ("blue", 0, 0, "0"),
-      "1": ("black", 0, 0, "1"),
-};
-
 /**
  * Main game loop
  * 
@@ -44,7 +39,7 @@ function init () {
             var chosenStartTile = document.getElementById("inp-start-tile").value;
             var map = new TileMap.Map(width, height, tilesize);
 
-            map.generateMap(chosenStartTile);
+            map.generateMap(parseInt(chosenStartTile));
             room = new TileEditorRoom(map);
 
             // Starts the main loop
@@ -94,16 +89,6 @@ function download(filename, text) {
       element.click();
 
       document.body.removeChild(element);
-}
-
-/**
- * Set attributes for html elements
- * 
- */
-function setAttributes(el, options) {
-      Object.keys(options).forEach(function(attr) {
-            el.setAttribute(attr, options[attr]);
-      });
 }
 
 window.addEventListener("load", init);

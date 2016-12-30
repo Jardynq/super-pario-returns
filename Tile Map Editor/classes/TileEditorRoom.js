@@ -1,32 +1,26 @@
 var TileEditorRoom = function (map) {
       this.render = new Render.Render();
       this.tileRenderer = null;
-      this.activeTilePreview = new Tile.ActiveTilePreview(100, 100);
 
       this.mouseDownTile = null;
       this.mouseUpTile = null;
       this.mouseX = null;
       this.mouseY = null;
-      this.isMouseDown = null;
+      this.isMouseDown = false;
 
-      this.activeTile = null;
-      this.activeTileId = 0;
+      this.activeTilePreview = new Tile.ActiveTilePreview(100, 100);
+      this.activeTile = new Tile.ColorTile(tileTypes[0].color , 0, 0, tileTypes[0].id);
+      this.activeTileId = tileTypes[0].id;
 
       // Amount of tile types
-      this.tileAmount = 5;
+      this.tileAmount = tileTypes.length;
 
       this.map = map;
-      this.cameraSpeed = null;
+      this.cameraSpeed = this.map.tilesize * 0.25;
 
       this.tileRenderer = new Render.TileRenderer(this.map);
       this.tileRenderer.addToRenderQueue(this.render.renderQueue);
-
       this.activeTilePreview.addToRenderQueue(this.render.renderQueue);
-
-      this.activeTile = new Tile.ColorTile("#4876FF", 0, 0, "0");
-
-      // Fixes camera      
-      this.cameraSpeed = this.map.tilesize * 0.25;
 
       // Add event listeners
       window.addEventListener('keydown', this.onKeyDown.bind(this));
@@ -58,24 +52,6 @@ TileEditorRoom.prototype.formatAndSave = function () {
 
       download("map.txt", tiles);
 };
-
-TileEditorRoom.prototype.getActiveTile = function (x, y) {
-      if (this.activeTileId === 0) {
-            this.activeTile = new Tile.ColorTile("#4876FF", x, y, "0");
-      }
-      if (this.activeTileId === 1) {
-            this.activeTile = new Tile.ColorTile("#5E2612", x, y, "1");
-      }
-      if (this.activeTileId === 2) {
-            this.activeTile = new Tile.ColorTile("#458B00", x, y, "2");
-      }
-      if (this.activeTileId === 3) {
-            this.activeTile = new Tile.ColorTile("#261109", x, y, "3");
-      }
-      if (this.activeTileId === 4) {
-            this.activeTile = new Tile.ColorTile("#2C5702", x, y, "4");
-      }
-};
 TileEditorRoom.prototype.updateActiveTile = function () {
       if (Input.isKeyDown("KeyE")) {
             if (this.activeTileId >= this.tileAmount - 1) {
@@ -91,35 +67,25 @@ TileEditorRoom.prototype.updateActiveTile = function () {
             }
       }
 
-      if (this.activeTileId === 0) {
-            this.activeTile = new Tile.ColorTile("#4876FF", 0, 0, "0");
-      } else if (this.activeTileId === 1) {
-            this.activeTile = new Tile.ColorTile("#5E2612", 0, 0, "1");
-      } else if (this.activeTileId === 2) {
-            this.activeTile = new Tile.ColorTile("#458B00", 0, 0, "2");
-      } else if (this.activeTileId === 3) {
-            this.activeTile = new Tile.ColorTile("#261109", 0, 0, "3");
-      } else if (this.activeTileId === 4) {
-            this.activeTile = new Tile.ColorTile("#2C5702", 0, 0, "4");
-      }
+      this.activeTile = setActiveTile(this.activeTileId, 0, 0);
 };
 
 TileEditorRoom.prototype.clickTile = function (e) {
       var clickedTile = this.map.getTile((e.x - this.render.offsetX * this.render.zoom) / (this.map.tilesize * this.render.zoom), (e.y - this.render.offsetY * this.render.zoom) / (this.map.tilesize * this.render.zoom));
 
-      this.getActiveTile(clickedTile.x, clickedTile.y);
+      this.activeTile = setActiveTile(this.activeTileId ,clickedTile.x, clickedTile.y);
 
       this.map.updateTile(clickedTile, this.activeTile);
 };
-TileEditorRoom.prototype.fillTiles = function (mouseDown) {
+TileEditorRoom.prototype.fillTiles = function (isMouseDown) {
       var startTile = this.map.getTile(this.mouseDownTile.x, this.mouseDownTile.y);
       var endTile = null;
 
-      if (!mouseDown) {
+      if (!isMouseDown) {
             endTile = this.map.getTile(this.mouseUpTile.x, this.mouseUpTile.y);
       }
 
-      if (endTile !== null) {
+      if (endTile !== null && startTile !== null) {
             this.fill(startTile, endTile);
       } else {
             return null;
@@ -134,8 +100,8 @@ TileEditorRoom.prototype.fill = function (startTile, endTile) {
                         continue;
                   }
 
-                  this.getActiveTile(tile.x, tile.y);
-                  this.map.updateTile(tile, this.activeTile);
+                  newTile = setActiveTile(this.activeTileId, tile.x, tile.y);
+                  this.map.updateTile(tile, newTile);
             }   
       }
 };

@@ -24,14 +24,14 @@ Tile = (function () {
             var chooser = Math.random() * 10;
 
             if (this.type === "0") {
-                  if (chooser >= 0 && chooser < 9) {
-                        return "#4876FF";
+                  if (chooser >= 0 && chooser < 8.5) {
+                        return "#527DFF";
                   }
-                  if (chooser >= 9 && chooser < 9.9) {
-                        return "#436EEE";
+                  if (chooser >= 8.5 && chooser < 9) {
+                        return "#4D76F0";
                   }
-                  if (chooser >= 9.9 && chooser <= 10) {
-                        return "#4997D0";
+                  if (chooser >= 9 && chooser <= 10) {
+                        return "#4D79FF";
                   }
             }
             if (this.type === "1") {
@@ -58,24 +58,24 @@ Tile = (function () {
             }
             if (this.type === "3") {
                   if (chooser >= 0 && chooser < 7) {
-                        return "#261109";
+                        return "#1C0D07";
                   }
                   if (chooser >= 7 && chooser < 9) {
-                        return "#240D05";
+                        return "#1A0904";
                   }
                   if (chooser >= 9 && chooser <= 10) {
-                        return "#1C0B04";
+                        return "#140803";
                   }
             }
             if (this.type === "4") {
                   if (chooser >= 0 && chooser < 7) {
-                        return "#214003";
+                        return "#1C3603";
                   }
                   if (chooser >= 7 && chooser < 9) {
-                        return "#28450A";
+                        return "#213808";
                   }
                   if (chooser >= 9 && chooser <= 10) {
-                        return "#192B07";
+                        return "#152406";
                   }
             }
       };

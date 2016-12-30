@@ -18,7 +18,7 @@ var BulletEntity = function (reader) {
 };
 BulletEntity.prototype = Object.create(Entity.prototype); // Bullet inherits Entity
 BulletEntity.prototype.render = function (ctx, render) {
-      if (this.oldPositions.length > 7 || this.isDisposed) {
+      if (this.oldPositions.length > 6 || this.isDisposed) {
             this.oldPositions.shift();
             if (this.oldPositions.length === 0) {
                   this.dispose();

@@ -7,26 +7,11 @@ TileMap = (function () {
             this.height = height;
             this.tiles = [];
       };
-      ns.Map.prototype.generateMap = function (chosenStartTile) {
+      ns.Map.prototype.generateMap = function (tile) {
             for (var y = 0; y < this.height; y++) {
                   for (var x = 0; x < this.width; x++) {
 
-                        if (chosenStartTile === "0") { // Sky
-                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#4876FF", x, y, "0");
-                              continue;                              
-                        } else if (chosenStartTile === "1") { // Dirt
-                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#5E2612", x, y, "1");
-                              continue;                              
-                        } else if (chosenStartTile === "2") { // Grass
-                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#458B00", x, y, "2");
-                              continue;                              
-                        } else if (chosenStartTile === "3") { // Dirt Background
-                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#261109", x, y, "3");
-                              continue;                              
-                        } else if (chosenStartTile === "4") { // Grass Background
-                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#2C5702", x, y, "4");
-                              continue;                              
-                        }
+                        this.tiles[x + (y * this.width)] = setActiveTile(tile, x, y);
                   }
             }
       };
@@ -47,27 +32,9 @@ TileMap = (function () {
                   for (x = 0; x < this.width; x++) {
                         var tile = tileRow[x];
 
-                        if (tile === "0") { // Sky
-                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#4876FF", x, y, "0");
-                              continue;                              
-                        } else if (tile === "1") { // Ground
-                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#5E2612", x, y, "1");
-                              continue;
-                        } else if (tile === "2") { // Ground
-                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#458B00", x, y, "2");
-                              continue;
-                        } else if (tile=== "3") { // Dirt Background
-                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#261109", x, y, "3");
-                              continue;                              
-                        } else if (tile === "4") { // Grass Background
-                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#2C5702", x, y, "4");
-                              continue;                              
-                        }
+                        this.tiles[x + (y * this.width)] = setActiveTile(parseInt(tile), x, y);
                   }
             }
-            console.log(this.width);
-            console.log(this.height);
-            console.log(this.tiles);
       };
       ns.Map.prototype.updateTile = function(tile, newTile) {
             this.tiles[tile.x + (tile.y * this.width)] = newTile;

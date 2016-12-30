@@ -32,6 +32,12 @@ Tile = (function () {
 
             ctx.fill();
             ctx.stroke();
+
+            ctx.textAlign = "center";
+            ctx.font = "30px Oswald";
+            ctx.fillStyle = "orange";            
+            ctx.fillText(room.activeTileId, canvas.width - this.width * 0.5 - 50, 180, this.width, this.height);
+            ctx.strokeText(room.activeTileId, canvas.width - this.width * 0.5 - 50, 180, this.width, this.height);
       };
       return ns;
 })();

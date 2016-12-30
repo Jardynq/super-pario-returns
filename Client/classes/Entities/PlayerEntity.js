@@ -126,6 +126,8 @@ PlayerEntity.prototype.update  = function (reader, updatePosition) {
 
       var oldX = this.x;
       var oldY = this.y;
+      var oldXSpeed = this.xSpeed;
+      var oldYSpeed = this.ySpeed;
 
       Entity.prototype.update.call(this, reader);      
 
@@ -135,6 +137,8 @@ PlayerEntity.prototype.update  = function (reader, updatePosition) {
             if (!updatePosition) {
                   this.x = oldX;
                   this.y = oldY;
+                  this.xSpeed = oldXSpeed;
+                  this.ySpeed = oldYSpeed;
 
                   var updatePacket = new DataView(new ArrayBuffer(5));
                   updatePacket.setUint8(0, Socket.PACKET_TYPES.playerUpdate);             
