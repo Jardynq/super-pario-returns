@@ -13,7 +13,7 @@ var TileEditorRoom = function (map) {
       this.activeTileId = 0;
 
       // Amount of tile types
-      this.tileAmount = 3;
+      this.tileAmount = 5;
 
       this.map = map;
       this.cameraSpeed = null;
@@ -69,6 +69,12 @@ TileEditorRoom.prototype.getActiveTile = function (x, y) {
       if (this.activeTileId === 2) {
             this.activeTile = new Tile.ColorTile("#458B00", x, y, "2");
       }
+      if (this.activeTileId === 3) {
+            this.activeTile = new Tile.ColorTile("#261109", x, y, "3");
+      }
+      if (this.activeTileId === 4) {
+            this.activeTile = new Tile.ColorTile("#2C5702", x, y, "4");
+      }
 };
 TileEditorRoom.prototype.updateActiveTile = function () {
       if (Input.isKeyDown("KeyE")) {
@@ -91,6 +97,10 @@ TileEditorRoom.prototype.updateActiveTile = function () {
             this.activeTile = new Tile.ColorTile("#5E2612", 0, 0, "1");
       } else if (this.activeTileId === 2) {
             this.activeTile = new Tile.ColorTile("#458B00", 0, 0, "2");
+      } else if (this.activeTileId === 3) {
+            this.activeTile = new Tile.ColorTile("#261109", 0, 0, "3");
+      } else if (this.activeTileId === 4) {
+            this.activeTile = new Tile.ColorTile("#2C5702", 0, 0, "4");
       }
 };
 

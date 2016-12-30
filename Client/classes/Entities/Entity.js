@@ -12,9 +12,6 @@ var Entity = function (reader) {
       this.x = 0;
       this.y = 0;
 
-      Entity.gravity = 1000;
-      Entity.maxFallSpeed = 1000;
-
       this.update(reader);
 };
 Entity.prototype = Object.create(Render.RenderObject.prototype); // Entity inherits RenderObject
@@ -50,6 +47,8 @@ Entity.prototype.step = function (timeScale) {
       }
 
       this.onGround = false;
+      this.isCollisionLeft = false;
+      this.isCollisionRight = false;
 
       this.x += this.xSpeed * timeScale;
       this.handleCollision(true);
@@ -57,20 +56,20 @@ Entity.prototype.step = function (timeScale) {
       this.handleCollision(false);
 
       // Easing
-      this.renderX += ((this.x - this.renderX) * 0.8);
-      this.renderY += ((this.y - this.renderY) * 0.8);
+      this.renderX += ((this.x - this.renderX) * 0.9);
+      this.renderY += ((this.y - this.renderY) * 0.9);
 };
 
 Entity.prototype.handleCollision = function (x) {
       speed = x ? this.xSpeed : this.ySpeed;
 
       var collisionTiles = [
-            room.map.getTileAt(this.x - this.width * 0.5 + 0.3, this.y - this.height * 0.5 + 0.3),
-            room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y - this.height * 0.5 + 0.3),
-            room.map.getTileAt(this.x - this.width * 0.5 + 0.3, this.y + this.height * 0.5 - 0.3),
-            room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y + this.height * 0.5 - 0.3),
-            room.map.getTileAt(this.x - this.width * 0.5 + 0.3, this.y),
-            room.map.getTileAt(this.x + this.width * 0.5 - 0.3, this.y)
+            room.map.getTile((this.x - this.width * 0.5 + 0.3) / room.map.tilesize, (this.y - this.height * 0.5 + 0.3) / room.map.tilesize),
+            room.map.getTile((this.x + this.width * 0.5 - 0.3) / room.map.tilesize, (this.y - this.height * 0.5 + 0.3) / room.map.tilesize),
+            room.map.getTile((this.x - this.width * 0.5 + 0.3) / room.map.tilesize, (this.y + this.height * 0.5 - 0.3) / room.map.tilesize),
+            room.map.getTile((this.x + this.width * 0.5 - 0.3) / room.map.tilesize, (this.y + this.height * 0.5 - 0.3) / room.map.tilesize),
+            room.map.getTile((this.x - this.width * 0.5 + 0.3) / room.map.tilesize, (this.y) / room.map.tilesize),
+            room.map.getTile((this.x + this.width * 0.5 - 0.3) / room.map.tilesize, (this.y) / room.map.tilesize)
       ];
 
       for (var i = 0; i < collisionTiles.length; i++) {
@@ -83,8 +82,10 @@ Entity.prototype.handleCollision = function (x) {
                   if (x) {
                         if (speed > 0) {
                               this.x = tile.x * room.map.tilesize - this.width * 0.5;
+                              this.isCollisionRight = true;
                         } else if (speed < 0) {
                               this.x = tile.x * room.map.tilesize + room.map.tilesize + this.width * 0.5;
+                              this.isCollisionLeft = true;
                         }
                         this.xSpeed = 0;
                         this.collidedWithTile();

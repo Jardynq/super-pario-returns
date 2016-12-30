@@ -27,6 +27,12 @@ TileMap = (function () {
                   } else if (tile == 2) { // Grass
                         this.tiles[i - 2] = new Tile.ColorTile(x, y, true, "2");
                         continue;
+                  } else if (tile == 3) { // Dirt Background
+                        this.tiles[i - 2] = new Tile.ColorTile(x, y, false, "3");
+                        continue;
+                  } else if (tile == 4) { // Grass Background
+                        this.tiles[i - 2] = new Tile.ColorTile(x, y, false, "4");
+                        continue;
                   }
             }
 
@@ -40,24 +46,21 @@ TileMap = (function () {
             y = Math.floor(y);
 
             if (x < 0) {
-                  x  = 0;
+                  return null;                  
+            } else if (x >= this.width) {
+                  return null;
             }
-            if (this.tiles[x + (y * this.width)] === undefined) {
+            if (y < 0) {
+                  return null;
+            } else if (y >= this.height) {
                   return null;
             }
 
-            // If x is larger than the width of the map then this makes sure it does not overflow
-            if (x >= this.width) {
-                  return this.tiles[(this.width - 1) + (y * this.width)];
+            if (this.tiles[x + (y * this.width)] === undefined) {
+                  return null;
             } else {
                   return this.tiles[x + (y * this.width)];
             }
-      };
-      ns.Map.prototype.getTileAt = function (x, y) {
-            x = Math.floor(x / this.tilesize);
-            y = Math.floor(y / this.tilesize);
-            
-            return this.getTile(x, y);
       };
 
       return ns;

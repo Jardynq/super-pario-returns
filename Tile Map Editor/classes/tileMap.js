@@ -20,6 +20,12 @@ TileMap = (function () {
                         } else if (chosenStartTile === "2") { // Grass
                               this.tiles[x + (y * this.width)] = new Tile.ColorTile("#458B00", x, y, "2");
                               continue;                              
+                        } else if (chosenStartTile === "3") { // Dirt Background
+                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#261109", x, y, "3");
+                              continue;                              
+                        } else if (chosenStartTile === "4") { // Grass Background
+                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#2C5702", x, y, "4");
+                              continue;                              
                         }
                   }
             }
@@ -50,6 +56,12 @@ TileMap = (function () {
                         } else if (tile === "2") { // Ground
                               this.tiles[x + (y * this.width)] = new Tile.ColorTile("#458B00", x, y, "2");
                               continue;
+                        } else if (tile=== "3") { // Dirt Background
+                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#261109", x, y, "3");
+                              continue;                              
+                        } else if (tile === "4") { // Grass Background
+                              this.tiles[x + (y * this.width)] = new Tile.ColorTile("#2C5702", x, y, "4");
+                              continue;                              
                         }
                   }
             }

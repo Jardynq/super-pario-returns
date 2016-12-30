@@ -13,6 +13,10 @@ var PlayerEntity = function (reader) {
 
       this.hasGravity = true;
 
+      this.onGround = false;
+      this.isCollisionLeft = false;
+      this.isCollisionRight = false;
+
       this.lastShot = 0;
 };
 PlayerEntity.prototype = Object.create(Entity.prototype); // PlayerEntity inherits Entity
@@ -22,14 +26,18 @@ PlayerEntity.prototype.render = function (ctx, render) {
       ctx.beginPath();
 
       ctx.fillStyle = this.color;
-      ctx.font = 15 * render.zoom + "px Oswald";
+      ctx.font = 20 * render.zoom + "px Oswald";
 
       ctx.textAlign = "center";
 
+      ctx.lineWidth = 1;
+
+      ctx.strokeText(this.ping, (this.renderX + render.offsetX) * render.zoom, (this.renderY + render.offsetY - this.height * 0.5 - 5) * render.zoom);
       ctx.fillText(this.ping, (this.renderX + render.offsetX) * render.zoom, (this.renderY + render.offsetY - this.height * 0.5 - 5) * render.zoom);
 
-      ctx.font = 35 * render.zoom + "px Oswald";
+      ctx.font = 35 + "px Oswald";
       ctx.fillText(fps, 40, 50);
+      ctx.strokeText(fps, 40 ,50);
 };
 
 PlayerEntity.prototype.step = function (timescale) {
@@ -49,23 +57,23 @@ PlayerEntity.prototype.step = function (timescale) {
 // Movement
 PlayerEntity.prototype.updateMovement = function () {
       // Left - right movement
-      if (Input.isKeyDown("KeyA")) {
+      if (!this.isCollisionLeft &&Input.isKeyDown("KeyA")) {
             if (this.xSpeed >= 0) {
                   this.xSpeed = -this.walkSpeed;
                   this.sendActionPacket("KeyA");
             }   
-      } else if (Input.isKeyDown("KeyD")) {
+      } else if (!this.isCollisionRight && Input.isKeyDown("KeyD")) {
             if (this.xSpeed <= 0) {
                   this.xSpeed = this.walkSpeed;
                   this.sendActionPacket("KeyD");   
             }
       } else if (this.xSpeed < 0 || this.xSpeed > 0){
             this.xSpeed = 0;
-            this.sendActionPacket(null);            
+            this.sendActionPacket(null);
       }
 
       // Jumping
-      if (this.onGround && Input.isKeyDown("KeyW")) {
+      if (this.onGround && Input.isKeyDown("KeyW") || this.onGround && Input.isKeyDown("Space")) {
             if (this.ySpeed >= 0) {
                   this.ySpeed = -this.jumpForce;
                   this.sendActionPacket("KeyW");

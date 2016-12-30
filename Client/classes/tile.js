@@ -36,13 +36,13 @@ Tile = (function () {
             }
             if (this.type === "1") {
                   if (chooser >= 0 && chooser < 7) {
-                        return "#5E2612";
+                        return "#632712";
                   }
                   if (chooser >= 7 && chooser < 9) {
-                        return "#4D1D0C";
+                        return "#59200C";
                   }
                   if (chooser >= 9 && chooser <= 10) {
-                        return "#401708";
+                        return "#4D1A08";
                   }
             }
             if (this.type === "2") {
@@ -54,6 +54,28 @@ Tile = (function () {
                   }
                   if (chooser >= 9 && chooser <= 10) {
                         return "#3E6B11";
+                  }
+            }
+            if (this.type === "3") {
+                  if (chooser >= 0 && chooser < 7) {
+                        return "#261109";
+                  }
+                  if (chooser >= 7 && chooser < 9) {
+                        return "#240D05";
+                  }
+                  if (chooser >= 9 && chooser <= 10) {
+                        return "#1C0B04";
+                  }
+            }
+            if (this.type === "4") {
+                  if (chooser >= 0 && chooser < 7) {
+                        return "#214003";
+                  }
+                  if (chooser >= 7 && chooser < 9) {
+                        return "#28450A";
+                  }
+                  if (chooser >= 9 && chooser <= 10) {
+                        return "#192B07";
                   }
             }
       };

@@ -6,9 +6,12 @@ var map = null;
 var room = null;
 
 var lastTickCount = new Date().getTime();
-var lastLoop = new Date();
+var lastFpsUpdate = new Date().getTime();
 
-var fps = null;
+var fps = 60;
+
+Entity.gravity = 1000;
+Entity.maxFallSpeed = 1000;
 
 Socket.connect(init);
 
@@ -18,14 +21,21 @@ Socket.connect(init);
  */
 function step () {
       var newTickCount = new Date().getTime();
+      var newFpsUpdate = new Date().getTime();
+
+      // timeScale
       var elapsedMilliseconds = newTickCount - lastTickCount;
       var timeScale = elapsedMilliseconds / 1000;
+
+      // Fps
+      if (newFpsUpdate - lastFpsUpdate > 150) {
+            fps = Math.round(1000 / (newTickCount - lastTickCount));
+            lastFpsUpdate = newFpsUpdate;
+      }
+
       lastTickCount = newTickCount;
 
-      var newLoop = new Date();
-      fps = Math.round(1000 / (newLoop - lastLoop));
-      lastLoop = newLoop;
-
+      // Main
       room.step(timeScale);
       room.render.renderAll(ctx);    
       window.requestAnimationFrame(step); // Request next frame
