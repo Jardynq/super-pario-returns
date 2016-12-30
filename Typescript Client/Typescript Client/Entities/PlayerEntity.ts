@@ -96,9 +96,13 @@ class MainPlayerEntity extends PlayerEntity {
         if (!forceUpdate) {
             var oldX = this.x;
             var oldY = this.y;
+            var oldXSpeed = this.xSpeed;
+            var oldYSpeed = this.ySpeed;
             super.update(data);
             this.x = oldX;
             this.y = oldY;
+            this.xSpeed = oldXSpeed;
+            this.ySpeed = oldYSpeed;
         } else {
             return super.update(data);
         }
