@@ -55,9 +55,9 @@ namespace Server.Packets
             }
             else
             {
-                // Don't allow the player to glitch himself through blocks
                 p.X = X;
                 p.Y = Y;
+                //Player.SimulateFrom((long)(Program.Timer.ElapsedMilliseconds - Player.Ping * 0.5));
             }
         }
     }

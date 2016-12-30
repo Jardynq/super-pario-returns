@@ -10,6 +10,7 @@ using Server.Packets;
 using System.Reflection;
 using System.Diagnostics;
 using System.Net;
+using System.Threading;
 
 namespace Server
 {
@@ -32,7 +33,21 @@ namespace Server
             server = new WebSocketServer(IPAddress.Any, 1337);
             server.AddWebSocketService<GameService>("/");
             server.Start();
-            Console.ReadKey(true);
+            while (true) {
+                Console.ReadKey(true);
+                foreach (var player in Room.Players.Values)
+                {
+                    long time = Timer.ElapsedMilliseconds;
+                    for (var i = 0; i < 1000; i += 200) {
+                        player.ReverseTo((long)(time - i));
+                        new PlayerUpdatePacket(player).Send(player);
+                        Console.WriteLine("Reversing");
+                        Thread.Sleep(200);
+                    }
+                    Console.WriteLine("Reversed");
+                }
+            }
+            Console.ReadLine();
             server.Stop();
             Console.WriteLine("SERVER STOPPED");
         }

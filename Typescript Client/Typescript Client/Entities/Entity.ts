@@ -37,21 +37,32 @@ class Entity implements iRenderable {
         this.renderY = this.y;
     }
 
-    public step(timeScale: number): void {
-        if (this.hasGravity) {
-            this.ySpeed = Math.min(this.ySpeed + Entity.Gravity * timeScale, Entity.MaxSpeed);
+    public step(targetTimeScale: number): void {
+        while (targetTimeScale > 0) {
+            var timeScale: number;
+            if (targetTimeScale > 0.03) {
+                timeScale = 0.001;
+                targetTimeScale -= 0.03;
+            } else {
+                timeScale = targetTimeScale;
+                targetTimeScale = 0;
+            }
+
+            if (this.hasGravity) {
+                this.ySpeed = Math.min(this.ySpeed + Entity.Gravity * timeScale, Entity.MaxSpeed);
+            }
+
+            this.onGround = false;
+            this.onWall = false;
+
+            this.x += this.xSpeed * timeScale;
+            this.HandleCollision(true);
+            this.y += this.ySpeed * timeScale;
+            this.HandleCollision(false);
+
+            this.renderX += (this.x - this.renderX) * 0.8;
+            this.renderY += (this.y - this.renderY) * 0.8;
         }
-
-        this.onGround = false;
-        this.onWall = false;
-
-        this.x += this.xSpeed * timeScale;
-        this.HandleCollision(true);
-        this.y += this.ySpeed * timeScale;
-        this.HandleCollision(false);
-
-        this.renderX += (this.x - this.renderX) * 0.8;
-        this.renderY += (this.y - this.renderY) * 0.8;
     }
 
     public update(data: DataView): number {

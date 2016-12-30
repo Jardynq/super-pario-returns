@@ -22,7 +22,7 @@ namespace Server.Entities
             HasGravity = true;
             Player = player;
 
-            Teleport(Program.rnd.Next(500), Program.rnd.Next(500));
+            Teleport(300, 300);
 
             Type = EntityType.Player;
         }
