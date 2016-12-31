@@ -1,6 +1,9 @@
-﻿class BulletEntity extends Entity {
+﻿class BulletEntity extends PhysicsEntity {
     private _oldPositions: { x: number, y: number }[] = [];
     public owner: PlayerEntity;
+
+    // Whether the bullet has hit something and is disappearing
+    public disappearing = false;
 
     constructor(id: number, room: GameRoom, data: DataView) {
         super(id, room, data);
@@ -10,26 +13,22 @@
     }
 
     public step(timeScale: number): void {
-        if (this.isDisposed == false) {
+        if (this.disappearing == false) {
             super.step(timeScale);
             this._oldPositions.push({ x: this.x, y: this.y });
         }
 
         if (this.x < 0 || this.x > this.room.map.width * this.room.map.tilesize
             || this.y < 0 || this.y > this.room.map.height * this.room.map.tilesize) {
-            this.dispose();
+            this.disappearing = true;
         }
     }
 
-    public dispose(): void {
-        this.isDisposed = true;
-    }
-
     public render(ctx: CanvasRenderingContext2D, camera: Camera): void {
-        if (this._oldPositions.length > 10 || this.isDisposed) {
+        if (this._oldPositions.length > 10 || this.disappearing) {
             this._oldPositions.shift();
             if (this._oldPositions.length == 0) {
-                super.dispose();
+                this.dispose();
                 return;
             }
         } else if (this._oldPositions.length < 2) {
@@ -44,10 +43,10 @@
         }
         ctx.lineWidth = 10 * camera.zoom;
         ctx.lineCap = "round";
-        var screenPos = camera.worldToScreen({ x: this._oldPositions[0].x, y: this._oldPositions[0].y });
+        var screenPos = camera.worldToScreen(new Vec2D(this._oldPositions[0].x, this._oldPositions[0].y));
         ctx.moveTo(screenPos.x, screenPos.y);
         for (var i = 1; i < this._oldPositions.length; i++) {
-            screenPos = camera.worldToScreen({ x: this._oldPositions[i].x, y: this._oldPositions[i].y });
+        screenPos = camera.worldToScreen(new Vec2D(this._oldPositions[i].x, this._oldPositions[i].y));
             ctx.lineTo(screenPos.x, screenPos.y);
         }
 
@@ -55,20 +54,24 @@
     }
 
     public update(data: DataView): number {
-        // Add the first position to make sure it gets displayed
-        if (this._oldPositions === undefined) {
-            this._oldPositions = [];
-        }
-        this._oldPositions.push({ x: this.x, y: this.y });
-
         // Read the owner
         var offset: number = super.update(data);
         this.owner = this.room.entities[data.getUint16(offset, true)] as PlayerEntity;
+
+        // Add the first position to make sure it gets displayed
+        if (this._oldPositions === undefined) {
+            this._oldPositions = [ { x: this.x, y: this.y } ];
+        }
+
         return offset + 2;
     }
 
     protected collidedWithTile(tile: Tile) {
-        this._oldPositions.push({ x: this.x, y: this.y });
-        this.dispose();
+        this.disappearing = true;
+    }
+
+    public serverDelete(): void {
+        // Prevent the entity from straight out disappearing
+        this.disappearing = true;
     }
 }

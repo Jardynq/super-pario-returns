@@ -32,6 +32,7 @@
     <TypeScriptCompile Include="Entities\Entity.ts" />
     <TypeScriptCompile Include="Entities\BulletEntity.ts" />
     <TypeScriptCompile Include="Entities\PlayerEntity.ts" />
+    <TypeScriptCompile Include="Entities\RayEntity.ts" />
     <TypeScriptCompile Include="GameRoom.ts" />
     <TypeScriptCompile Include="Input.ts" />
     <TypeScriptCompile Include="Render.ts" />
