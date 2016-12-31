@@ -48,8 +48,7 @@ namespace Server.Entities
                   && Y + Height > player.Entity.Y - player.Entity.Height * 0.5
                   && Y - Height < player.Entity.Y + player.Entity.Height * 0.5) {
                     Dispose();
-                    player.Entity.X = 200;
-                    player.Entity.Y = 200;
+                    player.Entity.Teleport(200, 200);
                     new EntityPacket(player.Entity).Send();
                 }
             }

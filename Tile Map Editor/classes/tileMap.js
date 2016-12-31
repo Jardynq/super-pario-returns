@@ -45,19 +45,13 @@ TileMap = (function () {
             x = Math.floor(x);
             y = Math.floor(y);
 
-            if (x < 0) {
-                  x  = 0;
+            if (x < 0 || x >= this.width ||
+                y < 0 || y >= this.height||
+                this.tiles[x + (y * this.width)] === undefined) {
+                  return null;                  
             }
-            if (this.tiles[x + (y * this.width)] === undefined) {
-                  return null;
-            }
-
-            // If x is larger than the width of the map then this makes sure it does not overflow
-            if (x >= this.width) {
-                  return this.tiles[(this.width - 1) + (y * this.width)];
-            } else {
-                  return this.tiles[x + (y * this.width)];
-            }
+            
+            return this.tiles[x + (y * this.width)];
       };
 
       return ns;

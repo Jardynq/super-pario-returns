@@ -5,11 +5,26 @@ var ctx = null;
 var map = null;
 var room = null;
 
+var lastTickCount = new Date().getTime();
+var lastFpsUpdate = new Date().getTime();
+
+var fps = 60;
+
 /**
  * Main game loop
  * 
  */
 function step () {
+      var newTickCount = new Date().getTime();
+      var newFpsUpdate = new Date().getTime();
+
+      // Fps
+      if (newFpsUpdate - lastFpsUpdate > 150) {
+            fps = Math.round(1000 / (newTickCount - lastTickCount));
+            lastFpsUpdate = newFpsUpdate;
+      }
+      lastTickCount = newTickCount;
+
       room.step();
       room.renderAll(ctx);      
       window.requestAnimationFrame(step); // Request next frame
@@ -28,6 +43,15 @@ function init () {
       fixCanvas();
 
       window.addEventListener("resize", fixCanvas); 
+
+      var startTile = document.getElementById("inp-start-tile");
+      for (i = 0; i < tileTypes.length; i++) {      
+            var option = document.createElement("option");
+            option.text = tileTypes[i].id +  " : " + tileTypes[i].description;
+            option.value = tileTypes[i].id;
+
+            startTile.appendChild(option);
+      }
 
       // Create the game room
       document.getElementById("btn-new-map").addEventListener("click", function () {

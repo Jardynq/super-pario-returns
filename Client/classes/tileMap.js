@@ -18,22 +18,7 @@ TileMap = (function () {
                   var x = (i - 2) % this.width;
                   var y = (i - 2 - x) / this.width;
 
-                  if (tile === 0) { // Sky
-                        this.tiles[i - 2] = new Tile.ColorTile(x, y, false, "0");
-                        continue;
-                  } else if (tile == 1) { // Dirt
-                        this.tiles[i - 2] = new Tile.ColorTile(x, y, true, "1");
-                        continue;
-                  } else if (tile == 2) { // Grass
-                        this.tiles[i - 2] = new Tile.ColorTile(x, y, true, "2");
-                        continue;
-                  } else if (tile == 3) { // Dirt Background
-                        this.tiles[i - 2] = new Tile.ColorTile(x, y, false, "3");
-                        continue;
-                  } else if (tile == 4) { // Grass Background
-                        this.tiles[i - 2] = new Tile.ColorTile(x, y, false, "4");
-                        continue;
-                  }
+                  this.tiles[x + (y * this.width)] = setActiveTile(parseInt(tile), x, y);
             }
 
             // Sets the height var

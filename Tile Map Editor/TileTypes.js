@@ -2,43 +2,38 @@ var tileTypes = [
       {
             description: "Sky Background",
             id: 0,
-            color: "#527DFF"
+            color: "#527DFF",
+            hasCollision: false,
       },
       {
             description: "Dirt Foreground",
             id: 1,
-            color: "#632712"
+            color: "#632712",
+            hasCollision: true,
       },
       {
             description: "Grass Foreground",
             id: 2,
-            color: "#458B00"
+            color: "#458B00",
+            hasCollision: true,
       },
       {     
             description: "Dirt Background",
             id: 3,
-            color: "#1C0D07"
+            color: "#1C0D07",
+            hasCollision: false,
       },
       {
             description: "Grass Background",
             id: 4,
-            color: "#1C3603"
-      }
+            color: "#1C3603",
+            hasCollision: false,
+      },
 ];
 setActiveTile = function (object, x, y) {
-      if (object === 0) {
-            return new Tile.ColorTile(tileTypes[0].color, x, y, tileTypes[0].id);
-      }
-      if (object === 1) {
-            return new Tile.ColorTile(tileTypes[1].color, x, y, tileTypes[1].id);
-      }
-      if (object === 2) {
-            return new Tile.ColorTile(tileTypes[2].color, x, y, tileTypes[2].id);
-      }
-      if (object === 3) {
-            return new Tile.ColorTile(tileTypes[3].color, x, y, tileTypes[3].id);
-      }
-      if (object === 4) {
-            return new Tile.ColorTile(tileTypes[4].color, x, y, tileTypes[4].id);
+      for (i = 0; i < tileTypes.length; i++) {
+            if (object === i) {
+                  return new Tile.ColorTile(tileTypes[i].color, x, y, tileTypes[i].hasCollision, tileTypes[i].id);
+            }
       }
 };

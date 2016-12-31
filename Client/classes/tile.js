@@ -1,12 +1,13 @@
 Tile = (function () {
       var ns = {};
 
-      ns.ColorTile = function ColorTile(x, y, hasCollision, type) {
+      ns.ColorTile = function ColorTile(color, x, y, hasCollision, type) {
             this.x = x;
             this.y = y;
 
             this.type = type;
-
+            
+            this.color = color;
             this.color = this.setColor();
 
             this.hasCollision = hasCollision;
@@ -23,7 +24,7 @@ Tile = (function () {
       ns.ColorTile.prototype.setColor = function () {
             var chooser = Math.random() * 10;
 
-            if (this.type === "0") {
+            if (this.type === 0) {
                   if (chooser >= 0 && chooser < 8.5) {
                         return "#527DFF";
                   }
@@ -34,7 +35,7 @@ Tile = (function () {
                         return "#4D79FF";
                   }
             }
-            if (this.type === "1") {
+            if (this.type === 1) {
                   if (chooser >= 0 && chooser < 7) {
                         return "#632712";
                   }
@@ -45,7 +46,7 @@ Tile = (function () {
                         return "#4D1A08";
                   }
             }
-            if (this.type === "2") {
+            if (this.type === 2) {
                   if (chooser >= 0 && chooser < 7) {
                         return "#458B00";
                   }
@@ -56,7 +57,7 @@ Tile = (function () {
                         return "#3E6B11";
                   }
             }
-            if (this.type === "3") {
+            if (this.type === 3) {
                   if (chooser >= 0 && chooser < 7) {
                         return "#1C0D07";
                   }
@@ -67,7 +68,7 @@ Tile = (function () {
                         return "#140803";
                   }
             }
-            if (this.type === "4") {
+            if (this.type === 4) {
                   if (chooser >= 0 && chooser < 7) {
                         return "#1C3603";
                   }
@@ -78,6 +79,7 @@ Tile = (function () {
                         return "#152406";
                   }
             }
+            return this.color;
       };
 
 

@@ -26,8 +26,15 @@ body {
     font-weight: bold;
     margin-bottom: 0.5rem;
 }
+#UI input, #UI select {
+    border: 2px solid #333;
+    height: 25px;
+    font-size: 15px;
+}
+
 #UI #btn-new-map {
     margin-top: 1rem;
+    height: auto;
 }
 
 #UI input[type='button'],
@@ -42,6 +49,7 @@ body {
     font-size: 14px;
 }
 #UI .file-upload:after {
+    font-weight: normal;
     content: "Choose File";
 }
 #UI .file-upload input[type='file'] {

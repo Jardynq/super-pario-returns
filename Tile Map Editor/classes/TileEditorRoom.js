@@ -2,13 +2,17 @@ var TileEditorRoom = function (map) {
       this.render = new Render.Render();
       this.tileRenderer = null;
 
+      // Hud
+      this.isDebugMenuActive = false;
+      this.isHudActive = true;
+
       this.mouseDownTile = null;
       this.mouseUpTile = null;
       this.mouseX = null;
       this.mouseY = null;
       this.isMouseDown = false;
 
-      this.activeTilePreview = new Tile.ActiveTilePreview(100, 100);
+      this.Hud = new Tile.Hud(100, 100);
       this.activeTile = new Tile.ColorTile(tileTypes[0].color , 0, 0, tileTypes[0].id);
       this.activeTileId = tileTypes[0].id;
 
@@ -20,7 +24,7 @@ var TileEditorRoom = function (map) {
 
       this.tileRenderer = new Render.TileRenderer(this.map);
       this.tileRenderer.addToRenderQueue(this.render.renderQueue);
-      this.activeTilePreview.addToRenderQueue(this.render.renderQueue);
+      this.Hud.addToRenderQueue(this.render.renderQueue);
 
       // Add event listeners
       window.addEventListener('keydown', this.onKeyDown.bind(this));
@@ -162,6 +166,18 @@ TileEditorRoom.prototype.onKeyDown = function (e) {
 
       if (Input.isKeyDown("Escape")) {
             this.formatAndSave();
+      }
+      if (Input.isKeyDown("Backquote")) {
+            if (this.isDebugMenuActive && this.isHudActive) {
+                  this.isHudActive = false;
+                  this.isDebugMenuActive = false;
+            } else {
+                  if (this.isHudActive) {
+                        this.isDebugMenuActive = true;
+                  } else {
+                        this.isHudActive = true;
+                  }
+            }
       }
 };
 TileEditorRoom.prototype.onKeyUp = function (e) {      
