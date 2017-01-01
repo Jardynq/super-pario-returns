@@ -19,11 +19,18 @@ class Camera {
         this.room = room;
     }
 
-    public worldToScreen(point: { x: number, y: number }): { x: number, y: number } {
-        return {
-            x: (point.x + this.offset.x) * this.zoom,
-            y: (point.y + this.offset.y) * this.zoom
-        };
+    public worldToScreen(point: Vec2D): Vec2D {
+        return new Vec2D(
+            (point.x + this.offset.x) * this.zoom,
+            (point.y + this.offset.y) * this.zoom
+        );
+    }
+
+    public screenToWorld(point: Vec2D): Vec2D {
+        return new Vec2D(
+            point.x / this.zoom - this.offset.x,
+            point.y / this.zoom - this.offset.y
+        );
     }
 }
 
@@ -39,4 +46,50 @@ class EasingFunction {
 
 interface iRenderable {
     render: (context: CanvasRenderingContext2D, camera: Camera) => void;
+}
+
+class Vec2D {
+    public x: number;
+    public y: number;
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public clone(): Vec2D {
+        return new Vec2D(this.x, this.y);
+    }
+
+    public add(vec: Vec2D): Vec2D {
+        this.x += vec.x;
+        this.y += vec.y;
+        return this;
+    }
+
+    public sub(vec: Vec2D): Vec2D {
+        this.x -= vec.x;
+        this.y -= vec.y;
+        return this;
+    }
+
+    public scale(factor: number): Vec2D {
+        this.x *= factor;
+        this.y *= factor;
+        return this;
+    }
+
+    public getLengthSquared(): number {
+        return this.x * this.x + this.y * this.y;
+    }
+
+    public getLength(): number {
+        return Math.sqrt(this.getLengthSquared());
+    }
+
+    public normalize(): Vec2D {
+        var length = this.getLength();
+        this.x /= length;
+        this.y /= length;
+        return this;
+    }
 }

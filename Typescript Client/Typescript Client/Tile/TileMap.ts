@@ -59,4 +59,89 @@ class TileMap implements iRenderable {
     public getTileAt(x: number, y: number): Tile {
         return this.getTile(Math.floor(x / this.tilesize), Math.floor(y / this.tilesize));
     }
+
+    /**
+     * Casts a from start to end and returns every tile it passed
+     * @param start The starting point in world coordinates
+     * @param end The endpoint in world coordinates
+     * @param stopAtCollision Whether or not the ray should stop when a collision tile is hit. The hit tile is added to the result
+     * @param indefinite Whether or not the ray should continue to the edge of the map
+     */
+    public castRay(start: Vec2D, end: Vec2D, stopAtCollision: boolean, indefinite: boolean): RaycastResult {
+        // Vector in the direction of the ray
+        var ray: Vec2D = end.clone().sub(start);
+        var xStep = ray.x > 0 ? 1 : -1;
+        var yStep = ray.y > 0 ? 1 : -1;
+
+        // The factor to multiply dir with to traverse one tile in the x direction
+        var DtX: number = this.tilesize / ray.x * xStep;
+        var DtY: number = this.tilesize / ray.y * yStep;
+
+        // The total traversal in the X-direction
+        var totaltX = (xStep == 1 ? this.tilesize - start.x % this.tilesize : -start.x % this.tilesize) / ray.x;
+        if (totaltX == -Infinity) totaltX = Infinity;
+        // The total traversal in the Y-direction
+        var totaltY = (yStep == 1 ? this.tilesize - start.y % this.tilesize : -start.y % this.tilesize) / ray.y;
+        if (totaltY == -Infinity) totaltY = Infinity;
+
+        // The current position in the tile grid
+        var tileX = Math.floor(start.x / this.tilesize);
+        var tileY = Math.floor(start.y / this.tilesize);
+        var endTileX = Math.floor(end.x / this.tilesize);
+        var endTileY = Math.floor(end.y / this.tilesize);
+        var tiles: Tile[] = [ this.getTile(tileX, tileY) ];
+
+        // Whether or not the last step was in the X or the Y-direction
+        var lastStepIsX: boolean = false;
+
+        while (true) {
+            // Check if the end of the ray has been reached
+            if (indefinite == false && tileX == endTileX && tileY != endTileY) {
+                break;
+            }
+
+            // If they totaltX and totaltY are equal a diagonal move should be made. But it has been optimized away since it never happens
+            if (totaltX < totaltY || ray.y == 0) {
+                totaltX += DtX;
+                tileX += xStep;
+                lastStepIsX = true;
+            } else {
+                totaltY += DtY;
+                tileY += yStep;
+                lastStepIsX = false;
+            }
+
+            // Check if the edge of the map has been reached
+            if (tileX < 0 || tileX >= this.width || tileY < 0 || tileY >= this.height) {
+                break;
+            }
+            
+            tiles.push(this.getTile(tileX, tileY));
+
+            // Check if a tile with collision has been hit
+            if (stopAtCollision && tiles[tiles.length - 1].hasCollision) {
+                // Step backwards to before this tile was hit
+                if (lastStepIsX) {
+                    totaltX -= DtX;
+                } else {
+                    totaltY -= DtY;
+                }
+                break;
+            }
+        }
+
+        return new RaycastResult(tiles, start, start.clone().add(ray.scale(Math.min(totaltX, totaltY))));
+    }
+}
+
+class RaycastResult {
+    public tiles: Tile[];
+    public end: Vec2D;
+    public start: Vec2D;
+
+    constructor(tiles: Tile[], start: Vec2D, end: Vec2D) {
+        this.tiles = tiles;
+        this.end = end;
+        this.start = start;
+    }
 }

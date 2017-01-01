@@ -1,4 +1,4 @@
-﻿class PlayerEntity extends Entity {
+﻿class PlayerEntity extends PhysicsEntity {
     public static moveSpeed: number = 0;
     public static jumpForce: number = 0;
 
@@ -21,10 +21,7 @@
     }
 
     public render(ctx: CanvasRenderingContext2D, camera: Camera): void {
-        var pingScreenPos = camera.worldToScreen({
-            x: this.renderX,
-            y: this.renderY - this.height * 0.5
-        });
+        var pingScreenPos = camera.worldToScreen(new Vec2D(this.renderX, this.renderY - this.height * 0.5));
 
         ctx.fillStyle = "white";
         ctx.textAlign = "center";
@@ -114,13 +111,19 @@ class MainPlayerEntity extends PlayerEntity {
     }
 
     public onClick(): void {
-
+        for (var i = 0; i < 360; i += 0.05) {
+            var angleInRadians = i / 180 * Math.PI;
+            var raycast: RaycastResult = this.room.map.castRay(new Vec2D(this.x, this.y), new Vec2D(this.x + Math.cos(angleInRadians), this.y + Math.sin(angleInRadians)), true, true);
+            var ray: RayEntity = this.room.addLocalEntity(RayEntity);
+            ray.start = raycast.start;
+            ray.end = raycast.end;
+        }
     }
 
     private lastShot = 0;
     public shoot(): void {
-        if (new Date().getTime() > this.lastShot + 200) {
-            var screenPos = this.room.camera.worldToScreen({ x: this.x, y: this.y });
+        /*if (new Date().getTime() > this.lastShot + 200) {
+            var screenPos = this.room.camera.worldToScreen(new Vec2D(this.x, this.y));
             var dirX = Input.mouseX - screenPos.x;
             var dirY = Input.mouseY - screenPos.y;
 
@@ -131,7 +134,7 @@ class MainPlayerEntity extends PlayerEntity {
             packet.setFloat32(1, angle, true);
             socket.sendPacket(packet);
             this.lastShot = new Date().getTime();
-        }
+        }*/
     }
 }
 

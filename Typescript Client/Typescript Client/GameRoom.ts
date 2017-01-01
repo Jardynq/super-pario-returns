@@ -8,6 +8,8 @@ class GameRoom {
 
     public player: MainPlayerEntity;
 
+    private _lastLocalEntityID: number = -1;
+
     // Dejitter buffer
     public jitterbuffer: DataView[] = [];
     private lastEntityPacketProcessed: number = 0;
@@ -109,7 +111,7 @@ class GameRoom {
 
             if (this.entities[id] === undefined) {
                 var type = entityView.getUint8(2);
-                var entity: Entity;
+                var entity: PhysicsEntity;
 
                 if (type === EntityType.Player) {
                     entity = new PlayerEntity(Number(id), this, entityView);
@@ -128,21 +130,31 @@ class GameRoom {
         if (containsAllEntities) {
             for (var entID in this.entities) {
                 if (receivedEntities[Number(entID)] !== true) {
-                    this.entities[entID].dispose();
+                    this.entities[entID].serverDelete();
                 }
             }
         }
     }
 
     public onJoin(reader: DataView): void {
-        Entity.Gravity = reader.getFloat32(1, true);
-        Entity.MaxSpeed = reader.getFloat32(5, true);
+        PhysicsEntity.Gravity = reader.getFloat32(1, true);
+        PhysicsEntity.MaxSpeed = reader.getFloat32(5, true);
         PlayerEntity.moveSpeed = reader.getInt16(9, true);
         PlayerEntity.jumpForce = reader.getInt16(11, true);
         var playerID: number = reader.getUint16(13, true);
 
         this.player = new MainPlayerEntity(playerID, this, new DataView(reader.buffer, 1));
         this.entities[playerID] = this.player;
+    }
+
+    /**
+     * Adds a local entity to the room
+     * @param type The class of the entity to be created
+     */
+    public addLocalEntity<T extends Entity>(type: { new (id: number, room: GameRoom, data: DataView): T }): T {
+        var id = this._lastLocalEntityID--;
+        this.entities[id] = new type(id, this, null);
+        return this.entities[id] as T;
     }
 
     public removeEntity(id: number): void {
