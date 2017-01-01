@@ -52,6 +52,7 @@ namespace Server
             var map = new TileMap();
             map.LoadMap(mapFiles[selectedMap]);
             Room = new GameRoom(map);
+            Console.WriteLine("MAP LOADED");
             Timer.Start();
 
             server = new WebSocketServer(IPAddress.Any, 1337);
