@@ -10,13 +10,13 @@ TileMap = (function () {
             this.generateMap(reader);
       };
       ns.Map.prototype.generateMap = function (reader) {
-            this.width = reader.getUint8(1, true);
+            this.width = reader.getUint16(1, true);
 
             // Parses the byte array
-            for (var i = 2; i < reader.byteLength; i++) {
+            for (var i = 3; i < reader.byteLength; i++) {
                   var tile = reader.getUint8(i, true);
-                  var x = (i - 2) % this.width;
-                  var y = (i - 2 - x) / this.width;
+                  var x = (i - 3) % this.width;
+                  var y = (i - 3 - x) / this.width;
 
                   this.tiles[x + (y * this.width)] = setActiveTile(parseInt(tile), x, y);
             }

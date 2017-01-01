@@ -10,6 +10,7 @@ using Server.Packets;
 using System.Reflection;
 using System.Diagnostics;
 using System.Net;
+using System.IO;
 
 namespace Server
 {
@@ -23,9 +24,33 @@ namespace Server
 
         static void Main(string[] args)
         {
+            // Select the map
+            int selectedMap = 0;
+            string[] mapFiles = Directory.GetFiles(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/../../../../Maps");
+            ConsoleKey key;
+
+            do
+            {
+                Console.Clear();
+                for (int i = 0; i < mapFiles.Length; i++)
+                {
+                    Console.WriteLine("[{0}] {1}", i == selectedMap ? "X" : " ", Path.GetFileNameWithoutExtension(mapFiles[i]));
+                }
+
+                key = Console.ReadKey().Key;
+                if (key == ConsoleKey.UpArrow && selectedMap > 0)
+                {
+                    selectedMap--;
+                } else if (key == ConsoleKey.DownArrow && selectedMap < mapFiles.Length)
+                {
+                    selectedMap++;
+                }
+            }
+            while (key != ConsoleKey.Enter);
+
             // Load the map
             var map = new TileMap();
-            map.LoadMap(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/../../../../Map.txt");
+            map.LoadMap(mapFiles[selectedMap]);
             Room = new GameRoom(map);
             Timer.Start();
 
@@ -108,7 +133,7 @@ namespace Server
             return base.OnOpen();
         }
 
-        protected override Task OnError(ErrorEventArgs e)
+        protected override Task OnError(WebSocketSharp.ErrorEventArgs e)
         {
             return base.OnError(e);
         }
