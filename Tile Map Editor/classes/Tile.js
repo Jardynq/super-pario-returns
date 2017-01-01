@@ -55,12 +55,38 @@ Tile = (function () {
                         ctx.fillText(tile.x, (tile.x * (room.map.tilesize * room.render.zoom)) + (room.render.offsetX * render.zoom) + (room.map.tilesize * room.render.zoom) * 0.5, (tile.y * (room.map.tilesize * room.render.zoom)) + (room.render.offsetY * render.zoom) + (room.map.tilesize * room.render.zoom) * 0.4);
                         ctx.fillText(tile.y, (tile.x * (room.map.tilesize * room.render.zoom)) + (room.render.offsetX * render.zoom) + (room.map.tilesize * room.render.zoom) * 0.5, (tile.y * (room.map.tilesize * room.render.zoom)) + (room.render.offsetY * render.zoom) + (room.map.tilesize * room.render.zoom) * 0.9);      
                   }
-
-                  // Fps
-                  ctx.fillStyle = "orange";                  
+                  
                   ctx.font = "35px Oswald";
+                  ctx.strokeStyle = "black";
+
+                  // Fps                  
                   ctx.fillText(fps, 40, 50);
                   ctx.strokeText(fps, 40, 50);
+                  
+                  // Render information
+                  // Top-Left and Bottom-Right corners of the screen
+                  var startTile = room.map.getTile(0 - (room.render.offsetX / room.map.tilesize), 0 - (room.render.offsetY / room.map.tilesize));
+                  var endTile = room.map.getTile(canvas.width / (room.map.tilesize * room.render.zoom) - (room.render.offsetX / room.map.tilesize), canvas.height / (room.map.tilesize * room.render.zoom) - (room.render.offsetY / room.map.tilesize));
+
+                  // Makes sure that if the endtile is bigger than the bottom of the map set it to the bottom of the map
+                  if (endTile === null) {
+                        endTile = room.getTile(room.map.width - 1, room.map.height - 1);
+                  }
+
+                  // Makes sure that if the starttile is smaller than the top of the map then set it to the top of the map
+                  if (startTile === null) {
+                        startTile = room.map.getTile(0, 0);
+                  }
+
+                  ctx.fillText("X: " + startTile.x, 60, 110);
+                  ctx.strokeText("X: " + startTile.x, 60, 110);
+                  ctx.fillText(endTile.x, 150, 110);
+                  ctx.strokeText(endTile.x, 150, 110);
+
+                  ctx.fillText("Y: " + startTile.y, 60, 160);
+                  ctx.strokeText("Y: " + startTile.y, 60, 160);
+                  ctx.fillText(endTile.y, 150, 160);
+                  ctx.strokeText(endTile.y, 150, 160);
             }
       };
       return ns;

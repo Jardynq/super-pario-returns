@@ -17,12 +17,16 @@ var GameRoom = function () {
       // Debug HUD such as fps ping and position
       this.isDebugMenuActive = false;
 
+      this.mouseX = null;
+      this.mouseY = null;
+
       // Event handlers for the game
       window.addEventListener('keydown', this.onKeyDown.bind(this));
       window.addEventListener("keyup", this.onKeyUp.bind(this));
       window.addEventListener('wheel', this.onMouseWheel.bind(this));
       window.addEventListener("mousedown", this.onMouseDown.bind(this));
       window.addEventListener("mouseup", this.onMouseUp.bind(this));
+      window.addEventListener("mousemove", this.onMouseMove.bind(this));
 };
 // Main step function
 GameRoom.prototype.step = function (timeScale) {
@@ -124,13 +128,13 @@ GameRoom.prototype.updateScreenOffset = function () {
       // View space position limits
       if (-this.render.offsetX <= 0) {
             this.render.offsetX = -0;
-      } else if (-this.render.offsetX * this.render.zoom >= this.map.width * this.map.tilesize * this.render.zoom - canvas.width) {
-            this.render.offsetX = -(this.map.width * this.map.tilesize * this.render.zoom - canvas.width) / this.render.zoom;
+      } else if (-this.render.offsetX * this.render.zoom >= this.map.width * this.map.tilesize * this.render.zoom - canvas.width + 1) {
+            this.render.offsetX = -(this.map.width * this.map.tilesize * this.render.zoom - canvas.width) / this.render.zoom + 1;
       }
       if (-this.render.offsetY <= 0) {
             this.render.offsetY = -0;
-      } else if (-this.render.offsetY * this.render.zoom >= this.map.tiles.length / this.map.width * this.map.tilesize * this.render.zoom - canvas.height) {
-            this.render.offsetY = -(this.map.tiles.length / this.map.width * (this.map.tilesize * this.render.zoom) - canvas.height) / this.render.zoom;
+      } else if (-this.render.offsetY * this.render.zoom >= this.map.tiles.length / this.map.width * this.map.tilesize * this.render.zoom - canvas.height + 1) {
+            this.render.offsetY = -(this.map.tiles.length / this.map.width * (this.map.tilesize * this.render.zoom) - canvas.height) / this.render.zoom + 1;
       }
 };
 
@@ -171,4 +175,8 @@ GameRoom.prototype.onMouseDown = function (e) {
 };
 GameRoom.prototype.onMouseUp = function (e) {
 
+};
+GameRoom.prototype.onMouseMove = function (e) {
+      this.mouseX = e.x;
+      this.mouseY = e.y;
 };

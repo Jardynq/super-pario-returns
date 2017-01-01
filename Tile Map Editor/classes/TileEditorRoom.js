@@ -54,7 +54,7 @@ TileEditorRoom.prototype.formatAndSave = function () {
       }
       tiles.substr(0, tiles.length - 2);
 
-      download("map.txt", tiles);
+      download("Map.txt", tiles);
 };
 TileEditorRoom.prototype.updateActiveTile = function () {
       if (Input.isKeyDown("KeyE")) {
@@ -149,13 +149,13 @@ TileEditorRoom.prototype.updateScreenOffset = function () {
       // View space position limits
       if (-this.render.offsetX <= 0) {
             this.render.offsetX = -0;
-      } else if (-this.render.offsetX * this.render.zoom >= this.map.width * this.map.tilesize * this.render.zoom - canvas.width) {
-            this.render.offsetX = -(this.map.width * this.map.tilesize * this.render.zoom - canvas.width) / this.render.zoom;
+      } else if (-this.render.offsetX * this.render.zoom >= this.map.width * this.map.tilesize * this.render.zoom - canvas.width + 1) {
+            this.render.offsetX = -(this.map.width * this.map.tilesize * this.render.zoom - canvas.width) / this.render.zoom + 1;
       }
       if (-this.render.offsetY <= 0) {
             this.render.offsetY = -0;
-      } else if (-this.render.offsetY * this.render.zoom >= this.map.tiles.length / this.map.width * this.map.tilesize * this.render.zoom - canvas.height) {
-            this.render.offsetY = -(this.map.tiles.length / this.map.width * (this.map.tilesize * this.render.zoom) - canvas.height) / this.render.zoom;
+      } else if (-this.render.offsetY * this.render.zoom >= this.map.tiles.length / this.map.width * this.map.tilesize * this.render.zoom - canvas.height + 1) {
+            this.render.offsetY = -(this.map.tiles.length / this.map.width * (this.map.tilesize * this.render.zoom) - canvas.height) / this.render.zoom + 1;
       }
 
 };
